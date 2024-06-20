@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\BillController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -74,13 +75,19 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
         Route::post('products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.product.toggleStatus');
 
-        // Route::post('/bill/save', [BillController::class, 'save'])->name('admin.bill.create');
-        // Route::get('/bill/save', [BillController::class, 'save'])->name('admin.bill.create');
-        Route::get('/bill/create', function () {
-            return view('admin.bill.create');
-        })->name('admin.bill.create');
+        // routes/web.php
+        Route::get('get-customers', [BillController::class,'getCustomers'])->name('get-customers');
+        Route::get('get-product', [BillController::class,'getProduct'])->name('get-product');
+        Route::get('bill/', [BillController::class,'index'])->name('admin.bill.index');
+        Route::get('bill/create', [BillController::class,'create'])->name('admin.bill.create');
+        Route::post('bill/', [BillController::class,'store'])->name('bill.store');
+        Route::get('bill/{id}/edit', [BillController::class,'edit'])->name('admin.bill.edit');
+        Route::put('bill/{id}',  [BillController::class,'update'])->name('admin.bill.update');
+        Route::delete('bill/{id}',[BillController::class,'destroy'])->name('admin.bill.destroy');
+        Route::get('bill/{id}/invoice', [BillController::class,'invoice'])->name('admin.bill.invoice');
 
-        Route::post('/bill/save', [BillController::class, 'save'])->name('admin.bill.store');
+
+
         Route::get("logout", [AdminController::class, "logout"]);
     });
 });

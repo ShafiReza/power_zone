@@ -38,7 +38,13 @@ class CreateBillItemsTable extends Migration
             $table->decimal('unit_price', 10, 2);
             $table->decimal('discount', 10, 2)->nullable();
             $table->decimal('total_amount', 10, 2);
+            $table->foreignId('customer_id')->constrained(); // Example foreign key constraint
+            $table->string('bill_type');
+            $table->date('bill_date');
+            $table->decimal('final_amount', 10, 2); // Ensure this line is present
             $table->timestamps();
+            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+
         });
     }
 

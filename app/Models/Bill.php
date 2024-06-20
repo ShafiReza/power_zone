@@ -9,22 +9,26 @@ class Bill extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['customer_name', 'bill_type', 'bill_date', 'amount', 'status'];
+    protected $fillable = ['customer_id', 'customer_name','bill_type', 'bill_date', 'final_amount', 'amount'];
 
-    public function items()
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function billItems()
     {
         return $this->hasMany(BillItem::class);
     }
-}
 
-class BillItem extends Model
-{
-    use HasFactory;
-
-    protected $fillable = ['bill_id', 'product_name', 'description', 'quantity', 'unit_price', 'discount', 'total_amount'];
-
-    public function bill()
+    public function billDiscounts()
     {
-        return $this->belongsTo(Bill::class);
+        return $this->hasMany(BillDiscount::class);
+    }
+
+    public function billVats()
+    {
+        return $this->hasMany(BillVat::class);
     }
 }
+
