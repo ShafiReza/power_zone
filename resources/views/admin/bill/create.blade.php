@@ -61,7 +61,7 @@
 
                 </tbody>
             </table>
-            <button type="button" class="btn btn-primary mb-5" onclick="addRow()">Add Row</button>
+            <button type="button" class="btn btn-primary mb-5" onclick="addProductRow()">Add Row</button>
             <table class="table table-bordered">
                 <thead>
                     <tr>
