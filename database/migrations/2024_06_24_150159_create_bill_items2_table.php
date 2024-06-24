@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bills', function (Blueprint $table) {
-            $table->decimal('final_amount', 10, 2)->after('bill_date'); // Adjust 'after' to the appropriate column
+        Schema::create('bill_items2', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('bill_id');
+            $table->string('discount_type');
+            $table->decimal('discount', 10, 2);
+            $table->decimal('vat', 10, 2);
+            $table->timestamps();
         });
     }
 
@@ -21,8 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bills', function (Blueprint $table) {
-            $table->dropColumn('final_amount');
-        });
+        Schema::dropIfExists('bill_items2');
     }
 };

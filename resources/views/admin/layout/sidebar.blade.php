@@ -92,6 +92,15 @@
                             </a>
                         </li>
                     </ul>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.bill.index') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Bill List
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </nav>

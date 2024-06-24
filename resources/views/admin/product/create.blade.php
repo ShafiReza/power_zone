@@ -26,7 +26,7 @@
         </div>
         <div class="form-group col-4">
             <label for="brand_name">Brand Name:</label>
-            <input type="text" class="form-control" id="brand_name" name="brand_name" required>
+            <input type="text" class="form-control" id="brand_name" name="brand_name" >
         </div>
         <div class="form-group col-4">
             <label for="category_id">Category:</label>
