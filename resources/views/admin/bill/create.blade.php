@@ -43,6 +43,7 @@
                     @endforeach
                 </select>
             </div>
+            <input type="hidden" name="products[]" value="">
             <table class="table table-bordered">
                 <thead>
                     <tr>
