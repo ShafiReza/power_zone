@@ -19,6 +19,11 @@ class IrregularCustomer extends Model
         'status',
     ];
 
+    public function customers()
+    {
+        return $this->morphMany(Customer::class, 'customerable');
+    }
+
     // Define the statuses
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';

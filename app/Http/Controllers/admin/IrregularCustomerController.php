@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\IrregularCustomer;
-
+use App\Models\Customer;
 class IrregularCustomerController extends Controller
 {
     public function index()
@@ -30,7 +30,16 @@ class IrregularCustomerController extends Controller
             'status' => 'required'
         ]);
 
-        IrregularCustomer::create($request->all());
+        $irregularCustomer = IrregularCustomer::create($request->all());
+
+        Customer::create([
+            'customer_id' => $irregularCustomer->id,
+            'customer_type' => 'irregular',
+            'customer_name' => $irregularCustomer->name,
+
+        ]);
+
+        //IrregularCustomer::create($request->all());
         return redirect()->route('admin.irregularCustomer.index')
             ->with('success', 'Irregular Customer created successfully.');
     }

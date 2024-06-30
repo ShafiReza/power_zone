@@ -18,7 +18,7 @@ class BillController extends Controller
 {
     public function index()
     {
-        $bills = Bill::all();
+        $bills = Bill::with(['regularCustomer', 'irregularCustomer'])->get();
         return view('admin.bill.index', compact('bills'));
     }
 
@@ -54,95 +54,90 @@ class BillController extends Controller
    // BillController.php
 
    public function store(Request $request)
-   {
-     //dd($request->all(), $request->input('bill_items2'));
-       // dd($request->all());
+{
+    // Create a new bill instance
+    $customerType = $request->input('customerType');
+    $customerId = $request->input('customerName');
 
-       // Validate the request data
-    //    $request->validate([
-    //        'customerType' => 'required',
-    //        'customerName' => 'required|exists:customers,id',
-    //        'billType' => 'required',
-    //        'billDate' => 'required|date',
-    //        'products' => 'required|array',
-    //        'products.*.product_name' => 'required|string',
-    //        'products.*.description' => 'nullable|string',
-    //        'products.*.quantity' => 'required|integer|min:1',
-    //        'products.*.unit_price' => 'required|numeric|min:0',
-    //        'products.*.discount' => 'nullable|numeric|min:0',
-    //        'products.*.discount_type' => 'nullable|string|in:Percentage,Flat',
-    //        'bill_items2' => 'required|array',
-    //        'bill_items2.*.discount_type' => 'required|string|in:Percentage,Flat',
-    //        'bill_items2.*.discount' => 'required|numeric|min:0',
-    //        'bill_items2.*.vat' => 'required|numeric|min:0',
-    //    ]);
+    $bill = new Bill();
+    if ($customerType == 'regularCustomer') {
+        $bill->regular_customer_id = $customerId;
+        $bill->customer_name = RegularCustomer::find($customerId)->name;
+    } elseif ($customerType == 'irregularCustomer') {
+        $bill->irregular_customer_id = $customerId;
+        $bill->customer_name = IrregularCustomer::find($customerId)->name;
+    }
 
-       // Create a new bill instance
-       $customerType = $request->input('customerType');
-       $customerId = $request->input('customerName');
 
-       $bill = new Bill;
-       if ($customerType == 'regularCustomer') {
-           $bill->regular_customer_id = $customerId;
-           $bill->customer_name = RegularCustomer::find($customerId)->name;
-       } else if ($customerType == 'irregularCustomer') {
-           $bill->irregular_customer_id = $customerId;
-           $bill->customer_name = IrregularCustomer::find($customerId)->name;
-       }
+    $bill->bill_type = $request->input('billType');
+    $bill->bill_date = $request->input('billDate');
+    $bill->final_amount = 0;
 
-       $bill->bill_type = $request->input('billType');
-       $bill->bill_date = $request->input('billDate');
-       $bill->final_amount = 0; // Update this based on your calculations
-       $bill->amount = 0; // Update this based on your calculations
+    // Save the bill to generate an ID
+    $bill->save();
 
-       $bill->save();
+    // Create bill items
+    $productNames = $request->input('product_name', []);
+    $descriptions = $request->input('description', []);
+    $quantities = $request->input('quantity', []);
+    $unitPrices = $request->input('unitPrice', []);
+    $discounts = $request->input('discount', []);
+    $discountTypes = $request->input('discountType', []);
 
-       $products = $request->input('products', []);
-       dd($products );
-       // Create bill items
-       foreach ($products as $product) {
-           if (!is_null($product)) {
-               $billItem = new BillItem();
-               $billItem->bill_id = $bill->id;
-               $billItem->product_name = $product['product_name'];
-               $billItem->description = $product['description'] ?? '';
-               $billItem->quantity = $product['quantity'];
-               $billItem->unit_price = $product['unit_price'];
-               $billItem->discount = $product['discount'] ?? 0;
-               $billItem->discount_type = $product['discount_type'] ?? 'Flat';
-               $billItem->total_amount = $product['quantity'] * $product['unit_price'];
-               $billItem->save();
+    foreach ($productNames as $index => $productName) {
+        $quantity = $quantities[$index];
+        $unitPrice = $unitPrices[$index];
+        $discount = $discounts[$index];
+        $discountType = $discountTypes[$index];
 
-               // Update final amount
-               $bill->final_amount += $billItem->total_amount;
-           }
-       }
+        $totalAmount = $quantity * $unitPrice;
+        if ($discountType === 'Percentage') {
+            $totalAmount -= $totalAmount * ($discount / 100);
+        } else {
+            $totalAmount -= $discount;
+        }
 
-       // Create bill items 2
-       $billItem2 = new BillItem2();
-       $billItem2->bill_id = $bill->id;
+        $billItem = new BillItem();
+        $billItem->bill_id = $bill->id;
+        $billItem->product_name = $productName;
+        $billItem->description = $descriptions[$index];
+        $billItem->quantity = $quantity;
+        $billItem->unit_price = $unitPrice;
+        $billItem->discount = $discount;
+        $billItem->discount_type = $discountType;
+        $billItem->total_amount = $totalAmount;
+        $billItem->save();
 
-       foreach ($request->input('bill_items2', []) as $billItem2Data) {
-           if (!is_null($billItem2Data)) {
-               $billItem2->discount_type = $billItem2Data['discount_type'];
-               $billItem2->discount = $billItem2Data['discount'];
-               $billItem2->vat = $billItem2Data['vat'];
-               $billItem2->save();
+        // Update final amount
+        $bill->final_amount += $totalAmount;
+    }
 
-               // Update final amount
-               if ($billItem2Data['discount_type'] == 'Percentage') {
-                   $bill->final_amount -= $bill->final_amount * ($billItem2Data['discount'] / 100);
-               } else {
-                   $bill->final_amount -= $billItem2Data['discount'];
-               }
-               $bill->final_amount += $billItem2Data['vat'];
-           }
-       }
-       $bill->save();
+    // Create bill items 2
+    $billItems2 = $request->input('bill_item2s', []);
+    foreach ($billItems2 as $billItem2Data) {
+        $billItem2 = new BillItem2();
+        $billItem2->bill_id = $bill->id;
+        $billItem2->discount_type = $billItem2Data['discount_type'];
+        $billItem2->discount = $billItem2Data['discount'];
+        $billItem2->vat = $billItem2Data['vat'];
+        $billItem2->save();
 
-       // Return a success response
-       return redirect()->route('admin.bill.index')->with('success', 'Bill created successfully!');
-   }
+        // Update final amount
+        if ($billItem2Data['discount_type'] === 'Percentage') {
+            $bill->final_amount -= $bill->final_amount * ($billItem2Data['discount'] / 100);
+        } else {
+            $bill->final_amount -= $billItem2Data['discount'];
+        }
+        $bill->final_amount += $billItem2Data['vat'];
+    }
+
+    // Save the final bill amount
+    $bill->save();
+
+    // Return a success response
+    return redirect()->route('admin.bill.index')->with('success', 'Bill created successfully!');
+}
+
 
 
     public function edit($id)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\RegularCustomer;
+use App\Models\Customer;
 
 class RegularCustomerController extends Controller
 {
@@ -33,7 +34,16 @@ class RegularCustomerController extends Controller
             'status' => 'required'
         ]);
 
-        RegularCustomer::create($request->all());
+        $regularCustomer = RegularCustomer::create($request->all());
+
+    Customer::create([
+        'customer_id' => $regularCustomer->id,
+        'customer_type' => 'regular',
+        'customer_name' => $regularCustomer->name,
+
+    ]);
+
+       // RegularCustomer::create($request->all());
         return redirect()->route('admin.regularCustomer.index')
             ->with('success', 'Regular Customer created successfully.');
     }

@@ -17,7 +17,7 @@
             <tbody>
                 @foreach($bills as $bill)
                     <tr>
-                        <td>{{ $bill->name }}</td>
+                        <td>{{ $bill->customer_name }}</td>
                         <td>{{ $bill->bill_date }}</td>
                         <td>{{ $bill->bill_type }}</td>
                         <td>{{ $bill->final_amount }}</td>

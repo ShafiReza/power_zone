@@ -9,30 +9,28 @@ class Bill extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['customer_id', 'customer_name', 'bill_type', 'bill_date', 'final_amount', 'amount'];
+    protected $fillable = ['regular_customer_id', 'irregular_customer_id','customer_name', 'bill_type', 'bill_date', 'final_amount'];
 
-    public function bill()
+    public function regularCustomer()
     {
-        return $this->belongsTo(Bill::class);
+        return $this->belongsTo(RegularCustomer::class, 'regular_customer_id');
     }
 
-    public function billItems()
+    public function irregularCustomer()
     {
-        return $this->hasMany(BillItem::class);
-    }
-    public function billItems2()
-    {
-        return $this->hasMany(BillItem2::class);
+        return $this->belongsTo(IrregularCustomer::class, 'irregular_customer_id');
     }
 
-    public function billDiscounts()
+    // Accessor method to get customer name based on type
+    public function getCustomerNameAttribute()
     {
-        return $this->hasMany(BillDiscount::class);
-    }
+        if ($this->regular_customer_id) {
+            return $this->regularCustomer->name;
+        } elseif ($this->irregular_customer_id) {
+            return $this->irregularCustomer->name;
+        }
 
-    public function billVats()
-    {
-        return $this->hasMany(BillVat::class);
+        return null;
     }
 }
 

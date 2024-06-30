@@ -12,12 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customers', function (Blueprint $table) {
-            $table->id(); // Creates `id` column as primary key, auto-incrementing
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->id();
+            $table->unsignedBigInteger('customer_id');
+            $table->string('customer_type');
+            $table->string('customer_name');
+            $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            // Add more columns as needed
-            $table->timestamps(); // Adds `created_at` and `updated_at` columns
+            $table->timestamps();
+
+            $table->foreign('customer_id')->references('id')->on('regular_customers')->onDelete('cascade');
         });
     }
 
