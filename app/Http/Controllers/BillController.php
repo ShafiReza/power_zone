@@ -29,18 +29,22 @@ class BillController extends Controller
         return view('admin.bill.create', ['customers' => $customers, 'products' => $products]);
     }
 
+
+
     public function getCustomers(Request $request)
-    {
-        $customerType = $request->input('customerType');
-        if ($customerType == 'regularCustomer') {
-            $customers = RegularCustomer::all();
-        } elseif ($customerType == 'irregularCustomer') {
-            $customers = IrregularCustomer::all();
-        } else {
-            $customers = [];
-        }
-        return response()->json($customers);
+{
+    $customerType = $request->input('customerType');
+    if ($customerType == 'regularCustomer') {
+        $customers = RegularCustomer::all();
+    } elseif ($customerType == 'irregularCustomer') {
+        $customers = IrregularCustomer::all();
+    } else {
+        $customers = [];
     }
+    return response()->json($customers);
+}
+
+
     public function getProduct(Request $request)
     {
         $productId = $request->input('productId');
@@ -55,6 +59,7 @@ class BillController extends Controller
 
    public function store(Request $request)
 {
+    //dd($request->all());
     // Create a new bill instance
     $customerType = $request->input('customerType');
     $customerId = $request->input('customerName');
@@ -63,6 +68,7 @@ class BillController extends Controller
     if ($customerType == 'regularCustomer') {
         $bill->regular_customer_id = $customerId;
         $bill->customer_name = RegularCustomer::find($customerId)->name;
+       // dd(RegularCustomer::find($customerId)->name);
     } elseif ($customerType == 'irregularCustomer') {
         $bill->irregular_customer_id = $customerId;
         $bill->customer_name = IrregularCustomer::find($customerId)->name;
@@ -113,7 +119,7 @@ class BillController extends Controller
     }
 
     // Create bill items 2
-    $billItems2 = $request->input('bill_item2s', []);
+    $billItems2 = $request->input('bill_items2', []);
     foreach ($billItems2 as $billItem2Data) {
         $billItem2 = new BillItem2();
         $billItem2->bill_id = $bill->id;
@@ -149,10 +155,10 @@ class BillController extends Controller
     }
 
 
-    public function destroy($id)
+    public function destroy(Bill $bill)
     {
-        $bill = Bill::find($id);
         $bill->delete();
-        return redirect()->route('bill.index');
+        return redirect()->route('admin.bill.index')
+            ->with('success', 'Bill deleted successfully.');
     }
 }

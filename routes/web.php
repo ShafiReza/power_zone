@@ -83,9 +83,8 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::post('bill/', [BillController::class,'store'])->name('bill.store');
         Route::get('bill/{id}/edit', [BillController::class,'edit'])->name('admin.bill.edit');
         Route::put('bill/{id}',  [BillController::class,'update'])->name('admin.bill.update');
-        Route::delete('bill/{id}',[BillController::class,'destroy'])->name('admin.bill.destroy');
         Route::get('bill/{id}/invoice', [BillController::class,'invoice'])->name('admin.bill.invoice');
-
+        Route::delete('bill/{bill}', [BillController::class, 'destroy'])->name('bill.destroy');
 
 
         Route::get("logout", [AdminController::class, "logout"]);
