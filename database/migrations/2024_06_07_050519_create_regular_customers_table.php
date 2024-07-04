@@ -20,8 +20,6 @@ return new class extends Migration
             $table->string('city');
             $table->text('note')->nullable();
             $table->decimal('initial_bill_amount', 10, 2);
-            $table->date('start_date');
-            $table->date('next_bill_date');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });

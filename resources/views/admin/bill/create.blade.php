@@ -82,7 +82,7 @@
                             </select></td>
                         <td><input type="number" class="form-control discount" name="bill_items2[0][discount]" onchange="calculateFinalAmount()"></td>
                         <td><input type="number" class="form-control vat" name="bill_items2[0][vat]" onchange="calculateFinalAmount()"></td>
-                        <td><input type="text" class="form-control final-amount" name="bill_items2[0][final-amount]" value="0.00" readonly></td>
+                        <td><input type="text" class="form-control final-amount" name="bill_items2[0][final_amount]" value="0.00" readonly></td>
                         {{-- <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td> --}}
                     </tr>
                 </tbody>

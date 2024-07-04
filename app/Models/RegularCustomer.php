@@ -16,8 +16,6 @@ class RegularCustomer extends Model
         'city',
         'note',
         'initial_bill_amount',
-        'start_date',
-        'next_bill_date',
         'status',
     ];
 

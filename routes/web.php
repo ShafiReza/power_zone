@@ -84,7 +84,17 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::get('bill/{id}/edit', [BillController::class,'edit'])->name('admin.bill.edit');
         Route::put('bill/{id}',  [BillController::class,'update'])->name('admin.bill.update');
         Route::get('bill/{id}/invoice', [BillController::class,'invoice'])->name('admin.bill.invoice');
+        Route::get('bill/{id}/quotation', [BillController::class,'quotation'])->name('admin.bill.quotation');
+        Route::get('bill/{id}/challan', [BillController::class,'challan'])->name('admin.bill.challan');
         Route::delete('bill/{bill}', [BillController::class, 'destroy'])->name('bill.destroy');
+
+
+        Route::get('bill/month', [BillController::class, 'monthlyBillIndex'])->name('admin.bill.monthlyBill');
+        // Route::get('bill/create', [BillController::class, 'createMonthlyBill'])->name('admin.bill.createMonthlyBill');
+        Route::post('bill/store', [BillController::class, 'storeMonthlyBill'])->name('bill.storeMonthlyBill');
+        Route::post('bill/{bill}/update-status', [BillController::class, 'updateStatus'])->name('bill.updateStatus');
+        Route::post('bill/mark-due', [BillController::class, 'markDue'])->name('bill.markDue');
+
 
 
         Route::get("logout", [AdminController::class, "logout"]);

@@ -24,8 +24,9 @@
                         <td>{{ $bill->bill_type }}</td>
                         <td>{{ $bill->final_amount }}</td>
                         <td>
-                            {{-- <a href="{{ route('bill.edit', $bill->id) }}" class="btn btn-primary btn-sm">Edit</a> --}}
-                            {{-- <a href="{{ route('bill.invoice', $bill->id) }}" class="btn btn-success btn-sm">Invoice</a> --}}
+                            <a href="{{ route('admin.bill.quotation', $bill->id) }}" class="btn btn-primary btn-sm">Quotation</a>
+                            <a href="{{ route('admin.bill.challan', $bill->id) }}" class="btn btn-info btn-sm">Challan</a>
+                            <a href="{{ route('admin.bill.invoice', $bill->id) }}" class="btn btn-success btn-sm">Invoice</a>
                             <form action="{{ route('bill.destroy', $bill->id) }}" method="POST" style="display:inline;" class="delete-form">
                                 @csrf
                                 @method('DELETE')

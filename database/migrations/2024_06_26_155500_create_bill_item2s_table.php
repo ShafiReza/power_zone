@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('discount_type');
             $table->decimal('discount', 8, 2);
             $table->decimal('vat', 8, 2);
+            $table->decimal('final_amount', 10, 2);
             $table->timestamps();
 
             $table->foreign('bill_id')->references('id')->on('bills')->onDelete('cascade');

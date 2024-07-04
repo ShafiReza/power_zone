@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+use Carbon\Carbon;
 class CreateBillsTable extends Migration
 {
     /**
@@ -18,10 +18,15 @@ class CreateBillsTable extends Migration
             $table->unsignedBigInteger('regular_customer_id')->nullable();
             $table->unsignedBigInteger('irregular_customer_id')->nullable();
             $table->string('customer_name')->nullable();
-            $table->string('bill_type');
-            $table->date('bill_date');
+            $table->string('bill_type')->nullable();
+            $table->date('bill_date')->nullable();
             $table->decimal('final_amount', 10, 2)->default(0);
+            $table->decimal('amount', 10, 2)->default(0);
+            $table->year('billing_year')->nullable();
+            $table->string('status')->default('pending');
+            $table->date('billing_month')->nullable(); // Add billing_month column here
             $table->timestamps();
+
             $table->foreign('regular_customer_id')->references('id')->on('regular_customers')->onDelete('cascade');
             $table->foreign('irregular_customer_id')->references('id')->on('irregular_customers')->onDelete('cascade');
         });

@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\RegularCustomer;
 use App\Models\Customer;
-
+use App\Models\Bill;
+use Carbon\Carbon;
 class RegularCustomerController extends Controller
 {
     public function index()
@@ -29,18 +30,33 @@ class RegularCustomerController extends Controller
             'area' => 'required',
             'city' => 'required',
             'initial_bill_amount' => 'required|numeric',
-            'start_date' => 'required|date',
-            'next_bill_date' => 'required|date',
             'status' => 'required'
         ]);
 
-        $regularCustomer = RegularCustomer::create($request->all());
+    //     $regularCustomer = RegularCustomer::create($request->all());
+
+    // Customer::create([
+    //     'customer_id' => $regularCustomer->id,
+    //     'customer_type' => 'regular',
+    //     'customer_name' => $regularCustomer->name,
+
+    // ]);
+
+    $regularCustomer = RegularCustomer::create($request->all());
 
     Customer::create([
         'customer_id' => $regularCustomer->id,
         'customer_type' => 'regular',
         'customer_name' => $regularCustomer->name,
+    ]);
 
+    // Generate initial bill for the customer
+    Bill::create([
+        'regular_customer_id' => $regularCustomer->id,
+        'amount' => $request->initial_bill_amount,
+        'billing_month' => Carbon::now()->format('Y-m-d'), // Ensure 'Y-m-d' format
+        'status' => 'pending',
+        'bill_date' => now()->toDateString()
     ]);
 
        // RegularCustomer::create($request->all());
@@ -62,8 +78,6 @@ class RegularCustomerController extends Controller
             'area' => 'required',
             'city' => 'required',
             'initial_bill_amount' => 'required|numeric',
-            'start_date' => 'required|date',
-            'next_bill_date' => 'required|date',
             'status' => 'required'
         ]);
 

@@ -9,7 +9,23 @@ class Bill extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['regular_customer_id', 'irregular_customer_id','customer_name', 'bill_type', 'bill_date', 'final_amount'];
+    protected $fillable = [
+        'regular_customer_id',
+        'irregular_customer_id',
+        'customer_name',
+        'bill_type',
+        'bill_date',
+        'final_amount',
+        'amount',
+        'status',
+        'billing_month'
+    ];
+    protected $attributes = [
+        'billing_month' => null, // Default value, adjust as needed
+    ];
+    protected $casts = [
+        'billing_month' => 'date:Y-m', // Cast billing_month to date format Y-m
+    ];
 
     public function regularCustomer()
     {
@@ -31,6 +47,10 @@ class Bill extends Model
         }
 
         return null;
+    }
+    public function monthly_bill()
+    {
+        return $this->hasMany(Bill::class);
     }
 }
 
