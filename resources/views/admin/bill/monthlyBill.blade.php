@@ -18,7 +18,7 @@
             <label for="month">Month:</label>
             <input type="month" class="form-control" id="month" name="month">
         </div>
-     
+
         <div class="form-group col-2">
             <label for="customer_name">Customer Name:</label>
             <input type="text" class="form-control" id="customer_name" name="customer_name">
@@ -33,6 +33,7 @@
 
     {{-- <a class="btn btn-success mb-3" href="{{ route('admin.bills.create') }}">Create Bill</a> --}}
 
+
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -46,11 +47,12 @@
         </thead>
         <tbody>
             @foreach ($bills as $bill)
+
                 <tr>
                     <td>{{ $bill->id }}</td>
                     <td>{{ $bill->regularCustomer->name }}</td>
                     <td>{{ $bill->amount }}</td>
-                    <td>{{ $bill->billing_month->format('F Y') }}</td>
+                    <td>{{ date('F Y', strtotime($bill->billing_month)) }}</td>
                     <td>
                         <form action="{{ route('bill.updateStatus', $bill->id) }}" method="POST">
                             @csrf
@@ -70,6 +72,7 @@
             @endforeach
         </tbody>
     </table>
+ 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

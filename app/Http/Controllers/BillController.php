@@ -18,7 +18,8 @@ class BillController extends Controller
 {
     public function index()
     {
-        $bills = Bill::with(['regularCustomer', 'irregularCustomer'])->get();
+        //$bills = Bill::with(['regularCustomer', 'irregularCustomer'])->get();
+        $bills = Bill::where('bill_type', '!=', 'initial')->get();
         return view('admin.bill.index', compact('bills'));
     }
     public function monthlyBillIndex(Request $request)
@@ -239,7 +240,7 @@ class BillController extends Controller
 
         // Save the final bill amount
         $bill->save();
-     
+
         // Return a success response
         return redirect()->route('admin.bill.index')->with('success', 'Bill created successfully!');
     }

@@ -46,11 +46,11 @@
                                 </div>
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
-                              
+
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>
-                                        Phone: {{ $customer->phone }}<br>
+                                   
 
                                     </address>
                                 </div>
