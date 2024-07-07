@@ -45,4 +45,9 @@ class RegularCustomer extends Model
     {
         return ucfirst($value); // Adjust status display format if needed
     }
+
+    public function bills()
+    {
+        return $this->hasMany(Bill::class);
+    }
 }

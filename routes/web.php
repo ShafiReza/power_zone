@@ -89,13 +89,11 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::delete('bill/{bill}', [BillController::class, 'destroy'])->name('bill.destroy');
 
 
-        Route::get('bill/month', [BillController::class, 'monthlyBillIndex'])->name('admin.bill.monthlyBill');
-        // Route::get('bill/create', [BillController::class, 'createMonthlyBill'])->name('admin.bill.createMonthlyBill');
-        Route::post('bill/store', [BillController::class, 'storeMonthlyBill'])->name('bill.storeMonthlyBill');
-        Route::post('bill/{bill}/update-status', [BillController::class, 'updateStatus'])->name('bill.updateStatus');
-        Route::post('bill/mark-due', [BillController::class, 'markDue'])->name('bill.markDue');
-
-
+        Route::get('/monthly-bills', [BillController::class, 'monthlyBillIndex'])->name('admin.bill.monthlyBillIndex');
+        Route::get('/monthly-bills/create', [BillController::class, 'createMonthlyBill'])->name('admin.bill.createMonthlyBill');
+        Route::post('/monthly-bills', [BillController::class, 'storeMonthlyBill'])->name('admin.bill.storeMonthlyBill');
+        Route::get('/monthly-bills/filter', [BillController::class, 'monthlyBill'])->name('admin.bill.monthlyBill');
+        Route::delete('/monthly-bills/{id}', [BillController::class, 'monthlyBillDestroy'])->name('admin.bill.monthlyBillDestroy');
 
         Route::get("logout", [AdminController::class, "logout"]);
     });

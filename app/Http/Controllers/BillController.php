@@ -18,31 +18,14 @@ class BillController extends Controller
 {
     public function index()
     {
-        //$bills = Bill::with(['regularCustomer', 'irregularCustomer'])->get();
-        $bills = Bill::where('bill_type', '!=', 'initial')->get();
+        $bills = Bill::with(['regularCustomer', 'irregularCustomer'])->get();
+
         return view('admin.bill.index', compact('bills'));
     }
     public function monthlyBillIndex(Request $request)
     {
-        $query = Bill::query();
-
-        if ($request->has('month')) {
-            $query->whereMonth('billing_month', $request->month);
-        }
-
-        if ($request->has('year')) {
-            $query->whereYear('billing_month', $request->year);
-        }
-
-        if ($request->has('customer_name')) {
-            $query->whereHas('regularCustomer', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->customer_name . '%');
-            });
-        }
-
-        $bills = $query->get();
-
-        return view('admin.bill.monthlyBill', compact('bills'));
+        $bills = Bill::with('customer')->get();
+        return view('admin.bill.monthlyBillIndex', compact('bills'));
     }
 
     public function create()
@@ -123,36 +106,25 @@ class BillController extends Controller
     public function storeMonthlyBill(Request $request)
     {
         $request->validate([
-            'regular_customer_id' => 'required|exists:regular_customers,id',
+            'customer_id' => 'required|exists:regular_customers,id',
             'amount' => 'required|numeric',
-            'billing_month' => 'required|date_format:Y-m',
+            'bill_month' => 'required|date_format:Y-m
+            ',
+            'start_date' => 'required|date',
+            'status' => 'required|in:pending,paid,due',
         ]);
 
-        Bill::create($request->all());
+        Bill::create([
+            'regular_customer_id' => $request->customer_id,
+            'amount' => $request->amount,
+            'bill_month' => $request->bill_month,
+            'start_date' => $request->start_date,
+            'status' => $request->status,
+        ]);
 
         return redirect()->route('admin.bill.monthlyBill')->with('success', 'Bill created successfully.');
+
     }
-
-    public function updateStatus(Bill $bill)
-    {
-        if ($bill->status == 'pending') {
-            $bill->status = 'paid';
-        }
-
-        $bill->save();
-
-        return redirect()->route('admin.bill.monthlyBill')->with('success', 'Bill status updated successfully.');
-    }
-
-    public function markDue()
-    {
-        Bill::where('status', 'pending')
-            ->whereMonth('billing_month', '<', Carbon::now()->month)
-            ->update(['status' => 'due']);
-
-        return redirect()->route('admin.bill.monthlyBill')->with('success', 'Bills marked as due.');
-    }
-
 
     // BillController.php
 
@@ -262,4 +234,30 @@ class BillController extends Controller
         return redirect()->route('admin.bill.index')
             ->with('success', 'Bill deleted successfully.');
     }
+
+    public function monthlyBillDestroy($id)
+    {
+        Bill::find($id)->delete();
+        return redirect()->route('admin.bill.monthlyBill')->with('success', 'Bill deleted successfully.');
+    }
+
+    public function monthlyBill(Request $request)
+    {
+        $query = Bill::with('customer');
+
+        if ($request->has('month')) {
+            $query->where('bill_month', 'LIKE', $request->month . '%');
+        }
+
+        if ($request->has('customer_name')) {
+            $query->whereHas('customer', function($q) use ($request) {
+                $q->where('name', 'LIKE', '%' . $request->customer_name . '%');
+            });
+        }
+
+        $bills = $query->get();
+
+        return view('admin.bill.monthlyBill', compact('bills'));
+    }
+
 }

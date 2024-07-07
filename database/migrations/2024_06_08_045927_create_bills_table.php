@@ -25,6 +25,8 @@ class CreateBillsTable extends Migration
             $table->year('billing_year')->nullable();
             $table->string('status')->default('pending');
             $table->date('billing_month')->nullable(); // Add billing_month column here
+            $table->dateTime('bill_month')->nullable();
+            $table->date('start_date')->nullable();
             $table->timestamps();
 
             $table->foreign('regular_customer_id')->references('id')->on('regular_customers')->onDelete('cascade');

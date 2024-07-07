@@ -1,4 +1,3 @@
-
 @extends('admin.layout.layout')
 
 @section('content')
@@ -14,68 +13,55 @@
 
     <form action="{{ route('admin.bill.monthlyBill') }}" method="GET">
         <div class="form-row">
-        <div class="form-group col-2">
-            <label for="month">Month:</label>
-            <input type="month" class="form-control" id="month" name="month">
+            <div class="form-group col-2">
+                <label for="month">Month:</label>
+                <input type="month" class="form-control" id="month" name="month">
+            </div>
+            <div class="form-group col-2">
+                <label for="customer_name">Customer Name:</label>
+                <input type="text" class="form-control" id="customer_name" name="customer_name">
+            </div>
+            <div class="form-group col-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
         </div>
-
-        <div class="form-group col-2">
-            <label for="customer_name">Customer Name:</label>
-            <input type="text" class="form-control" id="customer_name" name="customer_name">
-        </div>
-        <div class="form-group col-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary">Filter</button>
-        </div>
-    </div>
-        {{-- <button type="submit" class="btn btn-primary">Filter</button> --}}
-
     </form>
-
-    {{-- <a class="btn btn-success mb-3" href="{{ route('admin.bills.create') }}">Create Bill</a> --}}
-
-
+    <a class="btn btn-success mb-3" href="{{ route('admin.bill.createMonthlyBill') }}">Create Monthly Bill</a>
     <table class="table table-bordered">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Customer Name</th>
                 <th>Amount</th>
-                <th>Billing Month</th>
+                <th>Bill Month</th>
+                <th>Start Date</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($bills as $bill)
-
                 <tr>
                     <td>{{ $bill->id }}</td>
-                    <td>{{ $bill->regularCustomer->name }}</td>
+                    <td>{{ $bill->regularCustomer ? $bill->regularCustomer->name : 'N/A' }}</td>
                     <td>{{ $bill->amount }}</td>
-                    <td>{{ date('F Y', strtotime($bill->billing_month)) }}</td>
+                    <td>{{ \Carbon\Carbon::parse($bill->bill_month)->format('F Y') }}</td>
+                    <td>{{ $bill->start_date }}</td>
+                    <td>{{ ucfirst($bill->status) }}</td>
                     <td>
-                        <form action="{{ route('bill.updateStatus', $bill->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-link {{ $bill->status == 'pending' ? 'text-warning' : ($bill->status == 'paid' ? 'text-success' : 'text-danger') }}">
-                                {{ ucfirst($bill->status) }}
-                            </button>
-                        </form>
-                    </td>
-                    <td>
-                        <form action="{{ route('bill.destroy', $bill->id) }}" method="POST" style="display:inline;" class="delete-form">
+                        <form action="{{ route('admin.bill.monthlyBillDestroy', $bill->id) }}" method="POST" class="delete-form">
                             @csrf
                             @method('DELETE')
-                            <button type="button" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button>
+                            <button type="button" class="btn btn-danger delete-button">Delete</button>
                         </form>
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
- 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const deleteButtons = document.querySelectorAll('.delete-button');
@@ -99,6 +85,5 @@
         });
     });
 </script>
-
 
 @endsection

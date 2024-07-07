@@ -18,7 +18,11 @@ class Bill extends Model
         'final_amount',
         'amount',
         'status',
-        'billing_month'
+        'billing_month',
+        'amount',
+        'bill_month',
+        'start_date',
+        'status'
     ];
     protected $attributes = [
         'billing_month' => null, // Default value, adjust as needed
@@ -48,9 +52,24 @@ class Bill extends Model
 
         return null;
     }
+
+    public function customer()
+    {
+        return $this->belongsTo(RegularCustomer::class);
+    }
     public function monthly_bill()
     {
         return $this->hasMany(Bill::class);
+    }
+    public function scopeMonthlyBill($query)
+    {
+        return $query->select('id', 'regular_customer_id', 'amount', 'bill_month', 'start_date', 'status');
+    }
+
+    // Scope for general bills
+    public function scopeGeneralBill($query)
+    {
+        return $query->select('id', 'regular_customer_id', 'irregular_customer_id', 'customer_name', 'bill_type', 'bill_date', 'final_amount', 'amount', 'status', 'billing_month');
     }
 }
 
