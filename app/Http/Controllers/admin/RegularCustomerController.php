@@ -33,31 +33,16 @@ class RegularCustomerController extends Controller
             'status' => 'required'
         ]);
 
-    //     $regularCustomer = RegularCustomer::create($request->all());
-
-    // Customer::create([
-    //     'customer_id' => $regularCustomer->id,
-    //     'customer_type' => 'regular',
-    //     'customer_name' => $regularCustomer->name,
-
-    // ]);
 
     $regularCustomer = RegularCustomer::create($request->all());
 
     Customer::create([
-        'customer_id' => $regularCustomer->id,
+        'regular_customer_id' => $regularCustomer->id,
         'customer_type' => 'regular',
         'customer_name' => $regularCustomer->name,
     ]);
 
     // Generate initial bill for the customer
-    Bill::create([
-        'regular_customer_id' => $regularCustomer->id,
-        'amount' => $request->initial_bill_amount,
-        'billing_month' => Carbon::now()->format('Y-m-d'), // Ensure 'Y-m-d' format
-        'status' => 'pending',
-        'bill_date' => now()->toDateString()
-    ]);
 
        // RegularCustomer::create($request->all());
         return redirect()->route('admin.regularCustomer.index')

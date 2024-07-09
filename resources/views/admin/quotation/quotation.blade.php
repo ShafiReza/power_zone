@@ -28,7 +28,7 @@
                                 <div class="col-12">
                                     <h4>
                                         <small
-                                            class="float-right">Date:{{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}</small>
+                                            class="float-right">Date:{{ \Carbon\Carbon::parse($quotation->quotation_date)->format('d-m-Y') }}</small>
                                     </h4>
                                 </div>
                                 <!-- /.col -->
@@ -50,7 +50,7 @@
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>
-                                      
+
 
                                     </address>
                                 </div>
@@ -101,7 +101,7 @@
 
                                     <div class="table-responsive">
                                         <table class="table">
-                                            @foreach ($billItems2 as $item)
+                                            @foreach ($quotationItems2 as $item)
                                                 {{-- <tr>
                                                     <th style="width:50%">Discount Type</th>
                                                     <td>{{ $item->discount_type }}</td>

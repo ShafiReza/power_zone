@@ -50,7 +50,7 @@
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>
-                                   
+
 
                                     </address>
                                 </div>
@@ -71,7 +71,7 @@
                                                 <th>Quantity</th>
                                                 <th>Unit Price</th>
                                                 <th>Discount</th>
-                                                <th>Discount Type</th>
+
                                                 <th>Total Amount</th>
 
                                             </tr>
@@ -83,8 +83,14 @@
                                                     <td>{{ $product->description }}</td>
                                                     <td>{{ $product->quantity }}</td>
                                                     <td>{{ $product->unit_price }}</td>
-                                                    <td>{{ $product->discount }}</td>
-                                                    <td>{{ $product->discount_type }}</td>
+                                                    <td>
+                                                        @if($product->discount_type == 'Percentage')
+                                                            {{ intval($product->discount) }}%
+                                                        @else
+                                                            {{ number_format($product->discount) }}
+                                                        @endif
+                                                    </td>
+
                                                     <td>{{ $product->total_amount }}</td>
 
                                                 </tr>
@@ -106,17 +112,26 @@
                                     <div class="table-responsive">
                                         <table class="table">
                                             @foreach ($billItems2 as $item)
-                                                <tr>
-                                                    <th style="width:50%">Discount Type</th>
-                                                    <td>{{ $item->discount_type }}</td>
-                                                </tr>
+
                                                 <tr>
                                                     <th>Discount</th>
-                                                    <td>{{ $item->discount }}</td>
+                                                    <td>
+                                                        @if($item->discount_type == 'Percentage')
+                                                            {{ intval($item->discount) }}%
+                                                        @else
+                                                            {{ number_format($item->discount) }}
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <th>VAT</th>
-                                                    <td>{{ $item->vat }}</td>
+                                                    <td>
+                                                        @if($item->discount_type == 'Percentage')
+                                                            {{ intval($item->vat) }}%
+                                                        @else
+                                                            {{ number_format($item->vat) }}
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <th>Final Amount</th>

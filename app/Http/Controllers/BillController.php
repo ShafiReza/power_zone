@@ -44,19 +44,7 @@ class BillController extends Controller
 
         return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2'));
     }
-    public function quotation($id)
-    {
-        // Fetch bill items related to the bill
-        $products = BillItem::where('bill_id', $id)->get();
-        $billItems2 = BillItem2::where('bill_id', $id)->get();
-        // Fetch the bill details
-        $bill = Bill::find($id);
-
-        // Determine whether the customer is regular or irregular and fetch customer details accordingly
-        $customer = $bill->regular_customer_id ? RegularCustomer::find($bill->regular_customer_id) : IrregularCustomer::find($bill->irregular_customer_id);
-
-        return view('admin.bill.quotation', compact('customer', 'products', 'bill', 'billItems2'));
-    }
+    
 
     public function challan($id)
     {

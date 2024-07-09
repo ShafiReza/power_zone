@@ -3,25 +3,21 @@
 @section('content')
     <div class="content-wrapper container-fluid">
         <h2>Billing Page</h2>
-        <form id="billing-form" method="POST" action="{{ route('bill.store') }}">
+        <form id="billing-form" method="POST" action="{{ route('quotation.store') }}">
             @csrf
             <div class="form-row">
-                <div class="form-group col-4">
-                    <label for="customerType">Customer Type</label>
-                    <select id="customerType" name="customerType" class="form-control" onchange="getCustomers(this.value)">
-                        <option value="">Select Customer Type</option>
-                        <option value="regularCustomer">Regular Customer</option>
-                        <option value="irregularCustomer">Irregular Customer</option>
-                    </select>
-                </div>
-                <div class="form-group col-4">
-                    <label for="customerName">Customer Name</label>
-                    <select id="customerName" name="customerName" class="form-control">
-                        <option value="">Select Customer</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row">
+
+                    <div class="form-group col-3">
+                        <label for="customerName">Customer Name</label>
+                        <select id="customerName" name="customerName" class="form-control" onchange="getCustomerDetails(this.value)">
+                            <option value="">Select Customer</option>
+                            @foreach ($irregularCustomers as $customer)
+                                <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+            <div class="form-row col-4">
                 <div class="form-group col-4">
                     <label for="billType">Bill Type</label>
                     <select id="billType" name="billType" class="form-control">
@@ -33,8 +29,6 @@
                     <label for="billDate">Date</label>
                     <input type="date" name="billDate" class="form-control" id="billDate" value="{{ date('Y-m-d') }}">
                 </div>
-            </div>
-            <div class="form-row">
                 <div class="form-group col-4">
                     <label for="products">Products</label>
                     <select id="products" class="form-control" onchange="addProductRow(this.value)">
@@ -46,6 +40,9 @@
                     </select>
                 </div>
             </div>
+
+
+
             <input type="hidden" name="products[]" value="">
             <table class="table table-bordered">
                 <thead>
@@ -76,65 +73,44 @@
                 </thead>
                 <tbody id="bill-items2">
                     <tr>
-                        <td><select class="form-control discountType" name="bill_items2[0][discount_type]"
-                                onchange="calculateFinalAmount()">
+                        <td><select class="form-control discountType" name="bill_items2[0][discount_type]" onchange="calculateFinalAmount()">
                                 <option value="Flat">Flat</option>
                                 <option value="Percentage">Percentage</option>
                             </select></td>
-                        <td><input type="number" class="form-control discount" name="bill_items2[0][discount]"
-                                onchange="calculateFinalAmount()"></td>
-                        <td><input type="number" class="form-control vat" name="bill_items2[0][vat]"
-                                onchange="calculateFinalAmount()"></td>
-                        <td><input type="text" class="form-control final-amount" name="bill_items2[0][final_amount]"
-                                value="0.00" readonly></td>
+                        <td><input type="number" class="form-control discount" name="bill_items2[0][discount]" onchange="calculateFinalAmount()"></td>
+                        <td><input type="number" class="form-control vat" name="bill_items2[0][vat]" onchange="calculateFinalAmount()"></td>
+                        <td><input type="text" class="form-control final-amount" name="bill_items2[0][final_amount]" value="0.00" readonly></td>
                         {{-- <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td> --}}
                     </tr>
                 </tbody>
             </table>
             {{-- <button type="button" class="btn btn-primary" onclick="addRow2()">Add Row</button> --}}
+            </div>
             <button type="submit" class="btn btn-success">Submit</button>
         </form>
     </div>
 
     <script>
+
         function getCustomers(customerType) {
-            if (customerType) {
+            if (customerId) {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('get-customers') }}",
                     data: {
-                        customerType: customerType
+                        customerId: customerId
                     },
                     success: function(data) {
-                        $('#customerName').empty().append('<option value="">Select Customer</option>');
-                        $.each(data, function(index, customer) {
-                            if (customerType == 'egularCustomer') {
-                                $('#customerName').append('<option value="' + customer
-                                    .regularCustomerId + '">' + customer.customerName +
-                                    '</option>');
-                            } else {
-                                $('#customerName').append('<option value="' + customer
-                                    .irregularCustomerId + '">' + customer.customerName +
-                                    '</option>');
-                            }
-                        });
+                        // do something with the customer details
                     },
                     error: function(xhr, status, error) {
                         console.error(error);
                     }
                 });
-            } else {
-                $('#customerName').empty().append('<option value="">Select Customer</option>');
             }
         }
 
-        // Call getCustomers function based on the selected customer type
-        $(document).ready(function() {
-            $('#customerType').on('change', function() {
-                var selectedType = $(this).val();
-                getCustomers(selectedType);
-            });
-        });
+
 
         function addProductRow(productId) {
             if (!productId) return;

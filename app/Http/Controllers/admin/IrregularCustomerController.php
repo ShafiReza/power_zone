@@ -33,7 +33,7 @@ class IrregularCustomerController extends Controller
         $irregularCustomer = IrregularCustomer::create($request->all());
 
         Customer::create([
-            'customer_id' => $irregularCustomer->id,
+            'irregular_customer_id' => $irregularCustomer->id,
             'customer_type' => 'irregular',
             'customer_name' => $irregularCustomer->name,
 

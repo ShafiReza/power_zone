@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\Admin\MonthlyBillController;
+use App\Http\Controllers\Admin\QuotationController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -82,10 +83,8 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::get('bill/', [BillController::class,'index'])->name('admin.bill.index');
         Route::get('bill/create', [BillController::class,'create'])->name('admin.bill.create');
         Route::post('bill/', [BillController::class,'store'])->name('bill.store');
-        Route::get('bill/{id}/edit', [BillController::class,'edit'])->name('admin.bill.edit');
         Route::put('bill/{id}',  [BillController::class,'update'])->name('admin.bill.update');
         Route::get('bill/{id}/invoice', [BillController::class,'invoice'])->name('admin.bill.invoice');
-        Route::get('bill/{id}/quotation', [BillController::class,'quotation'])->name('admin.bill.quotation');
         Route::get('bill/{id}/challan', [BillController::class,'challan'])->name('admin.bill.challan');
         Route::delete('bill/{bill}', [BillController::class, 'destroy'])->name('bill.destroy');
 
@@ -96,6 +95,12 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::delete('monthlyBill/{id}', [MonthlyBillController::class, 'destroy'])->name('monthlyBill.destroy');
         Route::post('monthlyBill/{id}/toggle-status', [MonthlyBillController::class, 'toggleStatus'])->name('monthlyBill.toggleStatus');
 
+        Route::get('get-customers', [QuotationController::class,'getCustomers'])->name('get-customers');
+        Route::get('/quotations', [QuotationController::class, 'index'])->name('admin.quotation.index');
+        Route::get('/quotations/create', [QuotationController::class, 'create'])->name('admin.quotation.create');
+        Route::get('quotations/{id}/quotation', [QuotationController::class,'quotation'])->name('admin.quotation.quotation');
+        Route::post('/quotations', [QuotationController::class, 'store'])->name('quotation.store');
+        Route::delete('/quotations/{quotation}', [QuotationController::class, 'destroy'])->name('quotation.destroy');
 
         Route::get("logout", [AdminController::class, "logout"]);
     });
