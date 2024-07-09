@@ -1,6 +1,7 @@
 <?php
 
 use GuzzleHttp\Middleware;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\Admin\RegularCustomerController;
@@ -9,7 +10,7 @@ use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\BillController;
-
+use App\Http\Controllers\Admin\MonthlyBillController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -89,11 +90,12 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::delete('bill/{bill}', [BillController::class, 'destroy'])->name('bill.destroy');
 
 
-        Route::get('/monthly-bills', [BillController::class, 'monthlyBillIndex'])->name('admin.bill.monthlyBillIndex');
-        Route::get('/monthly-bills/create', [BillController::class, 'createMonthlyBill'])->name('admin.bill.createMonthlyBill');
-        Route::post('/monthly-bills', [BillController::class, 'storeMonthlyBill'])->name('admin.bill.storeMonthlyBill');
-        Route::get('/monthly-bills/filter', [BillController::class, 'monthlyBill'])->name('admin.bill.monthlyBill');
-        Route::delete('/monthly-bills/{id}', [BillController::class, 'monthlyBillDestroy'])->name('admin.bill.monthlyBillDestroy');
+        Route::get('monthlyBill', [MonthlyBillController::class, 'index'])->name('admin.monthlyBill.index');
+        Route::get('monthlyBill/create', [MonthlyBillController::class, 'create'])->name('admin.monthlyBill.create');
+        Route::post('monthlyBill', [MonthlyBillController::class, 'store'])->name('monthlyBill.store');
+        Route::delete('monthlyBill/{id}', [MonthlyBillController::class, 'destroy'])->name('monthlyBill.destroy');
+        Route::post('monthlyBill/{id}/toggle-status', [MonthlyBillController::class, 'toggleStatus'])->name('monthlyBill.toggleStatus');
+
 
         Route::get("logout", [AdminController::class, "logout"]);
     });

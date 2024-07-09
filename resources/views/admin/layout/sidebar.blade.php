@@ -103,7 +103,7 @@
                     </ul>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('admin.bill.monthlyBill') }}" class="nav-link">
+                            <a href="{{ route('admin.monthlyBill.index') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Monthly Bill</p>
                             </a>

@@ -22,11 +22,6 @@ class BillController extends Controller
 
         return view('admin.bill.index', compact('bills'));
     }
-    public function monthlyBillIndex(Request $request)
-    {
-        $bills = Bill::with('customer')->get();
-        return view('admin.bill.monthlyBillIndex', compact('bills'));
-    }
 
     public function create()
     {
@@ -35,11 +30,6 @@ class BillController extends Controller
         return view('admin.bill.create', ['customers' => $customers, 'products' => $products]);
     }
 
-    public function createMonthlyBill()
-    {
-        $customers = RegularCustomer::all();
-        return view('admin.bill.createMonthlyBill', compact('customers'));
-    }
 
     public function invoice($id)
     {
@@ -103,28 +93,7 @@ class BillController extends Controller
         return response()->json($product);
     }
 
-    public function storeMonthlyBill(Request $request)
-    {
-        $request->validate([
-            'customer_id' => 'required|exists:regular_customers,id',
-            'amount' => 'required|numeric',
-            'bill_month' => 'required|date_format:Y-m
-            ',
-            'start_date' => 'required|date',
-            'status' => 'required|in:pending,paid,due',
-        ]);
 
-        Bill::create([
-            'regular_customer_id' => $request->customer_id,
-            'amount' => $request->amount,
-            'bill_month' => $request->bill_month,
-            'start_date' => $request->start_date,
-            'status' => $request->status,
-        ]);
-
-        return redirect()->route('admin.bill.monthlyBill')->with('success', 'Bill created successfully.');
-
-    }
 
     // BillController.php
 
@@ -235,29 +204,7 @@ class BillController extends Controller
             ->with('success', 'Bill deleted successfully.');
     }
 
-    public function monthlyBillDestroy($id)
-    {
-        Bill::find($id)->delete();
-        return redirect()->route('admin.bill.monthlyBill')->with('success', 'Bill deleted successfully.');
-    }
 
-    public function monthlyBill(Request $request)
-    {
-        $query = Bill::with('customer');
 
-        if ($request->has('month')) {
-            $query->where('bill_month', 'LIKE', $request->month . '%');
-        }
-
-        if ($request->has('customer_name')) {
-            $query->whereHas('customer', function($q) use ($request) {
-                $q->where('name', 'LIKE', '%' . $request->customer_name . '%');
-            });
-        }
-
-        $bills = $query->get();
-
-        return view('admin.bill.monthlyBill', compact('bills'));
-    }
 
 }

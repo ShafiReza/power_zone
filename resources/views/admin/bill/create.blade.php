@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="content-wrapper container">
+    <div class="content-wrapper container-fluid">
         <h2>Billing Page</h2>
         <form id="billing-form" method="POST" action="{{ route('bill.store') }}">
             @csrf
