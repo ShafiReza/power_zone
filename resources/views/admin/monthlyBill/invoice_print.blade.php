@@ -7,28 +7,25 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-
+                        <h1>Invoice</h1>
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
 
+        <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
-
-
-
                         <!-- Main content -->
                         <div class="invoice p-3 mb-3">
                             <!-- title row -->
                             <div class="row">
-                                <h4 class="mx-auto">Quotation</h4>
+                                <h4 class="mx-auto">Invoice</h4>
                                 <div class="col-12">
                                     <h4>
-                                        <small
-                                            class="float-right">Date:{{ \Carbon\Carbon::parse($quotation->quotation_date)->format('d-m-Y') }}</small>
+                                        <small class="float-right">Date: {{ \Carbon\Carbon::parse($bill->start_date)->format('d-m-Y') }}</small>
                                     </h4>
                                 </div>
                                 <!-- /.col -->
@@ -36,7 +33,6 @@
                             <!-- info row -->
                             <div class="row invoice-info">
                                 <div class="col-sm-4 invoice-col">
-
                                     <address>
                                         <strong>Power Zone</strong><br>
                                         Bosila Housing,<br>
@@ -46,16 +42,11 @@
                                 </div>
                                 <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
-
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>
-
-
                                     </address>
                                 </div>
-                                <!-- /.col -->
-
                                 <!-- /.col -->
                             </div>
                             <!-- /.row -->
@@ -66,73 +57,40 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Product Name</th>
-                                                <th>Description</th>
-                                                <th>Quantity</th>
-                                                <th>Unit Price</th>
-                                                <th>Total Amount</th>
-
+                                                <th>Sl. No.</th> <!-- Add Sl. No. column -->
+                                                <th>Service</th>
+                                                <th>Bill Month</th>
+                                                <th>Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($products as $product)
+                                            @php
+                                                $serialNumber = 1;
+                                            @endphp
+                                            <tr>
+                                                <td>{{ $serialNumber }}</td>
+                                                <td>{{ ucfirst($bill->service) }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($bill->bill_month)->format('F Y') }}</td>
+                                                <td>{{ $bill->amount }}</td>
+                                            </tr>
+                                            @if($previousDue > 0)
+                                                @php
+                                                    $serialNumber++;
+                                                @endphp
                                                 <tr>
-                                                    <td>{{ $product->product_name }}</td>
-                                                    <td>{{ $product->description }}</td>
-                                                    <td>{{ $product->quantity }}</td>
-                                                    <td>{{ $product->unit_price }}</td>
-                                                    <td>{{ $product->total_amount }}</td>
-
+                                                    <td>{{ $serialNumber }}</td>
+                                                    <td>Previous Due</td>
+                                                    <td>{{ \Carbon\Carbon::parse($bill->bill_month)->subMonth()->format('F Y') }}</td>
+                                                    <td>{{ $previousDue }}</td>
                                                 </tr>
-                                            @endforeach
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>
                                 <!-- /.col -->
                             </div>
+
                             <!-- /.row -->
-
-                            <div class="row">
-                                <!-- accepted payments column -->
-
-                                <!-- /.col -->
-                                <div class="col-6">
-
-
-                                    <div class="table-responsive">
-                                        <table class="table">
-                                            @foreach ($quotationItems2 as $item)
-                                               
-                                                <tr>
-                                                    <th>Final Amount</th>
-                                                    <td>{{ $item->final_amount }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </table>
-                                    </div>
-                                </div>
-                                <!-- /.col -->
-                            </div>
-                            <!-- /.row -->
-
-                            <!-- this row will not appear when printing -->
-                            <div class="row no-print">
-                                <div class="col-12">
-                                    <a href="#" onclick="printPage()" class="btn btn-default"><i
-                                            class="fas fa-print"></i> Print</a>
-
-
-                                </div>
-                            </div>
-
-                            <script>
-                                function printPage() {
-                                    setTimeout(function() {
-                                        window.print();
-                                    }, 500);
-                                }
-                            </script>
-
                         </div>
                         <!-- /.invoice -->
                     </div><!-- /.col -->

@@ -86,4 +86,28 @@ class MonthlyBillController extends Controller
         return redirect()->route('admin.monthlyBill.index')->with('success', 'Bill status toggled successfully.');
     }
 
+    public function showInvoice($id)
+    {
+        $bill = MonthlyBill::with('regularCustomer')->findOrFail($id);
+        $customer = $bill->regularCustomer;
+
+        // Calculate previous month's due
+
+
+        return view('admin.monthlyBill.invoice', compact('bill', 'customer', 'previousDue'));
+    }
+    public function showInvoicePrint(MonthlyBill $bill)
+    {
+        $customer = $bill->regularCustomer; // Assuming your relationship is correctly defined
+
+        // Calculate previous month's due
+        $previousMonth = Carbon::parse($bill->bill_month)->subMonth()->format('Y-m');
+        $previousDue = MonthlyBill::where('regular_customer_id', $bill->regular_customer_id)
+            ->where('bill_month', $previousMonth)
+            ->where('status', 'due')
+            ->sum('amount');
+
+        return view('admin.monthlyBill.invoice_print', compact('bill', 'customer', 'previousDue'));
+    }
+
 }

@@ -78,14 +78,14 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::post('products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.product.toggleStatus');
 
         // routes/web.php
-        Route::get('get-customers', [BillController::class,'getCustomers'])->name('get-customers');
-        Route::get('get-product', [BillController::class,'getProduct'])->name('get-product');
-        Route::get('bill/', [BillController::class,'index'])->name('admin.bill.index');
-        Route::get('bill/create', [BillController::class,'create'])->name('admin.bill.create');
-        Route::post('bill/', [BillController::class,'store'])->name('bill.store');
-        Route::put('bill/{id}',  [BillController::class,'update'])->name('admin.bill.update');
-        Route::get('bill/{id}/invoice', [BillController::class,'invoice'])->name('admin.bill.invoice');
-        Route::get('bill/{id}/challan', [BillController::class,'challan'])->name('admin.bill.challan');
+        Route::get('get-customers', [BillController::class, 'getCustomers'])->name('get-customers');
+        Route::get('get-product', [BillController::class, 'getProduct'])->name('get-product');
+        Route::get('bill/', [BillController::class, 'index'])->name('admin.bill.index');
+        Route::get('bill/create', [BillController::class, 'create'])->name('admin.bill.create');
+        Route::post('bill/', [BillController::class, 'store'])->name('bill.store');
+        Route::put('bill/{id}',  [BillController::class, 'update'])->name('admin.bill.update');
+        Route::get('bill/{id}/invoice', [BillController::class, 'invoice'])->name('admin.bill.invoice');
+        Route::get('bill/{id}/challan', [BillController::class, 'challan'])->name('admin.bill.challan');
         Route::delete('bill/{bill}', [BillController::class, 'destroy'])->name('bill.destroy');
 
 
@@ -94,11 +94,15 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::post('monthlyBill', [MonthlyBillController::class, 'store'])->name('monthlyBill.store');
         Route::delete('monthlyBill/{id}', [MonthlyBillController::class, 'destroy'])->name('monthlyBill.destroy');
         Route::post('monthlyBill/{id}/toggle-status', [MonthlyBillController::class, 'toggleStatus'])->name('monthlyBill.toggleStatus');
+        Route::get('/admin/monthlyBill/showInvoice/{id}', [MonthlyBillController::class, 'showInvoice'])->name('admin.monthlyBill.showInvoice');
+        Route::get('admin/monthly-bill/{bill}/print', [MonthlyBillController::class,'showInvoicePrint'])->name('admin.monthlyBill.showInvoicePrint');
 
-        Route::get('get-customers', [QuotationController::class,'getCustomers'])->name('get-customers');
+
+
+        Route::get('get-customers', [QuotationController::class, 'getCustomers'])->name('get-customers');
         Route::get('/quotations', [QuotationController::class, 'index'])->name('admin.quotation.index');
         Route::get('/quotations/create', [QuotationController::class, 'create'])->name('admin.quotation.create');
-        Route::get('quotations/{id}/quotation', [QuotationController::class,'quotation'])->name('admin.quotation.quotation');
+        Route::get('quotations/{id}/quotation', [QuotationController::class, 'quotation'])->name('admin.quotation.quotation');
         Route::post('/quotations', [QuotationController::class, 'store'])->name('quotation.store');
         Route::delete('/quotations/{quotation}', [QuotationController::class, 'destroy'])->name('quotation.destroy');
 

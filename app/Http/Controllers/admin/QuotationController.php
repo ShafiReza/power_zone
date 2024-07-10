@@ -9,7 +9,7 @@ use App\Models\IrregularCustomer;
 use App\Models\Product;
 use App\Models\QuotationItem;
 use App\Models\QuotationItem2;
-
+use Illuminate\Support\Facades\Log;
 class QuotationController extends Controller
 {
     public function index()
@@ -46,81 +46,90 @@ class QuotationController extends Controller
         return view('admin.quotation.quotation', compact('customer', 'products', 'quotation', 'quotationItems2'));
     }
     public function store(Request $request)
-    {
-        // Create a new quotation instance
-        $customerId = $request->input('customerName');
+{
+    // Create a new quotation instance
+    $customerId = $request->input('customerName');
 
-        $quotation = new Quotation();
-        $quotation->irregular_customer_id = $customerId;
-        $quotation->customer_name = IrregularCustomer::find($customerId)->name;
-        $quotation->quotation_date = $request->input('quotationDate');
-        $quotation->final_amount = 0;
+    $quotation = new Quotation();
+    $quotation->irregular_customer_id = $customerId;
+    $quotation->customer_name = IrregularCustomer::find($customerId)->name;
+    $quotation->quotation_date = $request->input('quotationDate');
+    $quotation->final_amount = 0;
 
-        // Save the quotation to generate an ID
-        $quotation->save();
+    // Save the quotation to generate an ID
+    $quotation->save();
 
-        // Create quotation items
-        $productNames = $request->input('product_name', []);
-        $descriptions = $request->input('description', []);
-        $quantities = $request->input('quantity', []);
-        $unitPrices = $request->input('unitPrice', []);
-        $discounts = $request->input('discount', []);
-        $discountTypes = $request->input('discountType', []);
+    // Create quotation items
+    $productNames = $request->input('product_name', []);
+    $descriptions = $request->input('description', []);
+    $quantities = $request->input('quantity', []);
+    $unitPrices = $request->input('unitPrice', []);
+    $discounts = $request->input('discount', []);
+    $discountTypes = $request->input('discountType', []);
 
-        foreach ($productNames as $index => $productName) {
-            $quantity = $quantities[$index];
-            $unitPrice = $unitPrices[$index];
-            $discount = $discounts[$index];
-            $discountType = $discountTypes[$index];
+    //$totalFinalAmount = 0;
 
-            $totalAmount = $quantity * $unitPrice;
-            if ($discountType === 'Percentage') {
-                $totalAmount -= $totalAmount * ($discount / 100);
-            } else {
-                $totalAmount -= $discount;
-            }
+    foreach ($productNames as $index => $productName) {
+        $quantity = $quantities[$index];
+        $unitPrice = $unitPrices[$index];
+        $discount = $discounts[$index];
+        $discountType = $discountTypes[$index];
 
-            $quotationItem = new QuotationItem();
-            $quotationItem->quotation_id = $quotation->id;
-            $quotationItem->product_name = $productName;
-            $quotationItem->description = $descriptions[$index];
-            $quotationItem->quantity = $quantity;
-            $quotationItem->unit_price = $unitPrice;
-            $quotationItem->discount = $discount;
-            $quotationItem->discount_type = $discountType;
-            $quotationItem->total_amount = $totalAmount;
-            $quotationItem->save();
-
-            // Update final amount
-            $quotation->final_amount += $totalAmount;
-        }
-        $quotationItems2 = $request->input('quotation_items2', []);
-        foreach ($quotationItems2 as $quotationItem2Data) {
-            $quotationItem2 = new QuotationItem2();
-            $quotationItem2->quotation_id = $quotation->id;
-            $quotationItem2->discount_type = $quotationItem2Data['discount_type'];
-            $quotationItem2->discount = $quotationItem2Data['discount'];
-            $quotationItem2->vat = $quotationItem2Data['vat'];
-            $quotationItem2->final_amount = $quotationItem2Data['final_amount'];
-            $quotationItem2->save();
-
-            // Update final amount
-            if ($quotationItem2Data['discount_type'] === 'Percentage') {
-                $quotation->final_amount -= $quotation->final_amount * ($quotationItem2Data['discount'] / 100);
-            } else {
-                $quotation->final_amount -= $quotationItem2Data['discount'];
-            }
-            $quotation->final_amount += $quotationItem2Data['vat'];
+        $totalAmount = $quantity * $unitPrice;
+        if ($discountType === 'Percentage') {
+            $totalAmount -= $totalAmount * ($discount / 100);
+        } else {
+            $totalAmount -= $discount;
         }
 
-        // Create quotation items 2 (if any)
+        $quotationItem = new QuotationItem();
+        $quotationItem->quotation_id = $quotation->id;
+        $quotationItem->product_name = $productName;
+        $quotationItem->description = $descriptions[$index];
+        $quotationItem->quantity = $quantity;
+        $quotationItem->unit_price = $unitPrice;
+        $quotationItem->discount = $discount;
+        $quotationItem->discount_type = $discountType;
+        $quotationItem->total_amount = $totalAmount;
+        $quotationItem->save();
 
-        // Save the final quotation amount
-        $quotation->save();
+        // Update final amount
+        //$totalFinalAmount += $totalAmount;
+        $quotation->final_amount += $totalAmount;
 
-        // Return a success response
-        return redirect()->route('admin.quotation.index')->with('success', 'Quotation created successfully!');
     }
+
+    // Process QuotationItem2 items
+    $quotationItems2 = $request->input('bill_items2', []);
+    foreach ($quotationItems2 as $quotationItem2Data) {
+        $quotationItem2 = new QuotationItem2();
+        $quotationItem2->quotation_id = $quotation->id;
+        $quotationItem2->discount_type = $quotationItem2Data['discount_type'];
+        $quotationItem2->discount = $quotationItem2Data['discount'];
+        $quotationItem2->vat = $quotationItem2Data['vat'];
+        $quotationItem2->final_amount = $quotationItem2Data['final_amount'];
+        $quotationItem2->save();
+
+        // Calculate final amount considering QuotationItem2 discounts and VAT
+        $itemFinalAmount = $quotationItem2Data['final_amount'];
+        if ($quotationItem2Data['discount_type'] === 'Percentage') {
+            $quotation->final_amount -= $quotation->final_amount * ($quotationItem2Data['discount'] / 100);
+        } else {
+            $quotation->final_amount -= $quotationItem2Data['discount'];
+        }
+        $quotation->final_amount += $quotationItem2Data['vat'];
+        //$totalFinalAmount = $itemFinalAmount;
+    }
+
+    // Update final amount considering both QuotationItem and QuotationItem2
+    //$quotation->final_amount = $totalFinalAmount;
+    $quotation->save();
+
+    // Return a success response
+    return redirect()->route('admin.quotation.index')->with('success', 'Quotation created successfully!');
+}
+
+
 
     public function destroy(Quotation $quotation)
     {

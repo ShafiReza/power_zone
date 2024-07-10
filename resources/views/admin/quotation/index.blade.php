@@ -9,7 +9,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Customer Name</th>
-                    <th>Bill Date</th>
+                    <th>Quotation Date</th>
                     <th>Final Amount</th>
                     <th>Action</th>
                 </tr>
@@ -29,6 +29,7 @@
                                 @method('DELETE')
                                 <button type="button" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button>
                             </form>
+                            
                         </td>
                     </tr>
                 @endforeach

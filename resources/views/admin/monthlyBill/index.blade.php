@@ -79,6 +79,9 @@
                             <button type="button" class="btn btn-danger delete-button">Delete</button>
                         </form>
                     </td>
+                    <td>
+                        <a href="{{ route('admin.monthlyBill.showInvoice', $bill->id) }}" onclick="printInvoice(event, '{{ route('admin.monthlyBill.showInvoicePrint', $bill->id) }}')" class="btn btn-default"><i class="fas fa-print"></i> Print</a>
+                    </td>
                 </tr>
             @endforeach
         </tbody>
@@ -108,5 +111,16 @@
             });
         });
     });
+
+    function printInvoice(event, printUrl) {
+    event.preventDefault();
+    var newWindow = window.open(printUrl, '_blank');
+    newWindow.onload = function() {
+        newWindow.print();
+        newWindow.onfocus = function() {
+            newWindow.close();
+        };
+    };
+}
 </script>
 @endsection
