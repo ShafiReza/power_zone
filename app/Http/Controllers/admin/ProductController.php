@@ -28,11 +28,13 @@ class ProductController extends Controller
             'details' => 'nullable',
             'brand_name' => 'required',
             'category_id' => 'required',
+            'origin' => 'required',
             'purchase_price' => 'required|numeric',
             'sell_price' => 'required|numeric',
             'wholesale_price' => 'required|numeric',
             'quantity' => 'required|integer',
         ]);
+
         $total_amount = $request->quantity * $request->purchase_price;
 
         // Create the product with the total_amount

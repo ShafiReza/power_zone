@@ -19,6 +19,7 @@
                 <th>Details</th>
                 <th>Brand Name</th>
                 <th>Category</th>
+                <th>Origin</th>
                 <th>Purchase Price</th>
                 <th>Sell Price</th>
                 <th>Wholesale Price</th>
@@ -36,6 +37,7 @@
                     <td>{{ $product->details }}</td>
                     <td>{{ $product->brand_name }}</td>
                     <td>{{ $product->category->name }}</td>
+                    <td>{{ $product->origin }}</td>
                     <td>{{ $product->purchase_price }}</td>
                     <td>{{ $product->sell_price }}</td>
                     <td>{{ $product->wholesale_price }}</td>

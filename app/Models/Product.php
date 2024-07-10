@@ -14,6 +14,7 @@ class Product extends Model
         'details',
         'brand_name',
         'category_id',
+        'origin',
         'purchase_price',
         'sell_price',
         'wholesale_price',

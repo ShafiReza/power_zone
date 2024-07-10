@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('brand_name');
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories');
+            $table->text('origin')->nullable();
             $table->decimal('purchase_price', 10, 2);
             $table->decimal('sell_price', 10, 2);
             $table->decimal('wholesale_price', 10, 2);
