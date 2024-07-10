@@ -27,7 +27,7 @@
                 </div>
                 <div class="form-group col-4">
                     <label for="billDate">Date</label>
-                    <input type="date" name="billDate" class="form-control" id="billDate" value="{{ date('Y-m-d') }}">
+                    <input type="date" name="quotation_date" class="form-control" id="billDate" value="{{ date('Y-m-d') }}">
                 </div>
                 <div class="form-group col-4">
                     <label for="products">Products</label>

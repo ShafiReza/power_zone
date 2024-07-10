@@ -47,13 +47,14 @@ class QuotationController extends Controller
     }
     public function store(Request $request)
 {
+   // dd($request->all());
     // Create a new quotation instance
     $customerId = $request->input('customerName');
 
     $quotation = new Quotation();
     $quotation->irregular_customer_id = $customerId;
     $quotation->customer_name = IrregularCustomer::find($customerId)->name;
-    $quotation->quotation_date = $request->input('quotationDate');
+    $quotation->quotation_date = $request->input('quotation_date');
     $quotation->final_amount = 0;
 
     // Save the quotation to generate an ID

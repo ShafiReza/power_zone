@@ -98,23 +98,26 @@
 
     <script>
         function getCustomers(customerType) {
+
             if (customerType) {
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('get-customers') }}",
+                    url: "{{ route('get_customers') }}",
                     data: {
                         customerType: customerType
                     },
                     success: function(data) {
-                        $('#customerName').empty().append('<option value="">Select Customer</option>');
+                        console.log(data)
+                        $('#customerName').empty().append("<option value=''>Select Customer</option>");
                         $.each(data, function(index, customer) {
-                            if (customerType == 'egularCustomer') {
+
+                            if (customerType == 'regularCustomer') {
                                 $('#customerName').append('<option value="' + customer
-                                    .regularCustomerId + '">' + customer.customerName +
+                                    .id + '">' + customer.name +
                                     '</option>');
                             } else {
                                 $('#customerName').append('<option value="' + customer
-                                    .irregularCustomerId + '">' + customer.customerName +
+                                    .id+ '">' + customer.name +
                                     '</option>');
                             }
                         });

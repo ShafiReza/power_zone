@@ -44,7 +44,7 @@ class BillController extends Controller
 
         return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2'));
     }
-    
+
 
     public function challan($id)
     {
@@ -95,12 +95,23 @@ class BillController extends Controller
 
         $bill = new Bill();
         if ($customerType == 'regularCustomer') {
-            $bill->regular_customer_id = $customerId;
-            $bill->customer_name = RegularCustomer::find($customerId)->name;
-            // dd(RegularCustomer::find($customerId)->name);
+            $regularCustomer = RegularCustomer::find($customerId);
+            if ($regularCustomer) {
+                $bill->regular_customer_id = $customerId;
+                $bill->customer_name = $regularCustomer->name;
+            } else {
+                // Handle the case where the regular customer is not found
+                return response()->json(['error' => 'Regular customer not found'], 404);
+            }
         } elseif ($customerType == 'irregularCustomer') {
-            $bill->irregular_customer_id = $customerId;
-            $bill->customer_name = IrregularCustomer::find($customerId)->name;
+            $irregularCustomer = IrregularCustomer::find($customerId);
+            if ($irregularCustomer) {
+                $bill->irregular_customer_id = $customerId;
+                $bill->customer_name = $irregularCustomer->name;
+            } else {
+                // Handle the case where the irregular customer is not found
+                return response()->json(['error' => 'Irregular customer not found'], 404);
+            }
         }
 
 

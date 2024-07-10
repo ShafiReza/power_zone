@@ -78,7 +78,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::post('products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.product.toggleStatus');
 
         // routes/web.php
-        Route::get('get-customers', [BillController::class, 'getCustomers'])->name('get-customers');
+        Route::get('get_customers', [BillController::class, 'getCustomers'])->name('get_customers');
         Route::get('get-product', [BillController::class, 'getProduct'])->name('get-product');
         Route::get('bill/', [BillController::class, 'index'])->name('admin.bill.index');
         Route::get('bill/create', [BillController::class, 'create'])->name('admin.bill.create');
