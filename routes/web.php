@@ -76,6 +76,10 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::put('products/{product}', [ProductController::class, 'update'])->name('admin.product.update');
         Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
         Route::post('products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.product.toggleStatus');
+        Route::post('/product/updateQuantity/{product}', [ProductController::class, 'updateQuantity']);
+        Route::get('product/sales', [ProductController::class, 'sales'])->name('admin.product.sales');
+
+
 
         // routes/web.php
         Route::get('get_customers', [BillController::class, 'getCustomers'])->name('get_customers');

@@ -18,7 +18,9 @@ class BillController extends Controller
 {
     public function index()
     {
+
         $bills = Bill::with(['regularCustomer', 'irregularCustomer'])->get();
+
 
         return view('admin.bill.index', compact('bills'));
     }
@@ -156,6 +158,13 @@ class BillController extends Controller
 
             // Update final amount
             $bill->final_amount += $totalAmount;
+
+            $product = Product::where('name', $productName)->first();
+            if ($product) {
+                $product->quantity -= $quantity;
+                $product->total_amount = $product->quantity * $product->purchase_price;
+                $product->save();
+            }
         }
 
         // Create bill items 2

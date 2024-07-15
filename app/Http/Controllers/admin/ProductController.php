@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\Category; // Import the Category model if not already imported
+use App\Models\Category;
+use App\Models\Bill;
+use App\Models\BillItem;
+use App\Models\BillItem2;
 
 class ProductController extends Controller
 {
@@ -78,4 +81,31 @@ class ProductController extends Controller
 
         return redirect()->route('admin.product.index')->with('success', 'Product status updated successfully.');
     }
+
+    public function updateQuantity(Request $request, Product $product)
+{
+    $product->update([
+        'quantity' => $request->quantity,
+        'total_amount' => $request->total_amount
+    ]);
+
+    return response()->json(['success' => true]);
 }
+public function sales(Request $request)
+{
+    $id = $request->route('id');
+    $product = Product::find($id);
+    $products = BillItem::where('bill_id', $id)->get();
+    $billItems2 = BillItem2::where('bill_id', $id)->get();
+      // Fetch the bill details
+    $bill = Bill::find($id);
+
+
+    // Determine whether the customer is regular or irregular and fetch customer details accordingly
+
+    return view('admin.product.sales', compact('products', 'bill', 'billItems2','product'));
+}
+
+
+}
+
