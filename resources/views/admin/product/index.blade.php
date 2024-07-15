@@ -10,7 +10,7 @@
     @endif
 
     <a class="btn btn-success mb-3" href="{{ route('admin.product.create') }}">Create Product</a>
-
+    <a class="btn btn-success mb-3" href="{{ route('admin.product.sales') }}">Sales List</a>
     <table class="table table-bordered">
         <thead>
             <tr>

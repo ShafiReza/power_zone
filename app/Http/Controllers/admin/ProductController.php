@@ -12,7 +12,7 @@ use App\Models\BillItem2;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $products = Product::all();
         return view('admin.product.index', compact('products'));
@@ -91,19 +91,22 @@ class ProductController extends Controller
 
     return response()->json(['success' => true]);
 }
-public function sales(Request $request)
+public function sales(Bill $bill)
 {
-    $id = $request->route('id');
-    $product = Product::find($id);
-    $products = BillItem::where('bill_id', $id)->get();
-    $billItems2 = BillItem2::where('bill_id', $id)->get();
-      // Fetch the bill details
-    $bill = Bill::find($id);
+    //dd($bill->all());
+    if (!$bill) {
+        // Handle the case when bill is not found
+        return redirect()->back()->withErrors(['Bill not found']);
+    }
 
+    $billItems = BillItem::where('bill_id')->get();
+    if ($billItems->isEmpty()) {
+        // Handle the case when bill items are not found
+        return redirect()->back()->withErrors(['Bill items not found']);
+    }
+    dd($billItems->all());
 
-    // Determine whether the customer is regular or irregular and fetch customer details accordingly
-
-    return view('admin.product.sales', compact('products', 'bill', 'billItems2','product'));
+    return view('admin.product.sales', compact('bill', 'billItems'));
 }
 
 
