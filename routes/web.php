@@ -77,7 +77,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
         Route::post('products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.product.toggleStatus');
         Route::post('/product/updateQuantity/{product}', [ProductController::class, 'updateQuantity']);
-        Route::get('product/sales', [ProductController::class, 'sales'])->name('admin.product.sales');
+        Route::get('product/sales/{id}', [ProductController::class, 'sales'])->name('admin.product.sales');
 
 
 

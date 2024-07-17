@@ -54,8 +54,13 @@ class Bill extends Model
         return $this->belongsTo(RegularCustomer::class);
     }
 
+    public function billItems()
+    {
+        return $this->hasMany(BillItem::class);
+    }
 
-
-
+    public function billItems2()
+    {
+        return $this->hasMany(BillItem2::class);
+    }
 }
-

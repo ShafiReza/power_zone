@@ -8,24 +8,36 @@
             <thead>
                 <tr>
                     <th>Product Name</th>
-                    <th>Category</th>
                     <th>Quantity</th>
                     <th>Discount</th>
                     <th>Unit Price</th>
-                    <th>Total Amount</th>
                     <th>Bill Date</th>
+                    <th>Final Amount</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($billItems as $item)
                     <tr>
                         <td>{{ $item->product_name }}</td>
-                        <td>{{ $item->description }}</td> <!-- Assuming description is where category is stored -->
                         <td>{{ $item->quantity }}</td>
-                        <td>{{ $item->discount }} ({{ $item->discount_type }})</td>
+                        <td>
+                            @if($item->discount_type == 'Percentage')
+                                {{ intval($item->discount) }}%
+                            @else
+                                {{ number_format($item->discount) }}
+                            @endif
+                        </td>
                         <td>{{ $item->unit_price }}</td>
-                        <td>{{ $item->total_amount }}</td>
                         <td>{{ $bill->bill_date }}</td>
+                        <td>{{ $item->total_amount }}</td>
+                    </tr>
+                @endforeach
+                @foreach ($billItem2 as $item)
+                    <tr>
+                        <td colspan="3">Additional Charges/Discounts</td>
+                        <td>VAT: {{ $item->vat }}</td>
+                        <td>Discount: {{ $item->discount }}</td>
+                        <td>Final Amount: {{ $item->final_amount }}</td>
                     </tr>
                 @endforeach
             </tbody>

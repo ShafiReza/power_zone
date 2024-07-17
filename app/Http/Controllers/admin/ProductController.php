@@ -90,23 +90,17 @@ class ProductController extends Controller
     ]);
 
     return response()->json(['success' => true]);
-}
-public function sales(Bill $bill)
+}public function sales($id)
 {
-    //dd($bill->all());
-    if (!$bill) {
-        // Handle the case when bill is not found
-        return redirect()->back()->withErrors(['Bill not found']);
-    }
 
-    $billItems = BillItem::where('bill_id')->get();
-    if ($billItems->isEmpty()) {
-        // Handle the case when bill items are not found
-        return redirect()->back()->withErrors(['Bill items not found']);
-    }
-    dd($billItems->all());
+    $bill = Bill::with(['billItems', 'billItems2'])->find($id);
+    //dd($bill);
+    $billItems = BillItem::where('bill_id', $id)->get();
+   // dd($billItems);
+    $billItem2 = BillItem2::where('bill_id', $id)->get();
+   // dd($billItem2);
 
-    return view('admin.product.sales', compact('bill', 'billItems'));
+    return view('admin.product.sales', compact('bill', 'billItems', 'billItem2'));
 }
 
 
