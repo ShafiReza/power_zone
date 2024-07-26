@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -15,6 +15,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = Product::all();
+
         return view('admin.product.index', compact('products'));
     }
 
@@ -90,17 +91,13 @@ class ProductController extends Controller
     ]);
 
     return response()->json(['success' => true]);
-}public function sales($id)
+}
+
+public function sales($id)
 {
+    $bills = Bill::with(['billItems', 'billItems2'])->get();
 
-    $bill = Bill::with(['billItems', 'billItems2'])->find($id);
-    //dd($bill);
-    $billItems = BillItem::where('bill_id', $id)->get();
-   // dd($billItems);
-    $billItem2 = BillItem2::where('bill_id', $id)->get();
-   // dd($billItem2);
-
-    return view('admin.product.sales', compact('bill', 'billItems', 'billItem2'));
+    return view('admin.product.sales', compact('bills'));
 }
 
 
