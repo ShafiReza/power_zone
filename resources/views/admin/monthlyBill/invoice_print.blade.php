@@ -25,7 +25,8 @@
                                 <h4 class="mx-auto">Invoice</h4>
                                 <div class="col-12">
                                     <h4>
-                                        <small class="float-right">Date: {{ \Carbon\Carbon::parse($bill->start_date)->format('d-m-Y') }}</small>
+                                        <small class="float-right">Date:
+                                            {{ \Carbon\Carbon::parse($bill->start_date)->format('d-m-Y') }}</small>
                                     </h4>
                                 </div>
                                 <!-- /.col -->
@@ -58,6 +59,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Sl. No.</th> <!-- Add Sl. No. column -->
+                                                <th>Description</th>
                                                 <th>Service</th>
                                                 <th>Bill Month</th>
                                                 <th>Amount</th>
@@ -69,18 +71,20 @@
                                             @endphp
                                             <tr>
                                                 <td>{{ $serialNumber }}</td>
+                                                <td>{{ $bill->description }}</td>
                                                 <td>{{ ucfirst($bill->service) }}</td>
                                                 <td>{{ \Carbon\Carbon::parse($bill->bill_month)->format('F Y') }}</td>
                                                 <td>{{ $bill->amount }}</td>
                                             </tr>
-                                            @if($previousDue > 0)
+                                            @if ($previousDue > 0)
                                                 @php
                                                     $serialNumber++;
                                                 @endphp
                                                 <tr>
                                                     <td>{{ $serialNumber }}</td>
                                                     <td>Previous Due</td>
-                                                    <td>{{ \Carbon\Carbon::parse($bill->bill_month)->subMonth()->format('F Y') }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($bill->bill_month)->subMonth()->format('F Y') }}
+                                                    </td>
                                                     <td>{{ $previousDue }}</td>
                                                 </tr>
                                             @endif

@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MonthlyBill;
 use App\Models\RegularCustomer;
+use App\Models\Payment;
+use App\Models\Bill;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+
 class MonthlyBillController extends Controller
 {
     public function create()
@@ -20,6 +24,7 @@ class MonthlyBillController extends Controller
         $request->validate([
             'customer_id' => 'required|exists:regular_customers,id',
             'amount' => 'required|numeric',
+            'description' => 'nullable|string',
             'service' => 'required|in:lift,generator,lift and generator',
             'bill_month' => 'required|date_format:Y-m',
             'start_date' => 'required|date',
@@ -30,6 +35,7 @@ class MonthlyBillController extends Controller
             'regular_customer_id' => $request->customer_id,
             'customer_address' => $request->customer_address,
             'amount' => $request->amount,
+            'description' => $request->description,
             'service' => $request->service,
             'bill_month' => $request->bill_month,
             'start_date' => $request->start_date,
@@ -42,6 +48,8 @@ class MonthlyBillController extends Controller
 
     public function index(Request $request)
     {
+        
+
         $query = MonthlyBill::with('regularCustomer');
 
         if ($request->has('month')) {
@@ -49,14 +57,16 @@ class MonthlyBillController extends Controller
         }
 
         if ($request->has('customer_name')) {
-            $query->whereHas('regularCustomer', function($q) use ($request) {
+            $query->whereHas('regularCustomer', function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->customer_name . '%');
             });
         }
 
         $bills = $query->get();
 
-        return view('admin.monthlyBill.index', compact('bills'));
+        $bill = $bills->first();
+
+        return view('admin.monthlyBill.index', compact('bills','bill'));
     }
 
     public function destroy($id)
@@ -73,9 +83,9 @@ class MonthlyBillController extends Controller
 
         if ($bill->status == 'pending') {
             if ($startDate->diffInMonths($currentDate) < 1) {
-                $bill->status = 'paid';
+                $bill->status = 'Paid';
             } elseif ($startDate->diffInMonths($currentDate) >= 1) {
-                $bill->status = 'due';
+                $bill->status = 'Due';
             }
         } else {
             $bill->status = 'pending'; // Reset status to pending if it's currently paid or due
@@ -104,10 +114,82 @@ class MonthlyBillController extends Controller
         $previousMonth = Carbon::parse($bill->bill_month)->subMonth()->format('Y-m');
         $previousDue = MonthlyBill::where('regular_customer_id', $bill->regular_customer_id)
             ->where('bill_month', $previousMonth)
-            ->where('status', 'due')
+            ->where('status', 'Due')
             ->sum('amount');
 
         return view('admin.monthlyBill.invoice_print', compact('bill', 'customer', 'previousDue'));
     }
+    // public function storePayment(Request $request, $id)
+    // {
+    //     // Validate the request data
+    //     $validatedData = $request->validate([
+    //         'description' => 'required',
+    //         'receiveable_amount' => 'required|numeric',
+    //     ]);
 
+    //     // Find the bill and update its status
+    //     $bill = MonthlyBill::findOrFail($id);
+    //     $bill->status = 'paid';
+    //     $bill->save();
+
+    //     // Store the payment details
+    //     $payment = new Payment();
+    //     $payment->bill_id = $id;
+    //     $payment->description = $validatedData['description'];
+    //     $payment->receiveable_amount = $validatedData['receiveable_amount'];
+    //     $payment->due_amount = $bill->amount - $validatedData['receiveable_amount'];
+    //     $payment->save();
+
+    //     // Return the updated bill status and the list of bills
+    //     //$bills = MonthlyBill::all(); // or however you fetch the bills
+    //     return view('admin.monthlyBill.index', compact('bill'))->with('status', 'Paid');
+    // }
+
+    public function storePayment(Request $request)
+    {
+        // Debugging: Check all request data
+        dd($request->all());
+
+        // Validate the request data
+        // $validatedData = $request->validate([
+        //     'description' => 'required|string',
+        //     'receiveable_amount' => 'required|numeric',
+        //     'bill_id' => 'required|exists:monthly_bills,id', // Ensure bill_id is present and valid
+        // ]);
+
+        // Find the bill and update its status
+        $bill = MonthlyBill::findOrFail($request->input('bill_id'));
+
+        if ($bill->bill_type !== 'monthly') {
+            return redirect()->back()->with('error', 'Cannot insert payment for non-monthly bill.');
+        }
+
+        // Store the payment details
+        $payment = new Payment();
+
+        $payment->bill_id = $request->input('bill_id');
+        $payment->description = $request->input('description');
+        $payment->receiveable_amount = $request->input('receiveable_amount');
+        $payment->due_amount = $bill->amount - $request->input('receiveable_amount');
+
+        $payment->save();
+
+
+        // Update the bill status to 'paid'
+        $bill->status = 'paid';
+        $bill->save();
+
+        // Return a redirect or a JSON response
+        return redirect()->route('admin.monthlyBill.index')->with('status', 'Payment added successfully.');
+    }
+
+
+    public function showBill($id)
+    {
+        $payments = DB::table('payments')
+            ->where('bill_id', $id) // Use 'bill_id' if that’s the actual column name
+            ->get();
+        $bill = MonthlyBill::findOrFail($id)->payments;
+        return view('admin.monthlyBill.storePayment', compact('bill'));
+    }
 }

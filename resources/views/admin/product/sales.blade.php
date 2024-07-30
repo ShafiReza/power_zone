@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="content-wrapper container-fluid">
-        <h2>Bill Details</h2>
+       <h2>Sales List</h2>
 
         <table class="table table-bordered">
             <thead>
@@ -19,9 +19,7 @@
             <tbody>
                 @php $sl = 1; @endphp
                 @foreach ($bills as $bill)
-
                     @foreach ($bill->billItems as $item)
-
                         <tr>
                             <td rowspan="2">{{ $sl++ }}</td>
                             <td>{{ $item->product_name }}</td>
@@ -35,7 +33,7 @@
                             </td>
                             <td>{{ $item->unit_price }}</td>
                             <td>{{ $bill->bill_date }}</td>
-                            <td >{{ $item->total_amount }}</td>
+                            <td>{{ $item->total_amount }}</td>
                         </tr>
                     @endforeach
                     @foreach ($bill->billItems2 as $item)
@@ -43,11 +41,12 @@
                             <td></td>
                             <td colspan="2">Additional Charges/Discounts</td>
                             <td>VAT:
-                            @if($item->discount_type == 'Percentage')
-                                {{ intval($item->vat) }}%
-                            @else
-                                {{ number_format($item->vat) }}
-                            @endif</td>
+                                @if($item->discount_type == 'Percentage')
+                                    {{ intval($item->vat) }}%
+                                @else
+                                    {{ number_format($item->vat) }}
+                                @endif
+                            </td>
                             <td>Discount:
                                 @if($item->discount_type == 'Percentage')
                                     {{ intval($item->discount) }}%

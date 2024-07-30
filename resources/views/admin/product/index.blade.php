@@ -10,9 +10,9 @@
     @endif
 
     <a class="btn btn-success mb-3" href="{{ route('admin.product.create') }}">Create Product</a>
-    @foreach($products as $product)
-    <a class="btn btn-success mb-3" href="{{ route('admin.product.sales', ['id' => $product->id]) }}">Sales List</a>
-@endforeach
+
+
+
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -62,15 +62,59 @@
                             <button type="button" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button>
                         </form>
                     </td>
+                    <td><a class="btn btn-success mb-3" href="{{ route('admin.product.sales', ['id' => $product->id]) }}">Sales List</a>
+                    <button type="button" class="btn btn-info mb-3 add-product-btn" data-product-id="{{ $product->id }}">Add Product</button>
+                        <a class="btn btn-warning mb-3" href="{{ route('admin.product.stockList', ['id' => $product->id]) }}">Stock List</a></td>
                 </tr>
             @endforeach
         </tbody>
     </table>
 </div>
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="addProductForm" method="POST" action="{{ route('admin.product.addProduct') }}">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
+                    
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modal_product_id" name="product_id">
+                    <div class="form-group">
+                        <label for="entry_date">Entry Date</label>
+                        <input type="date" class="form-control" id="entry_date" name="entry_date" value="{{ date('Y-m-d') }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+          // Handle Add Product button click
+          document.querySelectorAll('.add-product-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                document.getElementById('modal_product_id').value = productId;
+                const addProductModal = new bootstrap.Modal(document.getElementById('addProductModal'));
+                addProductModal.show();
+            });
+        });
         // Attach click event listeners to delete buttons
         const deleteButtons = document.querySelectorAll('.delete-button');
         deleteButtons.forEach(button => {

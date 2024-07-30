@@ -35,6 +35,10 @@
             <input type="number" class="form-control" id="amount" name="amount" required>
         </div>
         <div class="form-group col-4">
+            <label for="description">Description:</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-group col-4">
             <label for="service">Service:</label>
             <select class="form-control" id="service" name="service" required>
                 <option value="lift">Lift</option>

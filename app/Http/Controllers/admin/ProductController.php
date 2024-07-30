@@ -9,7 +9,7 @@ use App\Models\Category;
 use App\Models\Bill;
 use App\Models\BillItem;
 use App\Models\BillItem2;
-
+use App\Models\StockEntry;
 class ProductController extends Controller
 {
     public function index(Request $request)
@@ -93,13 +93,56 @@ class ProductController extends Controller
     return response()->json(['success' => true]);
 }
 
+// public function sales($id)
+// {
+//     $bills = Bill::with(['billItems', 'billItems2'])->get();
+
+//     return view('admin.product.sales', compact('bills'));
+// }
 public function sales($id)
 {
-    $bills = Bill::with(['billItems', 'billItems2'])->get();
+    // Fetch bills with billItems containing the specified product ID
+    $bills = Bill::whereHas('billItems', function ($query) use ($id) {
+        $query->where('id', $id);
+    })->with(['billItems' => function ($query) use ($id) {
+        $query->where('id', $id);
+    }, 'billItems2'])->get();
+   // dd($bills);
 
-    return view('admin.product.sales', compact('bills'));
+    // Pass the product ID to the view
+    return view('admin.product.sales', compact('bills', 'id'));
 }
 
+public function addProduct(Request $request)
+{
+    $request->validate([
+        'product_id' => 'required|exists:products,id',
+        'entry_date' => 'required|date',
+        'description' => 'required|string',
+        'quantity' => 'required|integer|min:1',
+    ]);
+
+    $product = Product::findOrFail($request->product_id);
+    $product->quantity += $request->quantity;
+    $product->save();
+
+    StockEntry::create([
+        'product_id' => $request->product_id,
+        'entry_date' => $request->entry_date,
+        'description' => $request->description,
+        'quantity' => $request->quantity,
+    ]);
+
+    return redirect()->route('admin.product.index')->with('success', 'Product quantity updated successfully.');
+}
+
+public function stockList($id)
+{
+    $product = Product::findOrFail($id);
+    $stockEntries = StockEntry::where('product_id', $id)->get();
+
+    return view('admin.product.stockList', compact('product', 'stockEntries'));
+}
 
 }
 

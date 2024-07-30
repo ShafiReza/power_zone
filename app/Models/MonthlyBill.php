@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+
 class MonthlyBill extends Model
 {
     use HasFactory;
@@ -12,6 +13,7 @@ class MonthlyBill extends Model
         'regular_customer_id',
         'customer_address',
         'amount',
+        'description',
         'service',
         'bill_month',
         'start_date',
@@ -28,5 +30,10 @@ class MonthlyBill extends Model
     public function regularCustomer()
     {
         return $this->belongsTo(RegularCustomer::class, 'regular_customer_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'bill_id'); // Make sure 'bill_id' matches the column in the payments table
     }
 }

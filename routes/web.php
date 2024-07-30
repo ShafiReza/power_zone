@@ -77,7 +77,9 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
         Route::post('products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('admin.product.toggleStatus');
         Route::post('/product/updateQuantity/{product}', [ProductController::class, 'updateQuantity']);
-        Route::get('product/sales/{id}', [ProductController::class, 'sales'])->name('admin.product.sales');
+        Route::get('/product/{id}/sales', [ProductController::class, 'sales'])->name('admin.product.sales');
+        Route::post('product/add-product', [ProductController::class, 'addProduct'])->name('admin.product.addProduct');
+        Route::get('product/{id}/stock-list', [ProductController::class, 'stockList'])->name('admin.product.stockList');
 
 
 
@@ -100,6 +102,8 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::post('monthlyBill/{id}/toggle-status', [MonthlyBillController::class, 'toggleStatus'])->name('monthlyBill.toggleStatus');
         Route::get('/admin/monthlyBill/showInvoice/{id}', [MonthlyBillController::class, 'showInvoice'])->name('admin.monthlyBill.showInvoice');
         Route::get('admin/monthly-bill/{bill}/print', [MonthlyBillController::class,'showInvoicePrint'])->name('admin.monthlyBill.showInvoicePrint');
+        Route::post('/monthlyBill/payment', [MonthlyBillController::class, 'storePayment'])->name('monthlyBill.storePayment');
+        Route::get('/monthly-bills/{id}', [MonthlyBillController::class, 'showBill'])->name('admin.monthlyBill.showBill');
 
 
 

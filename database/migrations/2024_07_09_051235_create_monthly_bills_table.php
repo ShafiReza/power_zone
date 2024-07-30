@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('regular_customer_id');
             $table->string('customer_address');
             $table->decimal('amount', 10, 2);
+            $table->text('description')->nullable();
             $table->enum('service', ['lift', 'generator', 'lift and generator']);
             $table->string('bill_month'); // Ensure this is a date field
             $table->date('start_date'); // Ensure this is a date field
