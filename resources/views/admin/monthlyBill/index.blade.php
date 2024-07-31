@@ -67,8 +67,7 @@
                                 @elseif(\Carbon\Carbon::parse($bill->start_date)->diffInMonths(\Carbon\Carbon::now()) >= 1)
                                     <form action="{{ route('monthlyBill.toggleStatus', $bill->id) }}" method="POST">
                                         @csrf
-                                        <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                                            data-target="#paymentModal">Mark as Due</button>
+                                        <button type="submit" class="btn btn-sm btn-warning">Mark as Due</button>
                                     </form>
                                 @else
                                     {{ ucfirst($bill->status) }}
@@ -76,8 +75,7 @@
                             @else
                                 <form action="{{ route('monthlyBill.toggleStatus', $bill->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit"
-                                        class="btn btn-sm btn-secondary">{{ ucfirst($bill->status) }}</button>
+                                    <button type="submit" class="btn btn-sm btn-secondary">{{ ucfirst($bill->status) }}</button>
                                 </form>
                             @endif
                         </td>

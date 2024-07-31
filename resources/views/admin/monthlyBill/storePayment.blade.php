@@ -8,6 +8,7 @@
             <thead>
                 <tr>
                     <th>Description</th>
+                    <th>Bill Date</th>
                     <th>Bill Amount</th>
                     <th>Receivable Amount</th>
                     <th>Due Amount</th>
@@ -17,6 +18,7 @@
                 @forelse($payments as $payment)
                     <tr>
                         <td>{{ $payment->description }}</td>
+                        <td>{{ $payment->created_at }}</td>
                         <td>{{ $payment->bill->amount }}</td>
                         <td>{{ $payment->receiveable_amount }}</td>
                         <td>{{ $payment->due_amount }}</td>

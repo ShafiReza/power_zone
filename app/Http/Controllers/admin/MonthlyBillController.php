@@ -176,7 +176,7 @@ class MonthlyBillController extends Controller
         $payment->save();
 
         // Update the bill status to 'paid' if fully paid, otherwise 'pending'
-        $bill->status = $dueAmount <= 0 ? 'paid' : 'due';
+        $bill->status = 'paid';
         $bill->save();
 
         // Return a JSON response
