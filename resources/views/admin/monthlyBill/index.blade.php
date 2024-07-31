@@ -89,7 +89,9 @@
                                 <button type="button" class="btn btn-danger delete-button">Delete</button>
                             </form>
                         </td>
-                        <td><a class="btn btn-primary mb-3" href="{{ route('admin.monthlyBill.showBill', ['id' => $bill->id]) }}">Payment History</a></td>
+                        <td><a class="btn btn-primary mb-3"
+                                href="{{ route('admin.monthlyBill.showBill', ['id' => $bill->id]) }}">Payment History</a>
+                        </td>
 
 
                         <td>
@@ -99,7 +101,7 @@
                         </td>
                     </tr>
                     @php
-                    $totalAmount += $bill->amount;
+                        $totalAmount += $bill->amount;
                     @endphp
                 @endforeach
             </tbody>
@@ -119,8 +121,8 @@
                         <form id="paymentForm" method="POST" action="{{ route('monthlyBill.storePayment') }}">
                             @csrf
                             @if($bill)
-                            <input type="hidden" name="bill_id" value="{{ $bill->id }}">
-                        @endif
+                            <input type="hidden" name="bill_id" id="modal_bill_id" value="{{ $bill->id }}">
+                            @endif
                             <div class="form-group">
                                 <label for="description">Description</label>
                                 <textarea class="form-control" id="description" name="description" rows="3"></textarea>
@@ -128,7 +130,7 @@
                             <div class="form-group">
                                 <label for="bill_amount">Bill Amount</label>
                                 <input type="number" class="form-control" id="bill_amount" name="bill_amount"
-                                value="{{ $totalAmount }}" readonly>
+                                    value="{{ $totalAmount}}" readonly>
                             </div>
                             <div class="form-group">
                                 <label for="receiveable_amount">Receivable Amount</label>
@@ -139,59 +141,89 @@
                                 <label for="due_amount">Due Amount</label>
                                 <input type="number" class="form-control" id="due_amount" name="due_amount" readonly>
                             </div>
-
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" form="paymentForm" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-primary" id="submitPaymentForm">Submit</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const deleteButtons = document.querySelectorAll('.delete-button');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const form = this.closest('.delete-form');
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You want to delete this bill!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
+                });
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteButtons = document.querySelectorAll('.delete-button');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const form = this.closest('.delete-form');
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You want to delete this bill!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
+                $('#submitPaymentForm').on('click', function(event) {
+                    event.preventDefault(); // Prevent default form submission
+                    var form = $('#paymentForm');
+                    var formData = form.serialize();
+
+                    // Debugging: log the form data
+                    console.log("Form Data:", formData);
+
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            if (response.status === 'Payment added successfully.') {
+                                $('#paymentModal').modal('hide');
+                                Swal.fire('Success', response.status, 'success').then(
+                                    () => {
+                                        location
+                                    .reload(); // Reload the page to update the status
+                                    });
+                            } else {
+                                Swal.fire('Error', response.error, 'error');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire('Error', 'An error occurred while processing the payment',
+                                'error');
+                            console.log(xhr.responseText); // Log the error response
                         }
                     });
                 });
             });
-        });
 
-        function printInvoice(event, printUrl) {
-            event.preventDefault();
-            var newWindow = window.open(printUrl, '_blank');
-            newWindow.onload = function() {
-                newWindow.print();
-                newWindow.onfocus = function() {
-                    newWindow.close();
+            function printInvoice(event, printUrl) {
+                event.preventDefault();
+                var newWindow = window.open(printUrl, '_blank');
+                newWindow.onload = function() {
+                    newWindow.print();
+                    newWindow.onfocus = function() {
+                        newWindow.close();
+                    };
                 };
-            };
-        }
-    </script>
-    <script>
-        document.getElementById('receiveable_amount').addEventListener('input', function() {
-            var billAmount = parseFloat(document.getElementById('bill_amount').value);
-            var receiveableAmount = parseFloat(this.value);
-            var dueAmount = billAmount - receiveableAmount;
-            document.getElementById('due_amount').value = dueAmount.toFixed(2);
-        });
-    </script>
-@endsection
+            }
+        </script>
+        <script>
+            document.getElementById('receiveable_amount').addEventListener('input', function() {
+                var billAmount = parseFloat(document.getElementById('bill_amount').value);
+                var receiveableAmount = parseFloat(this.value);
+                var dueAmount = billAmount - receiveableAmount;
+                document.getElementById('due_amount').value = dueAmount.toFixed(2);
+            });
+        </script>
+    @endsection

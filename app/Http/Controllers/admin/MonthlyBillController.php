@@ -48,7 +48,7 @@ class MonthlyBillController extends Controller
 
     public function index(Request $request)
     {
-        
+
 
         $query = MonthlyBill::with('regularCustomer');
 
@@ -148,48 +148,51 @@ class MonthlyBillController extends Controller
     public function storePayment(Request $request)
     {
         // Debugging: Check all request data
-        dd($request->all());
+        // dd($request->all());
 
         // Validate the request data
-        // $validatedData = $request->validate([
-        //     'description' => 'required|string',
-        //     'receiveable_amount' => 'required|numeric',
-        //     'bill_id' => 'required|exists:monthly_bills,id', // Ensure bill_id is present and valid
-        // ]);
+        $validatedData = $request->validate([
+            'description' => 'required|string',
+            'receiveable_amount' => 'required|numeric',
+            'bill_id' => 'required|exists:monthly_bills,id', // Ensure bill_id is present and valid
+        ]);
 
         // Find the bill and update its status
         $bill = MonthlyBill::findOrFail($request->input('bill_id'));
 
-        if ($bill->bill_type !== 'monthly') {
-            return redirect()->back()->with('error', 'Cannot insert payment for non-monthly bill.');
-        }
+        // if ($bill->bill_type !== 'monthly') {
+        //     return response()->json(['error' => 'Cannot insert payment for non-monthly bill.'], 400);
+        // }
 
-        // Store the payment details
+        // Calculate the due amount
+        $dueAmount = $bill->amount - $request->input('receiveable_amount');
+
+        // Create a new payment
         $payment = new Payment();
-
         $payment->bill_id = $request->input('bill_id');
         $payment->description = $request->input('description');
         $payment->receiveable_amount = $request->input('receiveable_amount');
-        $payment->due_amount = $bill->amount - $request->input('receiveable_amount');
-
+        $payment->due_amount = $dueAmount;
         $payment->save();
 
-
-        // Update the bill status to 'paid'
-        $bill->status = 'paid';
+        // Update the bill status to 'paid' if fully paid, otherwise 'pending'
+        $bill->status = $dueAmount <= 0 ? 'paid' : 'due';
         $bill->save();
 
-        // Return a redirect or a JSON response
-        return redirect()->route('admin.monthlyBill.index')->with('status', 'Payment added successfully.');
+        // Return a JSON response
+        return response()->json([
+            'status' => 'Payment added successfully.',
+            'bill_status' => $bill->status,
+        ]);
     }
-
 
     public function showBill($id)
     {
-        $payments = DB::table('payments')
-            ->where('bill_id', $id) // Use 'bill_id' if that’s the actual column name
-            ->get();
-        $bill = MonthlyBill::findOrFail($id)->payments;
-        return view('admin.monthlyBill.storePayment', compact('bill'));
+        $bill = MonthlyBill::find($id);
+        if (!$bill) {
+            abort(404);
+        }
+        $payments = $bill->payments;
+        return view('admin.monthlyBill.storePayment', compact('bill', 'payments'));
     }
 }
