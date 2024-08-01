@@ -76,21 +76,40 @@
                                                 <td>{{ \Carbon\Carbon::parse($bill->bill_month)->format('F Y') }}</td>
                                                 <td>{{ $bill->amount }}</td>
                                             </tr>
-                                            @if ($previousDue > 0)
-                                                @php
-                                                    $serialNumber++;
-                                                @endphp
-                                                <tr>
-                                                    <td>{{ $serialNumber }}</td>
-                                                    <td>Previous Due</td>
-                                                    <td>{{ \Carbon\Carbon::parse($bill->bill_month)->subMonth()->format('F Y') }}
-                                                    </td>
-                                                    <td>{{ $previousDue }}</td>
-                                                </tr>
-                                            @endif
+
                                         </tbody>
                                     </table>
                                 </div>
+                                @if ($previousBills->count() > 0)
+                                <div class="col-6 table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl. No.</th>
+                                                <th>Status</th>
+                                                <th>Due Month</th>
+                                                <th>Due Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php
+                                                $sl = 0;
+                                            @endphp
+                                            @foreach ($previousBills as $previousBill)
+                                                @php
+                                                    $sl++;
+                                                @endphp
+                                                <tr>
+                                                    <td>{{ $sl }}</td>
+                                                    <td>Previous Due</td>
+                                                    <td>{{ \Carbon\Carbon::parse($previousBill->bill_month)->format('F Y') }}</td>
+                                                    <td>{{ $previousBill->amount }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
                                 <!-- /.col -->
                             </div>
 

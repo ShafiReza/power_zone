@@ -101,23 +101,28 @@ class MonthlyBillController extends Controller
         $bill = MonthlyBill::with('regularCustomer')->findOrFail($id);
         $customer = $bill->regularCustomer;
 
-        // Calculate previous month's due
+        // Calculate previous months' due
+        $previousBills = MonthlyBill::where('regular_customer_id', $bill->regular_customer_id)
+            ->where('bill_month', '<', $bill->bill_month)
+            ->where('status', 'due')
+            ->orderBy('bill_month', 'asc')
+            ->get(['bill_month', 'amount']);
 
-
-        return view('admin.monthlyBill.invoice', compact('bill', 'customer', 'previousDue'));
+        return view('admin.monthlyBill.invoice', compact('bill', 'customer', 'previousBills'));
     }
+
     public function showInvoicePrint(MonthlyBill $bill)
     {
-        $customer = $bill->regularCustomer; // Assuming your relationship is correctly defined
+        $customer = $bill->regularCustomer;
 
-        // Calculate previous month's due
-        $previousMonth = Carbon::parse($bill->bill_month)->subMonth()->format('Y-m');
-        $previousDue = MonthlyBill::where('regular_customer_id', $bill->regular_customer_id)
-            ->where('bill_month', $previousMonth)
-            ->where('status', 'Due')
-            ->sum('amount');
+        // Calculate previous months' due
+        $previousBills = MonthlyBill::where('regular_customer_id', $bill->regular_customer_id)
+            ->where('bill_month', '<', $bill->bill_month)
+            ->where('status', 'due')
+            ->orderBy('bill_month', 'asc')
+            ->get(['bill_month', 'amount']);
 
-        return view('admin.monthlyBill.invoice_print', compact('bill', 'customer', 'previousDue'));
+        return view('admin.monthlyBill.invoice_print', compact('bill', 'customer', 'previousBills'));
     }
     // public function storePayment(Request $request, $id)
     // {

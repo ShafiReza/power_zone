@@ -147,6 +147,13 @@ class BillController extends Controller
 
             $billItem = new BillItem();
             $billItem->bill_id = $bill->id;
+            $product = Product::where('name', $productName)->first();
+            if ($product) {
+                $billItem->product_id = $product->id;
+            } else {
+                // Handle the case where the product is not found
+                return response()->json(['error' => 'Product not found'], 404);
+            }
             $billItem->product_name = $productName;
             $billItem->description = $descriptions[$index];
             $billItem->quantity = $quantity;

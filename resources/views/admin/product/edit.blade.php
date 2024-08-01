@@ -56,10 +56,7 @@
             <label for="wholesale_price">Wholesale Price:</label>
             <input type="number" step="0.01" class="form-control" id="wholesale_price" name="wholesale_price" value="{{ $product->wholesale_price }}" required>
         </div>
-        <div class="form-group col-4">
-            <label for="quantity">Quantity:</label>
-            <input type="number" class="form-control" id="quantity" name="quantity" value="{{ $product->quantity }}" required>
-        </div>
+       
         <button type="submit" class="btn btn-primary">Update</button>
         <a class="btn btn-secondary" href="{{ route('admin.product.index') }}">Back</a>
     </form>

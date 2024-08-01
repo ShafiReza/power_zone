@@ -75,7 +75,8 @@
                             @else
                                 <form action="{{ route('monthlyBill.toggleStatus', $bill->id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="btn btn-sm btn-secondary">{{ ucfirst($bill->status) }}</button>
+                                    <button type="submit"
+                                        class="btn btn-sm btn-secondary">{{ ucfirst($bill->status) }}</button>
                                 </form>
                             @endif
                         </td>
@@ -99,7 +100,7 @@
                         </td>
                     </tr>
                     @php
-                        $totalAmount += $bill->amount;
+                        $totalAmount = $bill->amount;
                     @endphp
                 @endforeach
             </tbody>
@@ -118,8 +119,8 @@
                     <div class="modal-body">
                         <form id="paymentForm" method="POST" action="{{ route('monthlyBill.storePayment') }}">
                             @csrf
-                            @if($bill)
-                            <input type="hidden" name="bill_id" id="modal_bill_id" value="{{ $bill->id }}">
+                            @if ($bill)
+                                <input type="hidden" name="bill_id" id="modal_bill_id" value="{{ $bill->id }}">
                             @endif
                             <div class="form-group">
                                 <label for="description">Description</label>
@@ -128,7 +129,8 @@
                             <div class="form-group">
                                 <label for="bill_amount">Bill Amount</label>
                                 <input type="number" class="form-control" id="bill_amount" name="bill_amount"
-                                    value="{{ $totalAmount}}" readonly>
+                                    value="{{ $totalAmount }}" readonly>
+
                             </div>
                             <div class="form-group">
                                 <label for="receiveable_amount">Receivable Amount</label>
@@ -149,79 +151,79 @@
             </div>
         </div>
     </div>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const deleteButtons = document.querySelectorAll('.delete-button');
-                deleteButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        const form = this.closest('.delete-form');
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: "You want to delete this bill!",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, delete it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                form.submit();
-                            }
-                        });
-                    });
-                });
-
-                $('#submitPaymentForm').on('click', function(event) {
-                    event.preventDefault(); // Prevent default form submission
-                    var form = $('#paymentForm');
-                    var formData = form.serialize();
-
-                    // Debugging: log the form data
-                    console.log("Form Data:", formData);
-
-                    $.ajax({
-                        url: form.attr('action'),
-                        type: 'POST',
-                        data: formData,
-                        success: function(response) {
-                            if (response.status === 'Payment added successfully.') {
-                                $('#paymentModal').modal('hide');
-                                Swal.fire('Success', response.status, 'success').then(
-                                    () => {
-                                        location
-                                    .reload(); // Reload the page to update the status
-                                    });
-                            } else {
-                                Swal.fire('Error', response.error, 'error');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire('Error', 'An error occurred while processing the payment',
-                                'error');
-                            console.log(xhr.responseText); // Log the error response
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-button');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const form = this.closest('.delete-form');
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You want to delete this bill!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
                         }
                     });
                 });
             });
 
-            function printInvoice(event, printUrl) {
-                event.preventDefault();
-                var newWindow = window.open(printUrl, '_blank');
-                newWindow.onload = function() {
-                    newWindow.print();
-                    newWindow.onfocus = function() {
-                        newWindow.close();
-                    };
-                };
-            }
-        </script>
-        <script>
-            document.getElementById('receiveable_amount').addEventListener('input', function() {
-                var billAmount = parseFloat(document.getElementById('bill_amount').value);
-                var receiveableAmount = parseFloat(this.value);
-                var dueAmount = billAmount - receiveableAmount;
-                document.getElementById('due_amount').value = dueAmount.toFixed(2);
+            $('#submitPaymentForm').on('click', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                var form = $('#paymentForm');
+                var formData = form.serialize();
+
+                // Debugging: log the form data
+                console.log("Form Data:", formData);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.status === 'Payment added successfully.') {
+                            $('#paymentModal').modal('hide');
+                            Swal.fire('Success', response.status, 'success').then(
+                                () => {
+                                    location
+                                        .reload(); // Reload the page to update the status
+                                });
+                        } else {
+                            Swal.fire('Error', response.error, 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire('Error', 'An error occurred while processing the payment',
+                            'error');
+                        console.log(xhr.responseText); // Log the error response
+                    }
+                });
             });
-        </script>
-    @endsection
+        });
+
+        function printInvoice(event, printUrl) {
+            event.preventDefault();
+            var newWindow = window.open(printUrl, '_blank');
+            newWindow.onload = function() {
+                newWindow.print();
+                newWindow.onfocus = function() {
+                    newWindow.close();
+                };
+            };
+        }
+    </script>
+    <script>
+        document.getElementById('receiveable_amount').addEventListener('input', function() {
+            var billAmount = parseFloat(document.getElementById('bill_amount').value);
+            var receiveableAmount = parseFloat(this.value);
+            var dueAmount = billAmount - receiveableAmount;
+            document.getElementById('due_amount').value = dueAmount.toFixed(2);
+        });
+    </script>
+@endsection

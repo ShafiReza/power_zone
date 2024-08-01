@@ -63,7 +63,7 @@ class ProductController extends Controller
             'purchase_price' => 'required|numeric',
             'sell_price' => 'required|numeric',
             'wholesale_price' => 'required|numeric',
-            'quantity' => 'required|integer',
+
         ]);
 
         $product->update($request->all());
@@ -93,25 +93,19 @@ class ProductController extends Controller
     return response()->json(['success' => true]);
 }
 
-// public function sales($id)
-// {
-//     $bills = Bill::with(['billItems', 'billItems2'])->get();
-
-//     return view('admin.product.sales', compact('bills'));
-// }
 public function sales($id)
 {
     // Fetch bills with billItems containing the specified product ID
     $bills = Bill::whereHas('billItems', function ($query) use ($id) {
-        $query->where('id', $id);
+        $query->where('product_id', $id); // Assuming 'product_id' is the correct field
     })->with(['billItems' => function ($query) use ($id) {
-        $query->where('id', $id);
+        $query->where('product_id', $id); // Assuming 'product_id' is the correct field
     }, 'billItems2'])->get();
-   // dd($bills);
 
     // Pass the product ID to the view
     return view('admin.product.sales', compact('bills', 'id'));
 }
+
 
 public function addProduct(Request $request)
 {
