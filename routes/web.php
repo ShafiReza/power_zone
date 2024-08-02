@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\Admin\MonthlyBillController;
 use App\Http\Controllers\Admin\QuotationController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -89,10 +90,14 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::get('bill/', [BillController::class, 'index'])->name('admin.bill.index');
         Route::get('bill/create', [BillController::class, 'create'])->name('admin.bill.create');
         Route::post('bill/', [BillController::class, 'store'])->name('bill.store');
-        Route::put('bill/{id}',  [BillController::class, 'update'])->name('admin.bill.update');
+        Route::put('bill/{id}', [BillController::class, 'update'])->name('admin.bill.update');
         Route::get('bill/{id}/invoice', [BillController::class, 'invoice'])->name('admin.bill.invoice');
         Route::get('bill/{id}/challan', [BillController::class, 'challan'])->name('admin.bill.challan');
         Route::delete('bill/{bill}', [BillController::class, 'destroy'])->name('bill.destroy');
+
+        Route::post('/bill/mark-as-paid', [BillController::class, 'markAsPaid'])->name('bill.markAsPaid');
+        Route::get('/admin/bill/payment-history/{bill}', [BillController::class, 'paymentHistory'])->name('admin.bill.paymentHistory');
+
 
 
         Route::get('monthlyBill', [MonthlyBillController::class, 'index'])->name('admin.monthlyBill.index');
@@ -101,7 +106,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::delete('monthlyBill/{id}', [MonthlyBillController::class, 'destroy'])->name('monthlyBill.destroy');
         Route::post('monthlyBill/{id}/toggle-status', [MonthlyBillController::class, 'toggleStatus'])->name('monthlyBill.toggleStatus');
         Route::get('/admin/monthlyBill/showInvoice/{id}', [MonthlyBillController::class, 'showInvoice'])->name('admin.monthlyBill.showInvoice');
-        Route::get('admin/monthly-bill/{bill}/print', [MonthlyBillController::class,'showInvoicePrint'])->name('admin.monthlyBill.showInvoicePrint');
+        Route::get('admin/monthly-bill/{bill}/print', [MonthlyBillController::class, 'showInvoicePrint'])->name('admin.monthlyBill.showInvoicePrint');
         Route::post('/monthlyBill/payment', [MonthlyBillController::class, 'storePayment'])->name('monthlyBill.storePayment');
         Route::get('/monthly-bills/{id}', [MonthlyBillController::class, 'showBill'])->name('admin.monthlyBill.showBill');
 

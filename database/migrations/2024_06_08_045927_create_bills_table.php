@@ -23,9 +23,11 @@ class CreateBillsTable extends Migration
             $table->decimal('final_amount', 10, 2)->default(0);
             $table->decimal('amount', 10, 2)->default(0);
             $table->year('billing_year')->nullable();
-            $table->date('billing_month')->nullable(); // Add billing_month column here
+            $table->date('billing_month')->nullable();
+            $table->string('status')->default('pending');
+            $table->decimal('due_amount', 8, 2)->default(0);
             $table->timestamps();
-     
+
             $table->foreign('regular_customer_id')->references('id')->on('regular_customers')->onDelete('cascade');
             $table->foreign('irregular_customer_id')->references('id')->on('irregular_customers')->onDelete('cascade');
         });

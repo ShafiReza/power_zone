@@ -19,6 +19,8 @@ class Bill extends Model
         'final_amount',
         'amount',
         'billing_month',
+        'status',
+        'due_amount',
     ];
     protected $attributes = [
         'billing_month' => null, // Default value, adjust as needed
@@ -62,5 +64,9 @@ class Bill extends Model
     public function billItems2()
     {
         return $this->hasMany(BillItem2::class);
+    }
+    public function payments()
+    {
+        return $this->hasMany(PaymentHistory::class);
     }
 }

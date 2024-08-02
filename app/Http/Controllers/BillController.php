@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Bill;
 use App\Models\BillItem;
 use App\Models\BillItem2;
+use App\Models\PaymentHistory;
 use Carbon\Carbon;
 
 
@@ -219,7 +220,44 @@ class BillController extends Controller
             ->with('success', 'Bill deleted successfully.');
     }
 
+    public function markAsPaid(Request $request)
+    {
+        $bill = Bill::findOrFail($request->bill_id);
 
+        $receivableAmount = $request->receivable_amount;
+        $dueAmount = $bill->final_amount - $receivableAmount;
+
+        if ($dueAmount <= 0) {
+            $status = 'paid';
+            $dueAmount = 0;
+        } else {
+            $status = 'partial';
+
+
+        }
+
+        // Update the bill
+        $bill->due_amount = $dueAmount;
+        $bill->status = $status;
+        $bill->save();
+
+        // Create a new payment record
+        PaymentHistory::create([
+            'bill_id' => $bill->id,
+            'description' => $request->description,
+            'bill_amount' => $bill->final_amount,
+            'receivable_amount' => $receivableAmount,
+            'due_amount' => $dueAmount,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function paymentHistory(Bill $bill)
+    {
+        $payments = PaymentHistory::where('bill_id', $bill->id)->get();
+        return view('admin.bill.payment_history', compact('payments'));
+    }
 
 
 }
