@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('bill_month'); // Ensure this is a date field
             $table->date('start_date'); // Ensure this is a date field
             $table->date('next_generation_date')->nullable();
-            $table->enum('status', ['pending', 'paid', 'due']);
+            $table->enum('status', ['pending', 'paid', 'due','Partial']);
             $table->timestamps();
 
             $table->foreign('regular_customer_id')->references('id')->on('regular_customers')->onDelete('cascade');

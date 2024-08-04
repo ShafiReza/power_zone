@@ -1,4 +1,3 @@
-<!-- resources/views/admin/payment_history.blade.php -->
 @extends('admin.layout.layout')
 
 @section('content')
@@ -13,6 +12,7 @@
                 <th>Receivable Amount</th>
                 <th>Due Amount</th>
                 <th>Date</th>
+                {{-- <th>Action</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -24,9 +24,41 @@
                 <td>{{ $payment->receivable_amount }}</td>
                 <td>{{ $payment->due_amount }}</td>
                 <td>{{ $payment->created_at }}</td>
+                {{-- <td>
+                    <button class="btn btn-danger delete-button" data-id="{{ $payment->id }}">Delete</button>
+                    <form action="{{ route('payment.delete', $payment->id) }}" method="POST" class="delete-form" style="display: none;">
+                        @csrf
+                        @method('DELETE')
+                    </form>
+                </td> --}}
             </tr>
             @endforeach
         </tbody>
     </table>
 </div>
+{{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Attach click event listeners to delete buttons
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('tr').querySelector('.delete-form');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to delete this payment record!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script> --}}
 @endsection

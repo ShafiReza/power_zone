@@ -220,43 +220,87 @@ class BillController extends Controller
             ->with('success', 'Bill deleted successfully.');
     }
 
+    // public function markAsPaid(Request $request)
+    // {
+    //     $bill = Bill::findOrFail($request->bill_id);
+
+    //     // Check if this is the first payment
+    //     if ($bill->status === 'paid') {
+    //         $receivableAmount = $request->receivable_amount;
+    //         $dueAmount = $bill->final_amount - $receivableAmount;
+    //         $status = ($dueAmount <= 0) ? 'paid' : 'partial';
+    //     } else {
+    //         // This is not the first payment, update bill amount to due amount
+    //         $billAmount = $bill->due_amount;
+    //         $receivableAmount = $request->receivable_amount;
+    //         $dueAmount = $billAmount - $receivableAmount;
+    //         $status = ($dueAmount <= 0) ? 'paid' : 'partial';
+    //     }
+
+    //     // Update the bill
+    //     $bill->due_amount = $dueAmount;
+    //     $bill->status = $status;
+    //     $bill->save();
+
+    //     // Create a new payment record
+    //     $paymentHistory = PaymentHistory::create([
+    //         'bill_id' => $bill->id,
+    //         'description' => $request->description,
+    //         'bill_amount' => $dueAmount,
+    //         'receivable_amount' => $receivableAmount,
+    //         'due_amount' => $dueAmount,
+    //     ]);
+
+    //     return response()->json(['success' => true, 'dueAmount' => $paymentHistory->due_amount]);
+    // }
+
     public function markAsPaid(Request $request)
-    {
-        $bill = Bill::findOrFail($request->bill_id);
+{
+    $bill = Bill::findOrFail($request->bill_id);
 
-        $receivableAmount = $request->receivable_amount;
-        $dueAmount = $bill->final_amount - $receivableAmount;
-
-        if ($dueAmount <= 0) {
-            $status = 'paid';
-            $dueAmount = 0;
-        } else {
-            $status = 'partial';
-
-
-        }
-
-        // Update the bill
-        $bill->due_amount = $dueAmount;
-        $bill->status = $status;
-        $bill->save();
-
-        // Create a new payment record
-        PaymentHistory::create([
-            'bill_id' => $bill->id,
-            'description' => $request->description,
-            'bill_amount' => $bill->final_amount,
-            'receivable_amount' => $receivableAmount,
-            'due_amount' => $dueAmount,
-        ]);
-
-        return response()->json(['success' => true]);
+    // Check if this is the first payment
+    if ($bill->status === 'pending') {
+        $billAmount = $bill->final_amount;
+    } else {
+        // This is not the first payment, update bill amount to due amount
+        $billAmount = $bill->due_amount;
     }
 
-    public function paymentHistory(Bill $bill)
+    $receivableAmount = $request->receivable_amount;
+    $dueAmount = $billAmount - $receivableAmount;
+    $status = ($dueAmount <= 0) ? 'paid' : 'partial';
+
+    // Update the bill
+    $bill->due_amount = $dueAmount;
+    $bill->status = $status;
+    $bill->save();
+
+    // Create a new payment record
+    $paymentHistory = PaymentHistory::create([
+        'bill_id' => $bill->id,
+        'description' => $request->description,
+        'bill_amount' => $billAmount,
+        'receivable_amount' => $receivableAmount,
+        'due_amount' => $dueAmount,
+    ]);
+
+    return response()->json(['success' => true, 'dueAmount' => $paymentHistory->due_amount]);
+}
+
+
+
+    public function paymentHistory($billId)
     {
-        $payments = PaymentHistory::where('bill_id', $bill->id)->get();
+        $payments = PaymentHistory::where('bill_id', $billId)->latest()->get();
         return view('admin.bill.payment_history', compact('payments'));
+    }
+
+    public function PaymentDestroy($id)
+    {
+        $payment = PaymentHistory::findOrFail($id);
+        $payment->delete();
+
+        return redirect()->back()->with('success', 'Payment record deleted successfully.');
     }
 
 
