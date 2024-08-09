@@ -12,14 +12,15 @@ class Payment extends Model
     protected $fillable = [
         'bill_id',
         'description',
-        'receiveable_amount',
+        'receivable_amount',
         'due_amount',
         'updated_at',
         'created_at'
     ];
 
     public function bill()
-{
-    return $this->belongsTo(MonthlyBill::class, 'bill_id'); // Make sure 'bill_id' matches the column in the payments table
+    {
+        return $this->belongsTo(MonthlyBill::class, 'bill_id'); // Make sure 'bill_id' matches the column in the payments table
+    }
 }
-}
+

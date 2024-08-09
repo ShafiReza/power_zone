@@ -254,38 +254,41 @@ class BillController extends Controller
     //     return response()->json(['success' => true, 'dueAmount' => $paymentHistory->due_amount]);
     // }
 
-    public function markAsPaid(Request $request)
-{
-    $bill = Bill::findOrFail($request->bill_id);
+    public function markPaid(Request $request)
+    {
+        $bill = Bill::findOrFail($request->bill_id);
 
-    // Check if this is the first payment
-    if ($bill->status === 'pending') {
-        $billAmount = $bill->final_amount;
-    } else {
-        // This is not the first payment, update bill amount to due amount
-        $billAmount = $bill->due_amount;
+        // Check if this is the first payment
+        if ($bill->status === 'pending') {
+            $billAmount = $bill->final_amount;
+        } else {
+            // This is not the first payment, update bill amount to due amount
+            $billAmount = $bill->due_amount;
+        }
+
+        $receivableAmount = $request->receivable_amount;
+        $dueAmount = $billAmount - $receivableAmount;
+        $status = ($dueAmount <= 0) ? 'paid' : 'partial';
+
+        // Update the bill
+        $bill->due_amount = $dueAmount;
+        $bill->status = $status;
+        $bill->save();
+
+        // Create a new payment record
+        $paymentHistory = PaymentHistory::create([
+            'bill_id' => $bill->id,
+            'description' => $request->description,
+            'bill_amount' => $billAmount,
+            'receivable_amount' => $receivableAmount,
+            'due_amount' => $dueAmount,
+        ]);
+
+        return response()->json(['success' => true, 'dueAmount' => $paymentHistory->due_amount]);
     }
 
-    $receivableAmount = $request->receivable_amount;
-    $dueAmount = $billAmount - $receivableAmount;
-    $status = ($dueAmount <= 0) ? 'paid' : 'partial';
 
-    // Update the bill
-    $bill->due_amount = $dueAmount;
-    $bill->status = $status;
-    $bill->save();
 
-    // Create a new payment record
-    $paymentHistory = PaymentHistory::create([
-        'bill_id' => $bill->id,
-        'description' => $request->description,
-        'bill_amount' => $billAmount,
-        'receivable_amount' => $receivableAmount,
-        'due_amount' => $dueAmount,
-    ]);
-
-    return response()->json(['success' => true, 'dueAmount' => $paymentHistory->due_amount]);
-}
 
 
 

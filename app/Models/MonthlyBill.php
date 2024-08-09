@@ -18,6 +18,8 @@ class MonthlyBill extends Model
         'bill_month',
         'start_date',
         'status',
+        'type',
+        'due_amount',
         'next_generation_date',
     ];
 

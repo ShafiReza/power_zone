@@ -4,13 +4,26 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\RegularCustomer;
+use App\Models\IrregularCustomer;
+use App\Models\MonthlyBill;
+use App\Models\Bill;
 use Auth;
 use Validator;
 class AdminController extends Controller
 {
-    public function dashboard(){
-        return view("admin.dashboard");
+    public function dashboard()
+    {
+        // Calculate total number of regular customers
+        $totalRegularCustomers = RegularCustomer::count();
+        $totalIrregularCustomers = IrregularCustomer::count();
+        $totalDueAmount = MonthlyBill::where('status', 'Due')->sum('amount');
+        $totalPaidAmount = MonthlyBill::where('status', 'Paid')->sum('amount');
+        $totalPaid = Bill::where('status', 'paid')->sum('final_amount');
+        $totalDue = Bill::where('status', 'pending')->sum('final_amount');
 
+        // Pass the count to the view
+        return view("admin.dashboard", compact('totalRegularCustomers','totalIrregularCustomers','totalDueAmount','totalPaidAmount','totalPaid','totalDue'));
     }
     public function login(Request $request ){
         if($request->isMethod('post')){

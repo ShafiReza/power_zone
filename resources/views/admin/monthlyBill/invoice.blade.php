@@ -101,13 +101,15 @@
                                                 @endphp
                                                 <tr>
                                                     <td>{{ $sl }}</td>
-                                                    <td>Previous Due</td>
+                                                    <td>
+                                                            Previous Due
+                                                    </td>
                                                     <td>{{ \Carbon\Carbon::parse($previousBill->bill_month)->format('F Y') }}</td>
                                                     <td>
-                                                        @if ($previousBill->status == 'partial')
-                                                            {{ $previousBill->due_amount }}
+                                                        @if ($previousBill->status == 'pending')
+                                                        {{ $previousBill->amount }}
                                                         @else
-                                                            {{ $previousBill->amount }}
+                                                        {{ $previousBill->due_amount }}
                                                         @endif
                                                     </td>
                                                 </tr>

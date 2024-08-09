@@ -13,6 +13,7 @@ class RegularCustomerController extends Controller
     public function index()
     {
         $regularCustomers = RegularCustomer::all();
+
         return view('admin.regularCustomer.index', compact('regularCustomers'));
     }
 

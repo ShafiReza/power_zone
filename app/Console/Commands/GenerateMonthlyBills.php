@@ -1,48 +1,67 @@
 <?php
 
 namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
 use App\Models\MonthlyBill;
 use App\Models\RegularCustomer;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Http\Controllers\admin\MonthlyBillController;
+
 
 class GenerateMonthlyBills extends Command
 {
-    protected $signature = 'generate:monthlybills';
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'generatemonthlybills:cron';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
     protected $description = 'Generate monthly bills for regular customers';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * Execute the console command.
+     */
     public function handle()
-{
-    $customers = RegularCustomer::all();
-    $currentDate = Carbon::now();
+    {
+        $customers = RegularCustomer::all();
+        $currentDate = Carbon::now();
+        $monthlyBillController = new MonthlyBillController();
 
-    foreach ($customers as $customer) {
-        $latestBill = MonthlyBill::where('regular_customer_id', $customer->id)
-            ->latest()
-            ->first();
+        foreach ($customers as $customer) {
+            $latestBill = MonthlyBill::where('regular_customer_id', $customer->id)
+                ->latest()
+                ->first();
 
-        if ($latestBill && $latestBill->next_generation_date <= $currentDate) {
-            // Generate a new bill
-            $newBill = MonthlyBill::create([
-                'regular_customer_id' => $customer->id,
-                'customer_address' => $customer->address,
-                'amount' => 0, // Default amount, adjust as needed
-                'service' => 'lift', // Default service, adjust as needed
-                'bill_month' => $currentDate->format('Y-m'),
-                'start_date' => $currentDate,
-                'status' => 'pending',
-                'next_generation_date' => $currentDate->addMonth(),
-            ]);
+            if ($latestBill && $latestBill->next_generation_date <= $currentDate) {
+                // Update the status of the previous bill to "due" if it's "Partial" or "pending"
+                if (in_array($latestBill->status, ['Partial', 'pending'])) {
+                    $latestBill->status = 'due';
+                    $latestBill->save();
+                }
 
-            // Update the latest bill's next generation date
-            $latestBill->next_generation_date = $newBill->next_generation_date;
-            $latestBill->save();
+                // Generate a new bill
+                $billDetails = $monthlyBillController->getBillDetails($customer);
+
+                MonthlyBill::create([
+                    'regular_customer_id' => $customer->id,
+                    'customer_address' => $customer->address,
+                    'amount' => $billDetails['amount'],
+                    'description' => $billDetails['description'],
+                    'service' => $billDetails['service'],
+                    'bill_month' => $currentDate->format('F Y'),
+                    'start_date' => $currentDate,
+                    'next_generation_date' => $currentDate->copy()->addMonth(),
+                    'status' => 'pending',
+                    'type' => 'initial',
+                ]);
+            }
         }
     }
-}
 }

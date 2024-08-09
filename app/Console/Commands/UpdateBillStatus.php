@@ -1,29 +1,41 @@
 <?php
 
 namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
 use App\Models\MonthlyBill;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
 
 class UpdateBillStatus extends Command
 {
-    protected $signature = 'update:billstatus';
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'updatebillstatus:cron';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
     protected $description = 'Update the status of bills to due if not paid within a month';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
+    /**
+     * Execute the console command.
+     */
     public function handle()
-{
-    $bills = MonthlyBill::where('status', 'pending')->get();
+    {
+        $bills = MonthlyBill::whereIn('status', ['pending', 'partial'])
+            ->where('next_generation_date', '<=', Carbon::now())
+            ->get();
 
-    foreach ($bills as $bill) {
-        $startDate = Carbon::parse($bill->start_date);
-        if ($startDate->diffInMonths(Carbon::now()) >= 1) {
-            $bill->update(['status' => 'due']);
+        foreach ($bills as $bill) {
+            if ($bill->status != 'paid') {
+                $bill->status = 'due';
+                $bill->save();
+            }
         }
     }
-}
 }

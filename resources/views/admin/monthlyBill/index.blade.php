@@ -1,229 +1,242 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="content-wrapper container-fluid">
-        <h2>Monthly Bill List</h2>
+<div class="content-wrapper container-fluid">
+    <h2>Monthly Bill List</h2>
 
-        @if ($message = Session::get('success'))
-            <div class="alert alert-success">
-                <p>{{ $message }}</p>
-            </div>
-        @endif
+    @if ($message = Session::get('success'))
+        <div class="alert alert-success">
+            <p>{{ $message }}</p>
+        </div>
+    @endif
 
-        <form action="{{ route('admin.monthlyBill.index') }}" method="GET">
-            <div class="form-row">
-                <div class="form-group col-2">
-                    <label for="month">Month:</label>
-                    <input type="month" class="form-control" id="month" name="month">
-                </div>
-                <div class="form-group col-2">
-                    <label for="customer_name">Customer Name:</label>
-                    <input type="text" class="form-control" id="customer_name" name="customer_name">
-                </div>
-                <div class="form-group col-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
+    <form action="{{ route('admin.monthlyBill.index') }}" method="GET">
+        <div class="form-row">
+            <div class="form-group col-2">
+                <label for="month">Month:</label>
+                <input type="month" class="form-control" id="month" name="month">
             </div>
-        </form>
-        <a class="btn btn-success mb-3" href="{{ route('admin.monthlyBill.create') }}">Create Monthly Bill</a>
-        <table class="table table-bordered">
-            <thead>
+            <div class="form-group col-2">
+                <label for="customer_name">Customer Name:</label>
+                <input type="text" class="form-control" id="customer_name" name="customer_name">
+            </div>
+            <div class="form-group col-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
+    <a class="btn btn-success mb-3" href="{{ route('admin.monthlyBill.create') }}">Create Monthly Bill</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer Name</th>
+                <th>Customer Address</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Service</th>
+                <th>Bill Month</th>
+                <th>Start Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($bills as $bill)
                 <tr>
-                    <th>ID</th>
-                    <th>Customer Name</th>
-                    <th>Customer Address</th>
-                    <th>Amount</th>
-                    <th>Description</th>
-                    <th>Service</th>
-                    <th>Bill Month</th>
-                    <th>Start Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
+                    <td>{{ $bill->id }}</td>
+                    <td>{{ $bill->regularCustomer ? $bill->regularCustomer->name : 'N/A' }}</td>
+                    <td>{{ $bill->customer_address }}</td>
+                    <td>{{ $bill->amount }}</td>
+                    <td>{{ $bill->description }}</td>
+                    <td>{{ ucfirst($bill->service) }}</td>
+                    <td>{{ \Carbon\Carbon::parse($bill->bill_month)->format('F Y') }}</td>
+                    <td>{{ $bill->start_date }}</td>
+                    <td>
+                        @if($bill->status == 'paid' && $bill->due_amount == 0)
+                            <button class="btn btn-sm btn-secondary">
+                                Paid
+                            </button>
+                        @elseif($bill->status == 'Partial' && $bill->due_amount > 0)
+                            <button class="btn btn-sm btn-info mark-paid-button" data-id="{{ $bill->id }}" data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">
+                                Partial
+                            </button>
+                        @elseif($bill->status == 'pending')
+                            <button class="btn btn-sm btn-success mark-paid-button" data-id="{{ $bill->id }}" data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">
+                                Mark as Paid
+                            </button>
+                        @elseif($bill->status == 'due')
+                            <button class="btn btn-sm btn-danger">
+                                Due
+                            </button>
+                        @elseif($bill->status != 'paid' && $bill->bill_month == \Carbon\Carbon::now()->format('F Y'))
+                            <button class="btn btn-sm btn-danger">
+                                Due
+                            </button>
+                        @endif
+                    </td>
+
+                    <td>
+                        <form action="{{ route('monthlyBill.destroy', $bill->id) }}" method="POST"
+                              class="delete-form">
+                            @csrf
+                            @method('DELETE')
+                            <button type="button" class="btn btn-danger delete-button">Delete</button>
+                        </form>
+                    </td>
+                    <td><a class="btn btn-primary mb-3"
+                           href="{{ route('admin.monthlyBill.showBill', ['id' => $bill->id]) }}">Payment History</a>
+                    </td>
+                    <td>
+                        <a href="{{ route('admin.monthlyBill.invoice', ['clientId' => $bill->id, 'month' => $bill->bill_month]) }}"
+                           onclick="printInvoice(event, '{{ route('admin.monthlyBill.showInvoicePrint', $bill->id) }}')"
+                           class="btn btn-default"><i class="fas fa-print"></i> Print</a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
+            @endforeach
+        </tbody>
+    </table>
 
-                @php
-                    $totalAmount = 0;
-                @endphp
-                @foreach ($bills as $bill)
-                    <tr>
-                        <td>{{ $bill->id }}</td>
-                        <td>{{ $bill->regularCustomer ? $bill->regularCustomer->name : 'N/A' }}</td>
-                        <td>{{ $bill->customer_address }}</td>
-                        <td>{{ $bill->amount }}</td>
-                        <td>{{ $bill->description }}</td>
-                        <td>{{ ucfirst($bill->service) }}</td>
-                        <td>{{ \Carbon\Carbon::parse($bill->bill_month)->format('F Y') }}</td>
-                        <td>{{ $bill->start_date }}</td>
-                        <td>
-                            @if ($bill->status == 'pending')
-                                @if (\Carbon\Carbon::parse($bill->start_date)->diffInMonths(\Carbon\Carbon::now()) < 1)
-                                    <form action="{{ route('monthlyBill.toggleStatus', $bill->id) }}" method="POST">
-                                        @csrf
-                                        <button type="button" class="btn btn-sm btn-success" data-toggle="modal"
-                                            data-target="#paymentModal">Mark as Paid</button>
-                                    </form>
-                                @elseif(\Carbon\Carbon::parse($bill->start_date)->diffInMonths(\Carbon\Carbon::now()) >= 1)
-                                    <form action="{{ route('monthlyBill.toggleStatus', $bill->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-warning">Mark as Due</button>
-                                    </form>
-                                @else
-                                    {{ ucfirst($bill->status) }}
-                                @endif
-                            @else
-                                <form action="{{ route('monthlyBill.toggleStatus', $bill->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit"
-                                        class="btn btn-sm btn-secondary">{{ ucfirst($bill->status) }}</button>
-                                </form>
-                            @endif
-                        </td>
-                        <td>
-                            <form action="{{ route('monthlyBill.destroy', $bill->id) }}" method="POST"
-                                class="delete-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" class="btn btn-danger delete-button">Delete</button>
-                            </form>
-                        </td>
-                        <td><a class="btn btn-primary mb-3"
-                                href="{{ route('admin.monthlyBill.showBill', ['id' => $bill->id]) }}">Payment History</a>
-                        </td>
-
-
-                        <td>
-                            <a href="{{ route('admin.monthlyBill.showInvoice', $bill->id) }}"
-                                onclick="printInvoice(event, '{{ route('admin.monthlyBill.showInvoicePrint', $bill->id) }}')"
-                                class="btn btn-default"><i class="fas fa-print"></i> Print</a>
-                        </td>
-                    </tr>
-                    @php
-                        $totalAmount = $bill->amount;
-                    @endphp
-                @endforeach
-            </tbody>
-        </table>
-        <!-- Modal -->
-        <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
+    <div class="modal fade" id="markPaidModal" tabindex="-1" role="dialog" aria-labelledby="markPaidModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form id="markPaidForm">
+                    @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="paymentModalLabel">Payment Details</h5>
+                        <h5 class="modal-title" id="markPaidModalLabel">Mark as Paid</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="paymentForm" method="POST" action="{{ route('monthlyBill.storePayment') }}">
-                            @csrf
-                            @if ($bill)
-                                <input type="hidden" name="bill_id" id="modal_bill_id" value="{{ $bill->id }}">
-                            @endif
-                            <div class="form-group">
-                                <label for="description">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="bill_amount">Bill Amount</label>
-                                <input type="number" class="form-control" id="bill_amount" name="bill_amount"
-                                    value="{{ $totalAmount }}" readonly>
-
-                            </div>
-                            <div class="form-group">
-                                <label for="receiveable_amount">Receivable Amount</label>
-                                <input type="number" class="form-control" id="receiveable_amount" name="receiveable_amount"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <label for="due_amount">Due Amount</label>
-                                <input type="number" class="form-control" id="due_amount" name="due_amount" readonly>
-                            </div>
-                        </form>
+                        <input type="hidden" name="bill_id" id="billId">
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea name="description" id="description" class="form-control"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="bill_amount">Bill Amount</label>
+                            <input type="text" name="amount" id="billAmount" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="receivable_amount">Receivable Amount</label>
+                            <input type="text" name="receivable_amount" id="receivableAmount" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="due_amount">Due Amount</label>
+                            <input type="text" name="due_amount" id="dueAmount" class="form-control" readonly>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="submitPaymentForm">Submit</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const deleteButtons = document.querySelectorAll('.delete-button');
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const form = this.closest('.delete-form');
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You want to delete this bill!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
-                });
-            });
+</div>
 
-            $('#submitPaymentForm').on('click', function(event) {
-                event.preventDefault(); // Prevent default form submission
-                var form = $('#paymentForm');
-                var formData = form.serialize();
-
-                // Debugging: log the form data
-                console.log("Form Data:", formData);
-
-                $.ajax({
-                    url: form.attr('action'),
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        if (response.status === 'Payment added successfully.') {
-                            $('#paymentModal').modal('hide');
-                            Swal.fire('Success', response.status, 'success').then(
-                                () => {
-                                    location
-                                        .reload(); // Reload the page to update the status
-                                });
-                        } else {
-                            Swal.fire('Error', response.error, 'error');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire('Error', 'An error occurred while processing the payment',
-                            'error');
-                        console.log(xhr.responseText); // Log the error response
-                    }
-                });
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+ document.addEventListener('DOMContentLoaded', function() {
+    // Attach click event listeners to delete buttons
+    const deleteButtons = document.querySelectorAll('.delete-button');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const form = this.closest('.delete-form');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to delete this customer!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
             });
         });
+    });
 
-        function printInvoice(event, printUrl) {
-            event.preventDefault();
-            var newWindow = window.open(printUrl, '_blank');
-            newWindow.onload = function() {
-                newWindow.print();
-                newWindow.onfocus = function() {
-                    newWindow.close();
-                };
-            };
-        }
-    </script>
-    <script>
-        document.getElementById('receiveable_amount').addEventListener('input', function() {
-            var billAmount = parseFloat(document.getElementById('bill_amount').value);
-            var receiveableAmount = parseFloat(this.value);
-            var dueAmount = billAmount - receiveableAmount;
-            document.getElementById('due_amount').value = dueAmount.toFixed(2);
+    // Attach click event listeners to mark as paid buttons
+    const markPaidButtons = document.querySelectorAll('.mark-paid-button');
+    markPaidButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const billId = this.getAttribute('data-id');
+            const finalAmount = parseFloat(this.getAttribute('data-final-amount'));
+            const dueAmount = parseFloat(this.getAttribute('data-due-amount'));
+            const status = this.textContent.trim().toLowerCase(); // Get the status text
+
+            document.getElementById('billId').value = billId;
+
+            // Set bill amount to due amount for subsequent payments
+            if (status === 'partial') {
+                document.getElementById('billAmount').value = dueAmount;
+            } else if (status === 'paid') {
+                document.getElementById('billAmount').value = finalAmount;
+            } else {
+                document.getElementById('billAmount').value = finalAmount;
+            }
+
+            document.getElementById('receivableAmount').value = '';
+            document.getElementById('dueAmount').value = dueAmount;
+
+            $('#markPaidModal').modal('show');
         });
-    </script>
+    });
+
+    // Calculate due amount on receivable amount change
+    document.getElementById('receivableAmount').addEventListener('input', function() {
+        const billAmount = parseFloat(document.getElementById('billAmount').value);
+        const receivableAmount = parseFloat(this.value);
+        const dueAmount = billAmount - receivableAmount;
+        document.getElementById('dueAmount').value = dueAmount;
+    });
+
+    // Handle form submission for marking as paid
+    document.getElementById('markPaidForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        fetch('{{ route('monthlyBill.Paid') }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            // Debugging the response
+            console.log(response);
+            return response.json();
+        })
+        .then(data => {
+            console.log(data); // Debugging the parsed JSON data
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('An error occurred');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred');
+        });
+    });
+});
+
+function printInvoice(event, printUrl) {
+    event.preventDefault();
+    var newWindow = window.open(printUrl, '_blank');
+    newWindow.onload = function() {
+        newWindow.print();
+        newWindow.onfocus = function() {
+            newWindow.close();
+        };
+    };
+}
+
+</script>
 @endsection
