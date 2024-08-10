@@ -13,6 +13,8 @@ class BillItem2 extends Model
         'discount_type',
         'discount',
         'vat',
+        'receivable_amount',
+        'due_amount',
         'final_amount'
 
     ];

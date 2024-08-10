@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('discount_type');
             $table->decimal('discount', 8, 2);
             $table->decimal('vat', 8, 2);
+            $table->decimal('receivable_amount', 10, 2)->default(0); // Add this field
+            $table->decimal('due_amount', 10, 2)->default(0); // Add this field
             $table->decimal('final_amount', 10, 2);
             $table->timestamps();
 

@@ -57,10 +57,10 @@
                             <button class="btn btn-sm btn-secondary">
                                 Paid
                             </button>
-                        @elseif($bill->status == 'Partial' && $bill->due_amount > 0)
+                        {{-- @elseif($bill->status == 'Partial' && $bill->due_amount > 0)
                             <button class="btn btn-sm btn-info mark-paid-button" data-id="{{ $bill->id }}" data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">
                                 Partial
-                            </button>
+                            </button> --}}
                         @elseif($bill->status == 'pending')
                             <button class="btn btn-sm btn-success mark-paid-button" data-id="{{ $bill->id }}" data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">
                                 Mark as Paid
@@ -173,9 +173,10 @@
             document.getElementById('billId').value = billId;
 
             // Set bill amount to due amount for subsequent payments
-            if (status === 'partial') {
-                document.getElementById('billAmount').value = dueAmount;
-            } else if (status === 'paid') {
+            // if (status === 'partial') {
+            //     document.getElementById('billAmount').value = dueAmount;
+            // } else
+            if (status === 'paid') {
                 document.getElementById('billAmount').value = finalAmount;
             } else {
                 document.getElementById('billAmount').value = finalAmount;

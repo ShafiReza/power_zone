@@ -46,7 +46,6 @@
                     </select>
                 </div>
             </div>
-            <input type="hidden" name="products[]" value="">
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -64,41 +63,48 @@
 
                 </tbody>
             </table>
-            <button type="button" class="btn btn-primary mb-5" onclick="addProductRow()">Add Row</button>
+
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>Discount Type</th>
                         <th>Discount</th>
                         <th>VAT</th>
+                        <th>Receivable Amount</th>
+                        <th>Due Amount</th>
                         <th>Final Amount</th>
                     </tr>
                 </thead>
                 <tbody id="bill-items2">
                     <tr>
-                        <td><select class="form-control discountType" name="bill_items2[0][discount_type]"
+                        <td>
+                            <select class="form-control discountType" name="bill_items2[0][discount_type]"
                                 onchange="calculateFinalAmount()">
                                 <option value="Flat">Flat</option>
                                 <option value="Percentage">Percentage</option>
-                            </select></td>
-                        <td><input type="number" class="form-control discount" name="bill_items2[0][discount]"
+                            </select>
+                        </td>
+                        <td><input type="text" class="form-control discount" name="bill_items2[0][discount]"
+                                value="0.00" onchange="calculateFinalAmount()"></td>
+                        <td><input type="text" class="form-control vat" name="bill_items2[0][vat]" value="0.00"
                                 onchange="calculateFinalAmount()"></td>
-                        <td><input type="number" class="form-control vat" name="bill_items2[0][vat]"
-                                onchange="calculateFinalAmount()"></td>
+                        <td><input type="text" class="form-control receivable_amount"
+                                name="bill_items2[0][receivable_amount]" value="0.00" onchange="calculateFinalAmount()">
+                        </td>
+                        <td><input type="text" class="form-control due_amount" name="bill_items2[0][due_amount]"
+                                value="0.00" onchange="calculateFinalAmount()"></td>
                         <td><input type="text" class="form-control final-amount" name="bill_items2[0][final_amount]"
                                 value="0.00" readonly></td>
-                        {{-- <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td> --}}
                     </tr>
                 </tbody>
             </table>
-            {{-- <button type="button" class="btn btn-primary" onclick="addRow2()">Add Row</button> --}}
+
             <button type="submit" class="btn btn-success">Submit</button>
         </form>
     </div>
 
     <script>
         function getCustomers(customerType) {
-
             if (customerType) {
                 $.ajax({
                     type: "GET",
@@ -107,19 +113,10 @@
                         customerType: customerType
                     },
                     success: function(data) {
-                        console.log(data)
                         $('#customerName').empty().append("<option value=''>Select Customer</option>");
                         $.each(data, function(index, customer) {
-
-                            if (customerType == 'regularCustomer') {
-                                $('#customerName').append('<option value="' + customer
-                                    .id + '">' + customer.name +
-                                    '</option>');
-                            } else {
-                                $('#customerName').append('<option value="' + customer
-                                    .id+ '">' + customer.name +
-                                    '</option>');
-                            }
+                            $('#customerName').append('<option value="' + customer.id + '">' + customer
+                                .name + '</option>');
                         });
                     },
                     error: function(xhr, status, error) {
@@ -130,14 +127,6 @@
                 $('#customerName').empty().append('<option value="">Select Customer</option>');
             }
         }
-
-        // Call getCustomers function based on the selected customer type
-        $(document).ready(function() {
-            $('#customerType').on('change', function() {
-                var selectedType = $(this).val();
-                getCustomers(selectedType);
-            });
-        });
 
         function addProductRow(productId) {
             if (!productId) return;
@@ -154,7 +143,7 @@
                             <td><textarea class="form-control" name="description[]"></textarea></td>
                             <td><input type="number" class="form-control quantity" name="quantity[]" value="1" onchange="calculateTotal(this)"></td>
                             <td><input type="number" class="form-control unitPrice" name="unitPrice[]" value="${data.sell_price}" onchange="calculateTotal(this)"></td>
-                            <td><input type="number" class="form-control discount" name="discount[]" onchange="calculateTotal(this)"></td>
+                            <td><input type="number" class="form-control discount" name="discount[]" value="0.00" onchange="calculateTotal(this)"></td>
                             <td>
                                 <select class="form-control discountType" name="discountType[]" onchange="calculateTotal(this)">
                                     <option value="Percentage">Percentage(%)</option>
@@ -196,10 +185,12 @@
         function calculateFinalAmount() {
             let finalAmount = 0;
 
+            // Calculate the total amount from the bill items
             $('#bill-items .total-amount').each(function() {
                 finalAmount += parseFloat($(this).val()) || 0;
             });
 
+            // Process the additional fields (discount, VAT)
             $('#bill-items2 tr').each(function() {
                 const discountType = $(this).find('.discountType').val();
                 const discountAmount = parseFloat($(this).find('.discount').val()) || 0;
@@ -216,7 +207,13 @@
                 finalAmount -= discount;
             });
 
+            // Calculate the due amount
+            const receivableAmount = parseFloat($('.receivable_amount').val()) || 0;
+            const dueAmount = finalAmount - receivableAmount;
+
+            // Update the final amount and due amount fields
             $('.final-amount').val(finalAmount.toFixed(2));
+            $('.due_amount').val(dueAmount.toFixed(2));
         }
 
         function removeRow(button) {

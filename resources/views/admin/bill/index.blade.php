@@ -11,11 +11,16 @@
                     <th>Bill Date</th>
                     <th>Bill Type</th>
                     <th>Final Amount</th>
+                    <th>Due Amount</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $finalAmount = 0;
+                @endphp
+
                 @foreach ($bills as $bill)
                     <tr>
                         <td>{{ $bill->id }}</td>
@@ -23,6 +28,7 @@
                         <td>{{ $bill->bill_date }}</td>
                         <td>{{ $bill->bill_type }}</td>
                         <td>{{ $bill->final_amount }}</td>
+                        <td>{{ $bill->billItems2->first()->due_amount ?? 0 }}</td>
                         <td>
                             <button
                                 class="btn btn-sm {{ $bill->due_amount == 0 ? 'btn-success' : 'btn-warning' }} mark-paid-button"
@@ -45,9 +51,14 @@
                                 class="btn btn-info btn-sm">Payment History</a>
                         </td>
                     </tr>
+                    @php
+                        $finalAmount = $bill->billItems2->first()->final_amount ?? 'N/A';
+                    @endphp
                 @endforeach
             </tbody>
+
         </table>
+
     </div>
 
     <!-- Modal for Mark as Paid -->
@@ -66,11 +77,16 @@
                     <div class="modal-body">
                         <input type="hidden" name="bill_id" id="billId">
                         <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea name="description" id="description" class="form-control"></textarea>
+                            <label for="bill_date">Receive Date</label>
+                            <input type="date" name="receive_date" id="receive_date" class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="bill_amount">Bill Amount</label>
+                            <input type="text" name="bill_amount" id="finalAmount" class="form-control"
+                                value="{{ $finalAmount }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="bill_amount">Paid Amount</label>
                             <input type="text" name="bill_amount" id="billAmount" class="form-control" readonly>
                         </div>
                         <div class="form-group">
@@ -80,6 +96,10 @@
                         <div class="form-group">
                             <label for="due_amount">Due Amount</label>
                             <input type="text" name="due_amount" id="dueAmount" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea name="description" id="description" class="form-control"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -152,33 +172,33 @@
 
             // Handle form submission for marking as paid
             document.getElementById('markPaidForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        fetch('{{ route('bill.markPaid') }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            // Debugging the response
-            console.log(response);
-            return response.json();
-        })
-        .then(data => {
-            console.log(data); // Debugging the parsed JSON data
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('An error occurred');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred');
-        });
-    });
+                e.preventDefault();
+                const formData = new FormData(this);
+                fetch('{{ route('bill.markPaid') }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        // Debugging the response
+                        console.log(response);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data); // Debugging the parsed JSON data
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('An error occurred');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred');
+                    });
+            });
 
 
         });

@@ -183,10 +183,12 @@ class BillController extends Controller
             $billItem2->discount_type = $billItem2Data['discount_type'];
             $billItem2->discount = $billItem2Data['discount'];
             $billItem2->vat = $billItem2Data['vat'];
+            $billItem2->receivable_amount = $billItem2Data['receivable_amount'];
+            $billItem2->due_amount = $billItem2Data['due_amount'];
             $billItem2->final_amount = $billItem2Data['final_amount'];
             $billItem2->save();
 
-            // Update final amount
+           // Update final amount
             if ($billItem2Data['discount_type'] === 'Percentage') {
                 $bill->final_amount -= $bill->final_amount * ($billItem2Data['discount'] / 100);
             } else {
@@ -258,11 +260,9 @@ class BillController extends Controller
     {
         $bill = Bill::findOrFail($request->bill_id);
 
-        // Check if this is the first payment
         if ($bill->status === 'pending') {
             $billAmount = $bill->final_amount;
         } else {
-            // This is not the first payment, update bill amount to due amount
             $billAmount = $bill->due_amount;
         }
 
@@ -270,14 +270,13 @@ class BillController extends Controller
         $dueAmount = $billAmount - $receivableAmount;
         $status = ($dueAmount <= 0) ? 'paid' : 'partial';
 
-        // Update the bill
         $bill->due_amount = $dueAmount;
         $bill->status = $status;
         $bill->save();
 
-        // Create a new payment record
         $paymentHistory = PaymentHistory::create([
             'bill_id' => $bill->id,
+            'receive_date' => $request->receive_date,
             'description' => $request->description,
             'bill_amount' => $billAmount,
             'receivable_amount' => $receivableAmount,
@@ -294,8 +293,10 @@ class BillController extends Controller
 
     public function paymentHistory($billId)
     {
+        $bill = Bill::findOrFail($billId);
+        $finalAmount = $bill->billItems2->first()->final_amount ?? 'N/A';
         $payments = PaymentHistory::where('bill_id', $billId)->latest()->get();
-        return view('admin.bill.payment_history', compact('payments'));
+        return view('admin.bill.payment_history', compact('payments','bill','finalAmount'));
     }
 
     public function PaymentDestroy($id)

@@ -8,7 +8,9 @@
             <tr>
                 <th>ID</th>
                 <th>Description</th>
+                <th>Receive Date</th>
                 <th>Bill Amount</th>
+                <th>Paid Amount</th>
                 <th>Receivable Amount</th>
                 <th>Due Amount</th>
                 <th>Date</th>
@@ -20,6 +22,8 @@
             <tr>
                 <td>{{ $payment->id }}</td>
                 <td>{{ $payment->description }}</td>
+                <td>{{ $payment->receive_date }}</td>
+                <td>{{ $finalAmount }}</td>
                 <td>{{ $payment->bill_amount }}</td>
                 <td>{{ $payment->receivable_amount }}</td>
                 <td>{{ $payment->due_amount }}</td>

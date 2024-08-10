@@ -11,6 +11,7 @@ class CreatePaymentHistoriesTable extends Migration
         Schema::create('payment_histories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('bill_id');
+            $table->date('receive_date')->nullable();
             $table->text('description')->nullable();
             $table->decimal('bill_amount', 8, 2);
             $table->decimal('receivable_amount', 8, 2);

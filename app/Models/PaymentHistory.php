@@ -12,6 +12,7 @@ class PaymentHistory extends Model
     protected $fillable = [
         'bill_id',
         'description',
+        'receive_date',
         'bill_amount',
         'receivable_amount',
         'due_amount',
