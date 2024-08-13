@@ -22,8 +22,8 @@ return new class extends Migration
             $table->decimal('purchase_price', 10, 2);
             $table->decimal('sell_price', 10, 2);
             $table->decimal('wholesale_price', 10, 2);
-            $table->integer('quantity');
-            $table->decimal('total_amount', 10, 2);
+            $table->string('quantity');
+            $table->string('total_amount');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });

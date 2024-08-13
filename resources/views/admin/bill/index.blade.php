@@ -11,6 +11,7 @@
                     <th>Bill Date</th>
                     <th>Bill Type</th>
                     <th>Final Amount</th>
+                    <th>Receivable Amount</th>
                     <th>Due Amount</th>
                     <th>Status</th>
                     <th>Action</th>
@@ -22,19 +23,25 @@
                 @endphp
 
                 @foreach ($bills as $bill)
+                    @php
+                        $firstBillItem = $bill->billItems2->first();
+                        $dueAmount = $firstBillItem->due_amount ?? 0;
+
+                    @endphp
                     <tr>
                         <td>{{ $bill->id }}</td>
                         <td>{{ $bill->customer_name }}</td>
                         <td>{{ $bill->bill_date }}</td>
                         <td>{{ $bill->bill_type }}</td>
                         <td>{{ $bill->final_amount }}</td>
-                        <td>{{ $bill->billItems2->first()->due_amount ?? 0 }}</td>
+                        <td>{{ $firstBillItem->receivable_amount ?? 0 }}</td>
+                        <td>{{ $dueAmount }}</td>
                         <td>
                             <button
-                                class="btn btn-sm {{ $bill->due_amount == 0 ? 'btn-success' : 'btn-warning' }} mark-paid-button"
+                                class="btn btn-sm {{ $hasPartial ? 'btn-warning' : ($bill->billItems2->first()->due_amount == 0 ? 'btn-success' : 'btn-warning') }} mark-paid-button"
                                 data-id="{{ $bill->id }}" data-final-amount="{{ $bill->final_amount }}"
-                                data-due-amount="{{ $bill->due_amount }}">
-                                {{ $bill->due_amount == 0 ? 'Paid' : 'Partial' }}
+                                data-due-amount="{{ $bill->billItems2->first()->due_amount }}">
+                                {{ $hasPartial ? 'Partial' : ($bill->billItems2->first()->due_amount == 0 ? 'Paid' : 'Partial') }}
                             </button>
                         </td>
                         <td>
@@ -56,9 +63,7 @@
                     @endphp
                 @endforeach
             </tbody>
-
         </table>
-
     </div>
 
     <!-- Modal for Mark as Paid -->
@@ -137,24 +142,18 @@
 
             // Attach click event listeners to mark as paid buttons
             const markPaidButtons = document.querySelectorAll('.mark-paid-button');
+
             markPaidButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const billId = this.getAttribute('data-id');
-                    const finalAmount = parseFloat(this.getAttribute('data-final-amount'));
                     const dueAmount = parseFloat(this.getAttribute('data-due-amount'));
-                    const status = this.textContent.trim().toLowerCase(); // Get the status text
+                    const finalAmount = parseFloat(this.getAttribute('data-final-amount'));
 
                     document.getElementById('billId').value = billId;
 
-                    // Set bill amount to due amount for subsequent payments
-                    if (status === 'partial') {
-                        document.getElementById('billAmount').value = dueAmount;
-                    } else if (status === 'paid') {
-                        document.getElementById('billAmount').value = finalAmount;
-                    } else {
-                        document.getElementById('billAmount').value = finalAmount;
-                    }
-
+                    // Use due amount if greater than 0, otherwise use final amount
+                    document.getElementById('billAmount').value = dueAmount > 0 ? dueAmount :
+                        finalAmount;
                     document.getElementById('receivableAmount').value = '';
                     document.getElementById('dueAmount').value = dueAmount;
 
@@ -162,7 +161,6 @@
                 });
             });
 
-            // Calculate due amount on receivable amount change
             document.getElementById('receivableAmount').addEventListener('input', function() {
                 const billAmount = parseFloat(document.getElementById('billAmount').value);
                 const receivableAmount = parseFloat(this.value);
@@ -170,7 +168,6 @@
                 document.getElementById('dueAmount').value = dueAmount;
             });
 
-            // Handle form submission for marking as paid
             document.getElementById('markPaidForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 const formData = new FormData(this);
@@ -181,13 +178,8 @@
                             'Accept': 'application/json'
                         }
                     })
-                    .then(response => {
-                        // Debugging the response
-                        console.log(response);
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
-                        console.log(data); // Debugging the parsed JSON data
                         if (data.success) {
                             location.reload();
                         } else {
@@ -199,7 +191,6 @@
                         alert('An error occurred');
                     });
             });
-
 
         });
     </script>
