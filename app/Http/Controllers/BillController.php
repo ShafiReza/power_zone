@@ -30,7 +30,7 @@ class BillController extends Controller
         });
 
 
-        return view('admin.bill.index', compact('bills','hasPartial'));
+        return view('admin.bill.index', compact('bills', 'hasPartial'));
     }
 
     public function create()
@@ -229,110 +229,34 @@ class BillController extends Controller
             ->with('success', 'Bill deleted successfully.');
     }
 
-    // public function markAsPaid(Request $request)
-    // {
-    //     $bill = Bill::findOrFail($request->bill_id);
-
-    //     // Check if this is the first payment
-    //     if ($bill->status === 'paid') {
-    //         $receivableAmount = $request->receivable_amount;
-    //         $dueAmount = $bill->final_amount - $receivableAmount;
-    //         $status = ($dueAmount <= 0) ? 'paid' : 'partial';
-    //     } else {
-    //         // This is not the first payment, update bill amount to due amount
-    //         $billAmount = $bill->due_amount;
-    //         $receivableAmount = $request->receivable_amount;
-    //         $dueAmount = $billAmount - $receivableAmount;
-    //         $status = ($dueAmount <= 0) ? 'paid' : 'partial';
-    //     }
-
-    //     // Update the bill
-    //     $bill->due_amount = $dueAmount;
-    //     $bill->status = $status;
-    //     $bill->save();
-
-    //     // Create a new payment record
-    //     $paymentHistory = PaymentHistory::create([
-    //         'bill_id' => $bill->id,
-    //         'description' => $request->description,
-    //         'bill_amount' => $dueAmount,
-    //         'receivable_amount' => $receivableAmount,
-    //         'due_amount' => $dueAmount,
-    //     ]);
-
-    //     return response()->json(['success' => true, 'dueAmount' => $paymentHistory->due_amount]);
-    // }
-
-    // public function markPaid(Request $request)
-    // {
-    //     $bill = Bill::findOrFail($request->bill_id);
-
-    //     if ($bill->status === 'pending') {
-    //         $billAmount = $bill->final_amount;
-    //     } else {
-    //         $billAmount = $bill->due_amount;
-    //     }
-
-    //     $receivableAmount = $request->receivable_amount;
-    //     $dueAmount = $billAmount - $receivableAmount;
-    //     $status = ($dueAmount <= 0) ? 'paid' : 'partial';
-
-    //     $bill->due_amount = $dueAmount;
-    //     $bill->status = $status;
-    //     $bill->save();
-
-    //     $paymentHistory = PaymentHistory::create([
-    //         'bill_id' => $bill->id,
-    //         'receive_date' => $request->receive_date,
-    //         'description' => $request->description,
-    //         'bill_amount' => $billAmount,
-    //         'receivable_amount' => $receivableAmount,
-    //         'due_amount' => $dueAmount,
-    //     ]);
-
-    //     return response()->json(['success' => true, 'dueAmount' => $paymentHistory->due_amount]);
-    // }
 
     public function markPaid(Request $request)
     {
         $bill = Bill::findOrFail($request->bill_id);
-
-        // Calculate the bill amount based on the current status
-
-        if ($bill->status === 'pending') {
-            $billAmount = $bill->final_amount;
-        } else {
-            $billAmount = $bill->due_amount;
-        }
-
-
-        // Calculate the due amount after payment
+        $dueAmount = $bill->due_amount;
         $receivableAmount = $request->receivable_amount;
-        $dueAmount = $billAmount - $receivableAmount;
-        $status = ($dueAmount <= 0) ? 'paid' : 'partial';
+        $paidAmount = $dueAmount - $receivableAmount;
 
-        // Update the bill's due amount and status
-        $bill->due_amount = $dueAmount;
-        $bill->status = $status;
-
-        // If the due amount is greater than 0, set final amount to the current due amount
-        if ($dueAmount > 0) {
-            $bill->final_amount = $dueAmount;
+        if ($paidAmount <= 0) {
+            $bill->status = 'paid';
+            $bill->due_amount = 0;
+        } else {
+            $bill->status = 'partial';
+            $bill->due_amount = $paidAmount;
         }
 
         $bill->save();
 
-        // Save the payment history
         PaymentHistory::create([
             'bill_id' => $bill->id,
             'receive_date' => $request->receive_date,
             'description' => $request->description,
-            'bill_amount' => $billAmount,
+            'bill_amount' => $bill->final_amount,
             'receivable_amount' => $receivableAmount,
-            'due_amount' => $dueAmount,
+            'due_amount' => $paidAmount,
         ]);
 
-        return response()->json(['success' => true, 'dueAmount' => $dueAmount]);
+        return response()->json(['success' => true, 'dueAmount' => $paidAmount]);
     }
 
 
@@ -343,7 +267,9 @@ class BillController extends Controller
 
     public function paymentHistory($billId)
     {
+        
         $bill = Bill::findOrFail($billId);
+
         $finalAmount = $bill->billItems2->first()->final_amount ?? 'N/A';
         $payments = PaymentHistory::where('bill_id', $billId)->latest()->get();
 

@@ -18,15 +18,12 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                    $finalAmount = 0;
-                @endphp
-
                 @foreach ($bills as $bill)
                     @php
                         $firstBillItem = $bill->billItems2->first();
                         $dueAmount = $firstBillItem->due_amount ?? 0;
-
+                        $receivableAmount = $firstBillItem->receivable_amount ?? 0;
+                        $isPaid = $dueAmount == 0 && $receivableAmount == $bill->final_amount;
                     @endphp
                     <tr>
                         <td>{{ $bill->id }}</td>
@@ -34,19 +31,27 @@
                         <td>{{ $bill->bill_date }}</td>
                         <td>{{ $bill->bill_type }}</td>
                         <td>{{ $bill->final_amount }}</td>
-                        <td>{{ $firstBillItem->receivable_amount ?? 0 }}</td>
+                        <td>{{ $receivableAmount }}</td>
                         <td>{{ $dueAmount }}</td>
                         <td>
-                            <button
-                                class="btn btn-sm {{ $hasPartial ? 'btn-warning' : ($bill->billItems2->first()->due_amount == 0 ? 'btn-success' : 'btn-warning') }} mark-paid-button"
-                                data-id="{{ $bill->id }}" data-final-amount="{{ $bill->final_amount }}"
-                                data-due-amount="{{ $bill->billItems2->first()->due_amount }}">
-                                {{ $hasPartial ? 'Partial' : ($bill->billItems2->first()->due_amount == 0 ? 'Paid' : 'Partial') }}
-                            </button>
+                            @if ($isPaid)
+                                <button class="btn btn-sm btn-success" disabled>Paid</button>
+                            @else
+                                @if ($dueAmount == 0)
+                                    <button class="btn btn-sm btn-success mark-paid-button" data-id="{{ $bill->id }}"
+                                        data-final-amount="{{ $bill->final_amount }}" data-due-amount="{{ $dueAmount }}"
+                                        data-status="mark_as_paid">Mark as Paid</button>
+                                @else
+                                    <button class="btn btn-sm btn-warning mark-paid-button" data-id="{{ $bill->id }}"
+                                        data-final-amount="{{ $bill->final_amount }}"
+                                        data-due-amount="{{ $dueAmount }}" data-status="partial">Partial</button>
+                                @endif
+                            @endif
                         </td>
                         <td>
                             <a href="{{ route('admin.bill.challan', $bill->id) }}" class="btn btn-info btn-sm">Challan</a>
-                            <a href="{{ route('admin.bill.invoice', $bill->id) }}" class="btn btn-success btn-sm">Invoice</a>
+                            <a href="{{ route('admin.bill.invoice', $bill->id) }}"
+                                class="btn btn-success btn-sm">Invoice</a>
                             <form action="{{ route('bill.destroy', $bill->id) }}" method="POST" style="display:inline;"
                                 class="delete-form">
                                 @csrf
@@ -58,9 +63,6 @@
                                 class="btn btn-info btn-sm">Payment History</a>
                         </td>
                     </tr>
-                    @php
-                        $finalAmount = $bill->billItems2->first()->final_amount ?? 'N/A';
-                    @endphp
                 @endforeach
             </tbody>
         </table>
@@ -87,12 +89,11 @@
                         </div>
                         <div class="form-group">
                             <label for="bill_amount">Bill Amount</label>
-                            <input type="text" name="bill_amount" id="finalAmount" class="form-control"
-                                value="{{ $finalAmount }}" readonly>
+                            <input type="text" name="bill_amount" id="finalAmount" class="form-control" readonly>
                         </div>
                         <div class="form-group">
-                            <label for="bill_amount">Paid Amount</label>
-                            <input type="text" name="bill_amount" id="billAmount" class="form-control" readonly>
+                            <label for="paid_amount">Paid Amount</label>
+                            <input type="text" name="paid_amount" id="paidAmount" class="form-control" readonly>
                         </div>
                         <div class="form-group">
                             <label for="receivable_amount">Receivable Amount</label>
@@ -119,9 +120,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Attach click event listeners to delete buttons
-            const deleteButtons = document.querySelectorAll('.delete-button');
-            deleteButtons.forEach(button => {
+            // Delete button functionality
+            document.querySelectorAll('.delete-button').forEach(button => {
                 button.addEventListener('click', function() {
                     const form = this.closest('.delete-form');
                     Swal.fire({
@@ -140,32 +140,71 @@
                 });
             });
 
-            // Attach click event listeners to mark as paid buttons
-            const markPaidButtons = document.querySelectorAll('.mark-paid-button');
-
-            markPaidButtons.forEach(button => {
+            // Mark as Paid button functionality
+            document.querySelectorAll('.mark-paid-button').forEach(button => {
                 button.addEventListener('click', function() {
                     const billId = this.getAttribute('data-id');
                     const dueAmount = parseFloat(this.getAttribute('data-due-amount'));
                     const finalAmount = parseFloat(this.getAttribute('data-final-amount'));
+                    const status = this.getAttribute('data-status');
 
-                    document.getElementById('billId').value = billId;
-
-                    // Use due amount if greater than 0, otherwise use final amount
-                    document.getElementById('billAmount').value = dueAmount > 0 ? dueAmount :
-                        finalAmount;
-                    document.getElementById('receivableAmount').value = '';
-                    document.getElementById('dueAmount').value = dueAmount;
-
-                    $('#markPaidModal').modal('show');
+                    if (status === 'mark_as_paid' && dueAmount === 0) {
+                        // Mark as paid directly without opening the modal
+                        fetch('{{ route('bill.markPaid') }}', {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    bill_id: billId,
+                                    receive_date: new Date(),
+                                    description: '',
+                                    bill_amount: finalAmount,
+                                    receivable_amount: finalAmount,
+                                    due_amount: 0
+                                }),
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    location.reload();
+                                } else {
+                                    alert('An error occurred');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('An error occurred');
+                            });
+                    } else {
+                        // Open the modal for partial payment
+                        document.getElementById('billId').value = billId;
+                        document.getElementById('finalAmount').value = finalAmount;
+                        document.getElementById('paidAmount').value = dueAmount;
+                        document.getElementById('dueAmount').value = dueAmount;
+                        $('#markPaidModal').modal('show');
+                    }
                 });
             });
 
             document.getElementById('receivableAmount').addEventListener('input', function() {
-                const billAmount = parseFloat(document.getElementById('billAmount').value);
+                const paidAmount = parseFloat(document.getElementById('paidAmount').value);
                 const receivableAmount = parseFloat(this.value);
-                const dueAmount = billAmount - receivableAmount;
+                const dueAmount = paidAmount - receivableAmount;
                 document.getElementById('dueAmount').value = dueAmount;
+
+                if (dueAmount == 0) {
+                    document.querySelector('.mark-paid-button').classList.replace('btn-warning',
+                        'btn-success');
+                    document.querySelector('.mark-paid-button').textContent = 'Paid';
+                    document.querySelector('.mark-paid-button').disabled = true;
+                } else {
+                    document.querySelector('.mark-paid-button').classList.replace('btn-success',
+                        'btn-warning');
+                    document.querySelector('.mark-paid-button').textContent = 'Partial';
+                    document.querySelector('.mark-paid-button').disabled = false;
+                }
             });
 
             document.getElementById('markPaidForm').addEventListener('submit', function(e) {
@@ -191,7 +230,6 @@
                         alert('An error occurred');
                     });
             });
-
         });
     </script>
 @endsection
