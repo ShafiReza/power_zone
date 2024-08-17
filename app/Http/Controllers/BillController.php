@@ -232,42 +232,43 @@ class BillController extends Controller
 
     public function markPaid(Request $request)
     {
-        $bill = Bill::findOrFail($request->bill_id);
-        $dueAmount = $bill->due_amount;
-        $receivableAmount = $request->receivable_amount;
-        $paidAmount = $dueAmount - $receivableAmount;
+        $billId = $request->input('bill_id');
+        $receivableAmount = $request->input('receivable_amount');
+        $bill = Bill::find($billId);
 
-        if ($paidAmount <= 0) {
-            $bill->status = 'paid';
-            $bill->due_amount = 0;
-        } else {
-            $bill->status = 'partial';
-            $bill->due_amount = $paidAmount;
-        }
+        // Calculate the new due amount
+        $previousDueAmount = $request->input('due_amount');
+        $newDueAmount = $previousDueAmount - $receivableAmount;
 
-        $bill->save();
-
+        // Create a payment history entry
         PaymentHistory::create([
-            'bill_id' => $bill->id,
-            'receive_date' => $request->receive_date,
-            'description' => $request->description,
-            'bill_amount' => $bill->final_amount,
+            'bill_id' => $billId,
+            'receive_date' => now(),
+            'description' => $request->input('description'),
+            'bill_amount' => $bill->amount,  // Assuming bill_amount is a field on the bill model
             'receivable_amount' => $receivableAmount,
-            'due_amount' => $paidAmount,
+            'paid_amount' => $bill->amount - $newDueAmount, // Correctly calculate paid amount
+            'due_amount' => $newDueAmount,
         ]);
 
-        return response()->json(['success' => true, 'dueAmount' => $paidAmount]);
+        // Update bill status based on the new due amount
+        if ($newDueAmount > 0) {
+            $bill->status = 'Partial';
+        } else {
+            $bill->status = 'Paid';
+        }
+        $bill->save();
+
+        return response()->json([
+            'success' => true,
+            'due_amount' => $newDueAmount,
+            'bill_id' => $billId,
+        ]);
     }
-
-
-
-
-
-
 
     public function paymentHistory($billId)
     {
-        
+
         $bill = Bill::findOrFail($billId);
 
         $finalAmount = $bill->billItems2->first()->final_amount ?? 'N/A';

@@ -23,8 +23,8 @@
                 <td>{{ $payment->id }}</td>
                 <td>{{ $payment->description }}</td>
                 <td>{{ $payment->receive_date }}</td>
-                <td>{{ $finalAmount }}</td>
-                <td>{{ $payment->bill_amount}}</td>
+                <td>{{ $payment->bill_amount }}</td>
+                <td>{{ $payment->paid_amount }}</td> <!-- Ensure this is correctly referenced -->
                 <td>{{ $payment->receivable_amount }}</td>
                 <td>{{ $payment->due_amount }}</td>
                 <td>{{ $payment->created_at }}</td>

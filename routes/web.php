@@ -95,7 +95,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
         Route::get('bill/{id}/challan', [BillController::class, 'challan'])->name('admin.bill.challan');
         Route::delete('bill/{bill}', [BillController::class, 'destroy'])->name('bill.destroy');
 
-        Route::post('/bill/mark-paid', [BillController::class, 'markPaid'])->name('bill.markPaid');
+        Route::post('/bill/markPaid', [BillController::class, 'markPaid'])->name('bill.markPaid');
         Route::get('/admin/bill/payment-history/{bill}', [BillController::class, 'paymentHistory'])->name('admin.bill.paymentHistory');
         // Route::delete('/payment/{id}', [BillController::class, 'PaymentDestroy'])->name('payment.delete');
 

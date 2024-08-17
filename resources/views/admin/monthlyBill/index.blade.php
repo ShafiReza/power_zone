@@ -57,10 +57,6 @@
                             <button class="btn btn-sm btn-secondary">
                                 Paid
                             </button>
-                        {{-- @elseif($bill->status == 'Partial' && $bill->due_amount > 0)
-                            <button class="btn btn-sm btn-info mark-paid-button" data-id="{{ $bill->id }}" data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">
-                                Partial
-                            </button> --}}
                         @elseif($bill->status == 'pending')
                             <button class="btn btn-sm btn-success mark-paid-button" data-id="{{ $bill->id }}" data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">
                                 Mark as Paid
