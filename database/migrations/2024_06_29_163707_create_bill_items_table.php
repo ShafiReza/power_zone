@@ -21,7 +21,7 @@ return new class extends Migration
         $table->decimal('unit_price', 10, 2);
         $table->decimal('discount', 10, 2)->nullable();
         $table->string('discount_type')->nullable();
-        $table->decimal('total_amount', 10, 2);
+        $table->text('total_amount');
         $table->timestamps();
 
         $table->foreign('bill_id')->references('id')->on('bills')->onDelete('cascade');

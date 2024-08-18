@@ -35,6 +35,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function 
     Route::match(['get', 'post'], 'login', [AdminController::class, "login"])->name('admin.login');
     Route::group(['middleware' => [\App\Http\Middleware\Admin::class]], function () {
         Route::get("dashboard", [AdminController::class, "dashboard"])->name('admin.dashboard');
+        Route::get('/monthly-bill-due', [AdminController::class, 'showDueBills'])->name('monthlyBill.showDueBills');
 
         Route::get('regular-customers', [RegularCustomerController::class, 'index'])->name('admin.regularCustomer.index');
         Route::get('regular-customers/create', [RegularCustomerController::class, 'create'])->name('admin.regularCustomer.create');

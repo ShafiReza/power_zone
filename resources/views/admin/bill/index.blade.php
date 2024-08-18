@@ -161,10 +161,13 @@
 
             // Calculate due amount on receivable amount change
             document.getElementById('receivableAmount').addEventListener('input', function() {
-                const previousDueAmount = parseFloat(document.getElementById('dueAmount').value);
+                const finalAmount = parseFloat(document.getElementById('finalAmount').value) || 0;
                 const receivableAmount = parseFloat(this.value) || 0;
-                const newDueAmount = previousDueAmount - receivableAmount;
-                document.getElementById('dueAmount').value = newDueAmount;
+                const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
+
+                // Correct calculation for due amount
+                const newDueAmount = paidAmount - receivableAmount;
+                document.getElementById('dueAmount').value = newDueAmount.toFixed(2);
             });
 
             // Handle form submission for marking as paid
@@ -182,16 +185,17 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            const markPaidButton = document.querySelector(
+                                `.mark-paid-button[data-id="${data.bill_id}"]`);
                             if (data.due_amount === 0) {
-                                document.querySelector(`.mark-paid-button[data-id="${data.bill_id}"]`)
-                                    .outerHTML = '<button class="btn btn-sm btn-success">Paid</button>';
-                                $('#markPaidModal').modal('hide'); // Hide modal when fully paid
+                                markPaidButton.outerHTML =
+                                    '<button class="btn btn-sm btn-success">Paid</button>';
                             } else {
-                                document.querySelector(`.mark-paid-button[data-id="${data.bill_id}"]`)
-                                    .outerHTML =
+                                markPaidButton.outerHTML =
                                     '<button class="btn btn-sm btn-warning">Partial</button>';
                             }
-                            location.reload(); // Reload the page to reflect the changes
+                            $('#markPaidModal').modal('hide');
+                            location.reload(); // Reload the page to reflect changes
                         } else {
                             alert('An error occurred');
                         }
@@ -201,7 +205,6 @@
                         alert('An error occurred');
                     });
             });
-
 
         });
     </script>

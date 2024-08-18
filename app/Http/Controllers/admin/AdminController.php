@@ -10,6 +10,7 @@ use App\Models\MonthlyBill;
 use App\Models\Bill;
 use Auth;
 use Validator;
+
 class AdminController extends Controller
 {
     public function dashboard()
@@ -23,37 +24,50 @@ class AdminController extends Controller
         $totalDue = Bill::where('status', 'pending')->sum('final_amount');
 
         // Pass the count to the view
-        return view("admin.dashboard", compact('totalRegularCustomers','totalIrregularCustomers','totalDueAmount','totalPaidAmount','totalPaid','totalDue'));
+        return view("admin.dashboard", compact('totalRegularCustomers', 'totalIrregularCustomers', 'totalDueAmount', 'totalPaidAmount', 'totalPaid', 'totalDue'));
     }
-    public function login(Request $request ){
-        if($request->isMethod('post')){
-            $data= $request->all();
+    public function login(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $data = $request->all();
             $rules = [
-                'email'=> 'required|email|max:255',
-                'password'=> 'required|max:30'
+                'email' => 'required|email|max:255',
+                'password' => 'required|max:30'
             ];
 
             $customMessages = [
-                'email.required'=> 'Email is required',
+                'email.required' => 'Email is required',
                 'email.email' => 'Valid email is required',
                 'password.required' => 'Password is required',
 
 
             ];
 
-            $this->validate($request,$rules,$customMessages);
-            if(Auth::guard('admin')->attempt(['email' => $data['email'], 'password' => $data['password']])){
-                    return  redirect('admin/dashboard');
-            }else{
-                return redirect()->back()->with('error_message',"Invalid Email or Password");
+            $this->validate($request, $rules, $customMessages);
+            if (Auth::guard('admin')->attempt(['email' => $data['email'], 'password' => $data['password']])) {
+                return  redirect('admin/dashboard');
+            } else {
+                return redirect()->back()->with('error_message', "Invalid Email or Password");
             }
         }
         return view("admin.login");
-
     }
 
-    public function  logout(){
+    public function  logout()
+    {
         Auth::guard('admin')->logout();
         return redirect('admin/login');
+    }
+    public function showDueBills()
+    {
+        $currentMonth = \Carbon\Carbon::now()->format('F Y');
+        $dueBills = MonthlyBill::where('status', 'due')
+            ->whereMonth('bill_month', now()->month)
+            ->whereYear('bill_month', now()->year)
+            ->get();
+
+        $totalDueAmount = $dueBills->sum('amount');
+
+        return view('admin.monthlyBill.index', compact('dueBills', 'totalDueAmount', 'currentMonth'));
     }
 }

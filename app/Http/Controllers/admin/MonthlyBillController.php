@@ -59,6 +59,9 @@ class MonthlyBillController extends Controller
                 $q->where('name', 'like', '%' . $request->customer_name . '%');
             });
         }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
 
         $bills = $query->with('regularCustomer')->get();
 
@@ -117,11 +120,9 @@ class MonthlyBillController extends Controller
 
     public function Paid(Request $request)
     {
-
-
         $bill = MonthlyBill::findOrFail($request->bill_id);
 
-        if ($bill->status === 'pending') {
+        if ($bill->status === 'pending'|| $bill->status === 'due') {
             $billAmount = $bill->amount;
         } else {
             $billAmount = $bill->due_amount;
@@ -129,11 +130,15 @@ class MonthlyBillController extends Controller
 
         $receivableAmount = $request->receivable_amount;
         $dueAmount = $billAmount - $receivableAmount;
-        $status = ($dueAmount <= 0) ? 'paid' : 'partial';
-        $bill->type = 'Ongoing';
 
+        // Check if due amount is greater than 0 and status should be paid
+        if ($dueAmount > 0) {
+            return response()->json(['success' => false, 'error' => 'Due amount must be zero to mark as Paid.'], 400);
+        }
+
+        $bill->type = 'Ongoing';
         $bill->due_amount = $dueAmount;
-        $bill->status = $status;
+        $bill->status = 'paid';
         $bill->save();
 
         $payment = Payment::create([
@@ -141,7 +146,6 @@ class MonthlyBillController extends Controller
             'description' => $request->description,
             'amount' => $billAmount,
             'receivable_amount' => $receivableAmount,
-
             'due_amount' => $dueAmount,
         ]);
 

@@ -15,6 +15,7 @@ class PaymentHistory extends Model
         'receive_date',
         'bill_amount',
         'receivable_amount',
+        'paid_amount',
         'due_amount',
     ];
 

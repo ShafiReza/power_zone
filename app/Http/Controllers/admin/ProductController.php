@@ -10,6 +10,7 @@ use App\Models\Bill;
 use App\Models\BillItem;
 use App\Models\BillItem2;
 use App\Models\StockEntry;
+
 class ProductController extends Controller
 {
     public function index(Request $request)
@@ -21,6 +22,7 @@ class ProductController extends Controller
 
     public function create()
     {
+
         $categories = Category::where('status', 'active')->get(); // Fetch only active categories
         return view('admin.product.create', compact('categories'));
     }
@@ -36,7 +38,7 @@ class ProductController extends Controller
             'purchase_price' => 'required|numeric',
             'sell_price' => 'required|numeric',
             'wholesale_price' => 'required|numeric',
-       
+
         ]);
 
         $total_amount = $request->quantity * $request->purchase_price;
@@ -84,59 +86,63 @@ class ProductController extends Controller
     }
 
     public function updateQuantity(Request $request, Product $product)
-{
-    $product->update([
-        'quantity' => $request->quantity,
-        'total_amount' => $request->total_amount
-    ]);
+    {
+        $quantity = $request->quantity;
+        $purchasePrice = $product->purchase_price; // Make sure this field is available
 
-    return response()->json(['success' => true]);
+        $totalAmount = $quantity * $purchasePrice;
+
+        $product->update([
+            'quantity' => $quantity,
+            'total_amount' => $totalAmount,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function sales($id)
+    {
+        // Fetch bills with billItems containing the specified product ID
+        $bills = Bill::whereHas('billItems', function ($query) use ($id) {
+            $query->where('product_id', $id); // Assuming 'product_id' is the correct field
+        })->with(['billItems' => function ($query) use ($id) {
+            $query->where('product_id', $id); // Assuming 'product_id' is the correct field
+        }, 'billItems2'])->get();
+
+        // Pass the product ID to the view
+        return view('admin.product.sales', compact('bills', 'id'));
+    }
+
+
+    public function addProduct(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'entry_date' => 'required|date',
+            'description' => 'required|string',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $product = Product::findOrFail($request->product_id);
+        $product->quantity += $request->quantity;
+        $product->total_amount = $product->quantity * $product->purchase_price;
+        $product->save();
+
+        StockEntry::create([
+            'product_id' => $request->product_id,
+            'entry_date' => $request->entry_date,
+            'description' => $request->description,
+            'quantity' => $request->quantity,
+        ]);
+
+        return redirect()->route('admin.product.index')->with('success', 'Product quantity updated successfully.');
+    }
+
+    public function stockList($id)
+    {
+        $product = Product::findOrFail($id);
+        $stockEntries = StockEntry::where('product_id', $id)->get();
+
+        return view('admin.product.stockList', compact('product', 'stockEntries'));
+    }
 }
-
-public function sales($id)
-{
-    // Fetch bills with billItems containing the specified product ID
-    $bills = Bill::whereHas('billItems', function ($query) use ($id) {
-        $query->where('product_id', $id); // Assuming 'product_id' is the correct field
-    })->with(['billItems' => function ($query) use ($id) {
-        $query->where('product_id', $id); // Assuming 'product_id' is the correct field
-    }, 'billItems2'])->get();
-
-    // Pass the product ID to the view
-    return view('admin.product.sales', compact('bills', 'id'));
-}
-
-
-public function addProduct(Request $request)
-{
-    $request->validate([
-        'product_id' => 'required|exists:products,id',
-        'entry_date' => 'required|date',
-        'description' => 'required|string',
-        'quantity' => 'required|integer|min:1',
-    ]);
-
-    $product = Product::findOrFail($request->product_id);
-    $product->quantity += $request->quantity;
-    $product->save();
-
-    StockEntry::create([
-        'product_id' => $request->product_id,
-        'entry_date' => $request->entry_date,
-        'description' => $request->description,
-        'quantity' => $request->quantity,
-    ]);
-
-    return redirect()->route('admin.product.index')->with('success', 'Product quantity updated successfully.');
-}
-
-public function stockList($id)
-{
-    $product = Product::findOrFail($id);
-    $stockEntries = StockEntry::where('product_id', $id)->get();
-
-    return view('admin.product.stockList', compact('product', 'stockEntries'));
-}
-
-}
-

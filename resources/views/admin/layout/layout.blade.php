@@ -7,7 +7,7 @@
     <title>AdminLTE 3 | Dashboard</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ url('admin/plugins/fontawesome-free/css/all.min.css') }}">
     <!-- Ionicons -->
@@ -98,6 +98,8 @@
 
     <!-- Include your compiled app.js -->
     <script src="{{ asset('js/app.js') }}"></script>
+    {{-- <script src="{{ mix('js/app.js') }}"></script> --}}
+
 
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="{{ url('admin/js/pages/dashboard.js') }}"></script>
