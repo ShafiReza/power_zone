@@ -56,8 +56,8 @@ class GenerateMonthlyBills extends Command
                     'description' => $billDetails['description'],
                     'service' => $billDetails['service'],
                     'bill_month' => $currentDate->format('F Y'),
-                    'start_date' => $latestBill->start_date, // Use the latest bill's start_date
-                    'next_generation_date' => $latestBill->start_date->copy()->addMonth(),
+                    'start_date' => $currentDate, // Use the latest bill's start_date
+                    'next_generation_date' => $currentDate->copy()->addMonth(),
                     'status' => 'pending',
                     'type' => 'initial',
                 ]);
