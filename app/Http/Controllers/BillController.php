@@ -419,6 +419,7 @@ class BillController extends Controller
     // }
     public function markPaid(Request $request)
     {
+       // dd($request->all());
         $bill = Bill::findOrFail($request->bill_id);
 
         $billAmount = $request->bill_amount;
@@ -442,10 +443,10 @@ class BillController extends Controller
             'bill_id' => $bill->id,
             'receive_date' => now(),
             'description' => $request->input('description'),
-            'bill_amount' => $billAmount,
+            'bill_amount' =>$billAmount,
             'receivable_amount' => $receivableAmount,
-            'paid_amount' => $paidAmount,
-            'due_amount' => $dueAmount,
+            'paid_amount' => $request->input('paid_amount'),
+            'due_amount' => $request->input('due_amount'),
         ]);
 
         return response()->json([
@@ -466,6 +467,7 @@ class BillController extends Controller
         $hasPartial = $payments->where('due_amount', '>', 0)->isNotEmpty();
         return view('admin.bill.payment_history', compact('payments', 'bill', 'finalAmount', 'hasPartial'));
     }
+   
 
     public function PaymentDestroy($id)
     {
