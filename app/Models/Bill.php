@@ -19,6 +19,7 @@ class Bill extends Model
         'final_amount',
         'amount',
         'billing_month',
+        'type',
         'status',
         'due_amount',
     ];

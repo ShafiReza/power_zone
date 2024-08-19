@@ -7,10 +7,11 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Description</th>
+                <th>Receive Date</th>
                 <th>Bill Amount</th>
                 <th>Receivable Amount</th>
                 <th>Due Amount</th>
+                <th>Description</th>
                 <th>Date</th>
                 {{-- <th>Action</th> --}}
             </tr>
@@ -19,13 +20,14 @@
             @foreach($payments as $payment)
             <tr>
                 <td>{{ $payment->id }}</td>
-                <td>{{ $payment->description }}</td>
+                <td>{{ $payment->receive_date }}</td>
                 @php
                     $amount=$payment->receivable_amount + $payment->due_amount ;
                 @endphp
                 <td>{{ $amount }}</td>
                 <td>{{ $payment->receivable_amount }}</td>
                 <td>{{ $payment->due_amount }}</td>
+                <td>{{ $payment->description }}</td>
                 <td>{{ $payment->created_at }}</td>
                 {{-- <td>
                     <button class="btn btn-danger delete-button" data-id="{{ $payment->id }}">Delete</button>

@@ -11,9 +11,9 @@ class CreatePaymentsTable extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bill_id')->constrained('monthly_bills')->onDelete('cascade');
+            $table->date('receive_date')->nullable();
             $table->string('description');
             $table->decimal('receivable_amount', 10, 2); // corrected typo
-           
             $table->decimal('due_amount', 10, 2);
             $table->timestamps();
         });

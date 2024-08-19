@@ -110,9 +110,10 @@
                         <div class="modal-body">
                             <input type="hidden" name="bill_id" id="billId">
                             <div class="form-group">
-                                <label for="description">Description</label>
-                                <textarea name="description" id="description" class="form-control"></textarea>
+                                <label for="bill_date">Receive Date</label>
+                                <input type="date" name="receive_date" id="receive_date" class="form-control">
                             </div>
+
                             <div class="form-group">
                                 <label for="bill_amount">Bill Amount</label>
                                 <input type="text" name="amount" id="billAmount" class="form-control" readonly>
@@ -124,6 +125,10 @@
                             <div class="form-group">
                                 <label for="due_amount">Due Amount</label>
                                 <input type="text" name="due_amount" id="dueAmount" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea name="description" id="description" class="form-control"></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">

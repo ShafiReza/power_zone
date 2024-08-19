@@ -74,7 +74,7 @@
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form id="markPaidForm" method="POST" action="{{ route('bill.markPaid') }}">
+                <form action="{{ route('bill.markPaid') }}" method="POST">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="markPaidModalLabel">Mark as Paid</h5>
@@ -148,33 +148,87 @@
                     const billId = this.getAttribute('data-id');
                     const finalAmount = parseFloat(this.getAttribute('data-final-amount'));
                     const dueAmount = parseFloat(this.getAttribute('data-due-amount'));
+                    const status = this.textContent.trim().toLowerCase();
 
                     document.getElementById('billId').value = billId;
-                    document.getElementById('finalAmount').value = finalAmount;
-                    document.getElementById('paidAmount').value = dueAmount;
+                     document.getElementById('finalAmount').value = finalAmount;
+                    // document.getElementById('paidAmount').value = dueAmount;
+                    // document.getElementById('receivableAmount').value = '';
+                    // document.getElementById('dueAmount').value = dueAmount;
+                    if (status === 'paid') {
+                        document.getElementById('finalAmount').value = finalAmount;
+                    } else {
+                        document.getElementById('paidAmount').value = dueAmount;
+                    }
+
                     document.getElementById('receivableAmount').value = '';
                     document.getElementById('dueAmount').value = dueAmount;
+
 
                     $('#markPaidModal').modal('show');
                 });
             });
 
-            // Calculate due amount on receivable amount change
             document.getElementById('receivableAmount').addEventListener('input', function() {
-                const finalAmount = parseFloat(document.getElementById('finalAmount').value) || 0;
-                const receivableAmount = parseFloat(this.value) || 0;
-                const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
-
-                // Correct calculation for due amount
-                const newDueAmount = paidAmount - receivableAmount;
-                document.getElementById('dueAmount').value = newDueAmount.toFixed(2);
+                const paidAmount = parseFloat(document.getElementById('paidAmount').value);
+                const receivableAmount = parseFloat(this.value);
+                const dueAmount = paidAmount - receivableAmount;
+                document.getElementById('dueAmount').value = dueAmount;
             });
 
+            // Calculate due amount on receivable amount change
+            // document.getElementById('receivableAmount').addEventListener('input', function() {
+            //     const finalAmount = parseFloat(document.getElementById('finalAmount').value) || 0;
+            //     const receivableAmount = parseFloat(this.value) || 0;
+            //     const previousPaidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
+
+            //     // Update due amount based on new payment
+            //     const newDueAmount = dueAmount - receivableAmount;
+            //     document.getElementById('dueAmount').value = newDueAmount.toFixed(2);
+            // });
+
             // Handle form submission for marking as paid
+            // document.getElementById('markPaidForm').addEventListener('submit', function(e) {
+            //     e.preventDefault();
+            //     const formData = new FormData(this);
+
+            //     fetch('{{ route('bill.markPaid') }}', {
+            //             method: 'POST',
+            //             body: formData,
+            //             headers: {
+            //                 'Accept': 'application/json',
+            //             }
+            //         })
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             if (data.success) {
+            //                 const markPaidButton = document.querySelector(
+            //                     `.mark-paid-button[data-id="${data.bill_id}"]`);
+
+            //                 if (data.due_amount === 0) {
+            //                     markPaidButton.outerHTML =
+            //                         '<button class="btn btn-sm btn-success">Paid</button>';
+            //                 } else {
+            //                     markPaidButton.outerHTML =
+            //                         '<button class="btn btn-sm btn-warning">Partial</button>';
+            //                 }
+            //                 $('#markPaidModal').modal('hide');
+            //                 location.reload(); // Reload the page to reflect changes
+            //             } else {
+            //                 alert('An error occurred');
+            //             }
+            //         })
+            //         .catch(error => {
+            //             console.error('Error:', error);
+            //             alert('An error occurred');
+            //         });
+            // });
             document.getElementById('markPaidForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                const formData = new FormData(this);
 
+                const paidAmount = parseFloat(document.getElementById('paidAmount').value);
+                const receivableAmount = parseFloat(document.getElementById('receivableAmount').value);
+                const formData = new FormData(this);
                 fetch('{{ route('bill.markPaid') }}', {
                         method: 'POST',
                         body: formData,
@@ -185,17 +239,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            const markPaidButton = document.querySelector(
-                                `.mark-paid-button[data-id="${data.bill_id}"]`);
-                            if (data.due_amount === 0) {
-                                markPaidButton.outerHTML =
-                                    '<button class="btn btn-sm btn-success">Paid</button>';
-                            } else {
-                                markPaidButton.outerHTML =
-                                    '<button class="btn btn-sm btn-warning">Partial</button>';
-                            }
-                            $('#markPaidModal').modal('hide');
-                            location.reload(); // Reload the page to reflect changes
+                            location.reload();
                         } else {
                             alert('An error occurred');
                         }
@@ -208,4 +252,5 @@
 
         });
     </script>
+
 @endsection

@@ -26,6 +26,7 @@ class CreateBillsTable extends Migration
             $table->date('billing_month')->nullable();
             $table->string('status')->default('pending');
             $table->decimal('due_amount', 8, 2)->default(0);
+            $table->string('type');
             $table->timestamps();
 
             $table->foreign('regular_customer_id')->references('id')->on('regular_customers')->onDelete('cascade');

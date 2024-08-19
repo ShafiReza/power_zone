@@ -144,6 +144,7 @@ class MonthlyBillController extends Controller
         $payment = Payment::create([
             'bill_id' => $bill->id,
             'description' => $request->description,
+            'receive_date' => $request->input('receive_date'),
             'amount' => $billAmount,
             'receivable_amount' => $receivableAmount,
             'due_amount' => $dueAmount,
