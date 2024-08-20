@@ -1,14 +1,14 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="content-wrapper container-fluid">
+    <div class="content-wrapper container-fluid col-11 table-responsive">
         <h2>Billing List</h2>
         @if ($message = Session::get('success'))
             <div class="alert alert-success">
                 <p>{{ $message }}</p>
             </div>
         @endif
-        <table class="table table-bordered">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>ID</th>

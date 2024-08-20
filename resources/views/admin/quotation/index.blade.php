@@ -2,9 +2,9 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="content-wrapper container-fluid">
+    <div class="content-wrapper container-fluid col-11 table-responsive">
         <h2>Quotation List</h2>
-        <table class="table table-bordered">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -29,7 +29,7 @@
                                 @method('DELETE')
                                 <button type="button" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button>
                             </form>
-                            
+
                         </td>
                     </tr>
                 @endforeach

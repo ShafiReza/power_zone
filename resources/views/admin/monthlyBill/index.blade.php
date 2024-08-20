@@ -1,7 +1,7 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="content-wrapper container-fluid">
+    <div class="content-wrapper container-fluid col-11 table-responsive">
         <h2>Monthly Bill List</h2>
 
         @if ($message = Session::get('success'))
@@ -26,7 +26,7 @@
             </div>
         </form>
         <a class="btn btn-success mb-3" href="{{ route('admin.monthlyBill.create') }}">Create Monthly Bill</a>
-        <table class="table table-bordered">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>ID</th>

@@ -106,13 +106,10 @@
                                 <!-- accepted payments column -->
 
                                 <!-- /.col -->
-                                <div class="col-6">
-
-
+                                <div class="col-6 ml-auto">
                                     <div class="table-responsive">
                                         <table class="table">
                                             @foreach ($billItems2 as $item)
-
                                                 <tr>
                                                     <th>Discount</th>
                                                     <td>

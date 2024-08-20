@@ -1,13 +1,13 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="content-wrapper container-fluid">
+    <div class="content-wrapper container-fluid col-11 table-responsive">
         <h2>Billing Page</h2>
         <form id="billing-form" method="POST" action="{{ route('quotation.store') }}">
             @csrf
             <div class="form-row">
 
-                    <div class="form-group col-3">
+                    <div class="form-group col-2">
                         <label for="customerName">Customer Name</label>
                         <select id="customerName" name="customerName" class="form-control" onchange="getCustomerDetails(this.value)">
                             <option value="">Select Customer</option>
@@ -44,7 +44,7 @@
 
 
             <input type="hidden" name="products[]" value="">
-            <table class="table table-bordered">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Product Name</th>
@@ -61,8 +61,8 @@
 
                 </tbody>
             </table>
-            <button type="button" class="btn btn-primary mb-5" onclick="addProductRow()">Add Row</button>
-            <table class="table table-bordered">
+
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Discount Type</th>
@@ -73,13 +73,13 @@
                 </thead>
                 <tbody id="bill-items2">
                     <tr>
-                        <td><select class="form-control discountType" name="bill_items2[0][discount_type]" onchange="calculateFinalAmount()">
+                        <td><select class="form-control col-6 discountType" name="bill_items2[0][discount_type]" onchange="calculateFinalAmount()">
                                 <option value="Flat">Flat</option>
                                 <option value="Percentage">Percentage</option>
                             </select></td>
-                        <td><input type="number" class="form-control discount" name="bill_items2[0][discount]" onchange="calculateFinalAmount()"></td>
-                        <td><input type="number" class="form-control vat" name="bill_items2[0][vat]" onchange="calculateFinalAmount()"></td>
-                        <td><input type="text" class="form-control final-amount" name="bill_items2[0][final_amount]" value="0.00" readonly></td>
+                        <td><input type="number" class="form-control col-6 discount" name="bill_items2[0][discount]" onchange="calculateFinalAmount()"></td>
+                        <td><input type="number" class="form-control col-6 vat" name="bill_items2[0][vat]" onchange="calculateFinalAmount()"></td>
+                        <td><input type="text" class="form-control col-6 final-amount" name="bill_items2[0][final_amount]" value="0.00" readonly></td>
                         {{-- <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td> --}}
                     </tr>
                 </tbody>

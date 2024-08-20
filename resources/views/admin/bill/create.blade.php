@@ -1,12 +1,12 @@
 @extends('admin.layout.layout')
 
 @section('content')
-    <div class="content-wrapper container-fluid">
+    <div class="content-wrapper container-fluid col-11 table-responsive">
         <h2>Billing Page</h2>
         <form id="billing-form" method="POST" action="{{ route('bill.store') }}">
             @csrf
             <div class="form-row">
-                <div class="form-group col-4">
+                <div class="form-group col-3">
                     <label for="customerType">Customer Type</label>
                     <select id="customerType" name="customerType" class="form-control" onchange="getCustomers(this.value)">
                         <option value="">Select Customer Type</option>
@@ -14,7 +14,7 @@
                         <option value="irregularCustomer">Irregular Customer</option>
                     </select>
                 </div>
-                <div class="form-group col-4">
+                <div class="form-group col-3">
                     <label for="customerName">Customer Name</label>
                     <select id="customerName" name="customerName" class="form-control">
                         <option value="">Select Customer</option>
@@ -22,20 +22,20 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-4">
+                <div class="form-group col-3">
                     <label for="billType">Bill Type</label>
                     <select id="billType" name="billType" class="form-control">
                         <option value="Day">Day</option>
                         <option value="Month">Month</option>
                     </select>
                 </div>
-                <div class="form-group col-4">
+                <div class="form-group col-3">
                     <label for="billDate">Date</label>
                     <input type="date" name="billDate" class="form-control" id="billDate" value="{{ date('Y-m-d') }}">
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-4">
+                <div class="form-group col-3">
                     <label for="products">Products</label>
                     <select id="products" class="form-control" onchange="addProductRow(this.value)">
                         <option value="">Select Product</option>
@@ -46,7 +46,7 @@
                     </select>
                 </div>
             </div>
-            <table class="table table-bordered">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Product Name</th>
@@ -64,7 +64,7 @@
                 </tbody>
             </table>
 
-            <table class="table table-bordered">
+            <table class="table table-hover">
                 <thead>
                     <tr>
                         <th>Discount Type</th>

@@ -1,6 +1,6 @@
 @extends('admin.layout.layout')
 @section('content')
-<div class="content-wrapper container-fluid">
+<div class="content-wrapper container-fluid col-11 table-responsive">
     <h2>Product List</h2>
 
     @if ($message = Session::get('success'))
@@ -13,7 +13,7 @@
 
 
 
-    <table class="table table-bordered">
+    <table class="table table-hover">
         <thead>
             <tr>
                 <th>ID</th>
@@ -61,10 +61,11 @@
                             @method('DELETE')
                             <button type="button" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button>
                         </form>
+                        <a class="btn btn-success " href="{{ route('admin.product.sales', ['id' => $product->id]) }}">Sales List</a>
+                    <button type="button" class="btn btn-info add-product-btn" data-product-id="{{ $product->id }}">Add Product</button>
+                        <a class="btn btn-warning " href="{{ route('admin.product.stockList', ['id' => $product->id]) }}">Stock List</a>
                     </td>
-                    <td><a class="btn btn-success mb-3" href="{{ route('admin.product.sales', ['id' => $product->id]) }}">Sales List</a>
-                    <button type="button" class="btn btn-info mb-3 add-product-btn" data-product-id="{{ $product->id }}">Add Product</button>
-                        <a class="btn btn-warning mb-3" href="{{ route('admin.product.stockList', ['id' => $product->id]) }}">Stock List</a></td>
+
                 </tr>
             @endforeach
         </tbody>
@@ -77,7 +78,7 @@
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
-                    
+
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="modal_product_id" name="product_id">
