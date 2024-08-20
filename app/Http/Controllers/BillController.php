@@ -251,8 +251,7 @@ class BillController extends Controller
         }
 
         $bill->bill_type = $request->input('billType');
-        $bill->bill_date = $request->input('billDate');
-        ;
+        $bill->bill_date = $request->input('billDate');;
         $bill->type = 'Ongoing';
         $bill->final_amount = 0; // Initialize final amount
 
@@ -419,19 +418,11 @@ class BillController extends Controller
     // }
     public function markPaid(Request $request)
     {
-       // dd($request->all());
         $bill = Bill::findOrFail($request->bill_id);
 
         $billAmount = $request->bill_amount;
         $receivableAmount = $request->receivable_amount;
         $dueAmount = $billAmount - $receivableAmount;
-
-        // Calculate paid amount based on due amount
-        if ($dueAmount == 0) {
-            $paidAmount = $billAmount;
-        } else {
-            $paidAmount = $billAmount - $dueAmount;
-        }
 
         // Update bill's due amount and status
         $bill->due_amount = $dueAmount;
@@ -441,19 +432,16 @@ class BillController extends Controller
         // Create a payment history entry
         PaymentHistory::create([
             'bill_id' => $bill->id,
-            'receive_date' => now(),
+            'receive_date' => $request->input('receive_date'),
             'description' => $request->input('description'),
-            'bill_amount' =>$billAmount,
+            'bill_amount' => $billAmount,
             'receivable_amount' => $receivableAmount,
             'paid_amount' => $request->input('paid_amount'),
-            'due_amount' => $request->input('due_amount'),
+            'due_amount' =>$request->input('due_amount'),
         ]);
 
-        return response()->json([
-            'success' => true,
-            'due_amount' => $dueAmount,
-            'bill_id' => $bill->id,
-        ]);
+        return redirect()->route('admin.bill.index')->with('success', 'Bill marked as paid successfully.');
+
     }
 
 
@@ -467,7 +455,7 @@ class BillController extends Controller
         $hasPartial = $payments->where('due_amount', '>', 0)->isNotEmpty();
         return view('admin.bill.payment_history', compact('payments', 'bill', 'finalAmount', 'hasPartial'));
     }
-   
+
 
     public function PaymentDestroy($id)
     {

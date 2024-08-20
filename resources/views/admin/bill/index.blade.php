@@ -3,6 +3,11 @@
 @section('content')
     <div class="content-wrapper container-fluid">
         <h2>Billing List</h2>
+        @if ($message = Session::get('success'))
+            <div class="alert alert-success">
+                <p>{{ $message }}</p>
+            </div>
+        @endif
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -37,15 +42,16 @@
                             @if ($isPaid)
                                 <button class="btn btn-sm btn-success">Paid</button>
                             @else
-                                @if ($dueAmount == 0)
-                                    <button class="btn btn-sm btn-success mark-paid-button" data-id="{{ $bill->id }}"
-                                        data-final-amount="{{ $bill->final_amount }}" data-due-amount="{{ $dueAmount }}"
-                                        data-status="mark_as_paid">Mark as Paid</button>
+                                <button class="btn btn-sm btn-warning mark-paid-button" data-id="{{ $bill->id }}"
+                                    data-final-amount="{{ $bill->final_amount }}" data-due-amount="{{ $dueAmount }}"
+                                    data-status="partial"
+                                    @if ($bill->billItems2->first()) data-prev-due-amount="{{ $bill->billItems2->first()->due_amount ?? 0 }}"
+                                @elseif($bill->payments)
+                                data-prev-due-amount="{{ $bill->payments->last()->due_amount ?? 0 }}"
                                 @else
-                                    <button class="btn btn-sm btn-warning mark-paid-button" data-id="{{ $bill->id }}"
-                                        data-final-amount="{{ $bill->final_amount }}"
-                                        data-due-amount="{{ $dueAmount }}" data-status="partial">Partial</button>
-                                @endif
+                                    data-prev-due-amount="0" @endif>
+                                    Partial
+                                </button>
                             @endif
                         </td>
                         <td>
@@ -148,27 +154,22 @@
                     const billId = this.getAttribute('data-id');
                     const finalAmount = parseFloat(this.getAttribute('data-final-amount'));
                     const dueAmount = parseFloat(this.getAttribute('data-due-amount'));
+                    const prevDueAmount = parseFloat(this.getAttribute('data-prev-due-amount'));
+                    const newPaymentAmount = parseFloat(document.getElementById('receivableAmount')
+                        .value);
+                    const newDueAmount = prevDueAmount - newPaymentAmount;
                     const status = this.textContent.trim().toLowerCase();
 
                     document.getElementById('billId').value = billId;
-                     document.getElementById('finalAmount').value = finalAmount;
-                    // document.getElementById('paidAmount').value = dueAmount;
-                    // document.getElementById('receivableAmount').value = '';
-                    // document.getElementById('dueAmount').value = dueAmount;
-                    if (status === 'paid') {
-                        document.getElementById('finalAmount').value = finalAmount;
-                    } else {
-                        document.getElementById('paidAmount').value = dueAmount;
-                    }
-
+                    document.getElementById('finalAmount').value = finalAmount;
+                    document.getElementById('paidAmount').value =
+                    prevDueAmount; // Set paid amount to previous due amount
                     document.getElementById('receivableAmount').value = '';
-                    document.getElementById('dueAmount').value = dueAmount;
-
+                    document.getElementById('dueAmount').value = newDueAmount;
 
                     $('#markPaidModal').modal('show');
                 });
             });
-
             document.getElementById('receivableAmount').addEventListener('input', function() {
                 const paidAmount = parseFloat(document.getElementById('paidAmount').value);
                 const receivableAmount = parseFloat(this.value);
@@ -252,5 +253,4 @@
 
         });
     </script>
-
 @endsection
