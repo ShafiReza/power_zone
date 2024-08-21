@@ -10,8 +10,8 @@
                 <th>Description</th>
                 <th>Receive Date</th>
                 <th>Bill Amount</th>
-                <th>Paid Amount</th> <!-- This is the field we are fixing -->
-                <th>Receivable Amount</th>
+                <th>Payable Amount</th> <!-- This is the field we are fixing -->
+                <th>Received Amount</th>
                 <th>Due Amount</th>
                 <th>Date</th>
             </tr>

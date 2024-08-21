@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->text('description')->nullable();
             $table->enum('service', ['lift', 'generator', 'lift and generator']);
-            $table->string('bill_month'); // Ensure this is a date field
+            $table->date('bill_month'); // Ensure this is a date field
             $table->date('start_date'); // Ensure this is a date field
             $table->date('next_generation_date')->nullable();
             $table->enum('status', ['pending', 'paid', 'due','Partial']);

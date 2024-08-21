@@ -36,6 +36,8 @@ class BillController extends Controller
 
         $bills = $query->with(['regularCustomer', 'irregularCustomer'])->get();
 
+        // dd($bills);
+
 
         return view('admin.bill.index', compact('bills', 'hasPartial'));
     }
@@ -439,6 +441,10 @@ class BillController extends Controller
             'paid_amount' => $request->input('paid_amount'),
             'due_amount' =>$request->input('due_amount'),
         ]);
+
+        BillItem2::where('bill_id',$bill->id)->update(['due_amount' =>$request->input('due_amount')]);
+        Bill::where('id',$bill->id)->update(['due_amount' =>$request->input('due_amount')]);
+
 
         return redirect()->route('admin.bill.index')->with('success', 'Bill marked as paid successfully.');
 

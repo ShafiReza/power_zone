@@ -48,7 +48,7 @@
         </div>
         <div class="form-group col-4">
             <label for="bill_month">Bill Month (Name with Year):</label>
-            <input type="month" class="form-control" id="bill_month" name="bill_month" required>
+            <input type="date" class="form-control" id="bill_month" name="bill_month" required>
         </div>
         <div class="form-group col-4">
             <label for="start_date">Start Date:</label>

@@ -26,7 +26,7 @@ class MonthlyBillController extends Controller
             'amount' => 'required|numeric',
             'description' => 'nullable|string',
             'service' => 'required|in:lift,generator,lift and generator',
-            'bill_month' => 'required|date_format:Y-m',
+            'bill_month' => 'required|date',
             'start_date' => 'required|date',
 
         ]);

@@ -28,7 +28,7 @@
                         $firstBillItem = $bill->billItems2->first();
                         $dueAmount = $firstBillItem->due_amount ?? 0;
                         $receivableAmount = $firstBillItem->receivable_amount ?? 0;
-                        $isPaid = $dueAmount == 0 && $receivableAmount == $bill->final_amount;
+                        $isPaid = $dueAmount == 0 ? 1 : 0;
                     @endphp
                     <tr>
                         <td>{{ $bill->id }}</td>
@@ -38,6 +38,7 @@
                         <td>{{ $bill->final_amount }}</td>
                         <td>{{ $receivableAmount }}</td>
                         <td>{{ $dueAmount }}</td>
+
                         <td>
                             @if ($isPaid)
                                 <button class="btn btn-sm btn-success">Paid</button>
@@ -99,7 +100,7 @@
                             <input type="text" name="bill_amount" id="finalAmount" class="form-control" readonly>
                         </div>
                         <div class="form-group">
-                            <label for="paid_amount">Paid Amount</label>
+                            <label for="paid_amount">Payable Amount</label>
                             <input type="text" name="paid_amount" id="paidAmount" class="form-control" readonly>
                         </div>
                         <div class="form-group">
