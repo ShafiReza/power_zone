@@ -7,25 +7,46 @@ use Illuminate\Http\Request;
 use App\Models\RegularCustomer;
 use App\Models\IrregularCustomer;
 use App\Models\MonthlyBill;
+use App\Models\PaymentHistory;
 use App\Models\Bill;
+use App\Models\BillItem2;
 use Auth;
 use Validator;
 
 class AdminController extends Controller
 {
     public function dashboard()
-    {
-        // Calculate total number of regular customers
-        $totalRegularCustomers = RegularCustomer::count();
-        $totalIrregularCustomers = IrregularCustomer::count();
-        $totalDueAmount = MonthlyBill::where('status', 'Due')->sum('amount');
-        $totalPaidAmount = MonthlyBill::where('status', 'Paid')->sum('amount');
-        $totalPaid = Bill::where('status', 'paid')->sum('final_amount');
-        $totalDue = Bill::where('status', 'pending')->sum('final_amount');
+{
+    // Get the current month and year
+    $currentMonth = \Carbon\Carbon::now()->month;
+    $currentYear = \Carbon\Carbon::now()->year;
 
-        // Pass the count to the view
-        return view("admin.dashboard", compact('totalRegularCustomers', 'totalIrregularCustomers', 'totalDueAmount', 'totalPaidAmount', 'totalPaid', 'totalDue'));
-    }
+    // Calculate total number of regular customers for the current month
+    $totalRegularCustomers = RegularCustomer::count();
+    $totalIrregularCustomers = IrregularCustomer::count();
+
+    $totalDueAmount = MonthlyBill::where('status', 'Due')
+                                 ->whereMonth('created_at', $currentMonth)
+                                 ->whereYear('created_at', $currentYear)
+                                 ->sum('amount');
+
+    $totalPaidAmount = MonthlyBill::where('status', 'Paid')
+                                  ->whereMonth('created_at', $currentMonth)
+                                  ->whereYear('created_at', $currentYear)
+                                  ->sum('amount');
+
+    $totalPaid = PaymentHistory::whereMonth('created_at', $currentMonth)
+                     ->whereYear('created_at', $currentYear)
+                     ->sum('receivable_amount');
+
+    $totalDue = BillItem2::whereMonth('created_at', $currentMonth)
+                    ->whereYear('created_at', $currentYear)
+                    ->sum('due_amount');
+
+    // Pass the count to the view
+    return view("admin.dashboard", compact('totalRegularCustomers', 'totalIrregularCustomers', 'totalDueAmount', 'totalPaidAmount', 'totalPaid', 'totalDue'));
+}
+
     public function login(Request $request)
     {
         if ($request->isMethod('post')) {

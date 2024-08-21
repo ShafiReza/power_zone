@@ -10,9 +10,11 @@ use App\Models\RegularCustomer;
 use App\Models\IrregularCustomer;
 use App\Models\Product;
 use App\Models\Bill;
+use App\Models\MonthlyBill;
 use App\Models\BillItem;
 use App\Models\BillItem2;
 use App\Models\PaymentHistory;
+
 use Carbon\Carbon;
 
 
@@ -57,12 +59,29 @@ class BillController extends Controller
         $billItems2 = BillItem2::where('bill_id', $id)->get();
         // Fetch the bill details
         $bill = Bill::find($id);
+             // Fetch the latest bill of the customer that is marked as partial
+             $previousBills = Bill::where('regular_customer_id', $id)
+             ->where('status', 'partial')
+             ->get();
+
+         // Fetch customer details, products, etc.
+         $customer = RegularCustomer::find($id);
+         //$products = Product::all();
 
         // Determine whether the customer is regular or irregular and fetch customer details accordingly
         $customer = $bill->regular_customer_id ? RegularCustomer::find($bill->regular_customer_id) : IrregularCustomer::find($bill->irregular_customer_id);
 
-        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2'));
+        $bill = Bill::findOrFail($id);
+        $finalAmount = $bill->billItems2->first()->final_amount ?? 'N/A';
+        $previousBills = PaymentHistory::where('bill_id', $id)->get();
+
+        // dd($previousBills);
+
+
+
+        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills'));
     }
+
 
 
     public function challan($id)
@@ -253,7 +272,7 @@ class BillController extends Controller
         }
 
         $bill->bill_type = $request->input('billType');
-        $bill->bill_date = $request->input('billDate');;
+        $bill->bill_date = $request->input('billDate');
         $bill->type = 'Ongoing';
         $bill->final_amount = 0; // Initialize final amount
 
@@ -306,6 +325,8 @@ class BillController extends Controller
                 $product->total_amount = $product->quantity * $product->purchase_price;
                 $product->save();
             }
+
+
         }
 
         // Create bill items 2
@@ -332,6 +353,17 @@ class BillController extends Controller
 
         // Save the final bill amount
         $bill->save();
+
+                // Create a payment history entry
+                PaymentHistory::create([
+                    'bill_id' => $bill->id,
+                    'receive_date' => $request->input('billDate'),
+                    'description' => 'Initial Payment',
+                    'bill_amount' => $billItem2Data['final_amount'],
+                    'receivable_amount' =>$billItem2Data['receivable_amount'],
+                    'paid_amount' => $billItem2Data['final_amount'],
+                    'due_amount' =>$billItem2Data['final_amount'] - $billItem2Data['receivable_amount'],
+                ]);
 
 
         return redirect()->route('admin.bill.index')->with('success', 'Bill created successfully.');

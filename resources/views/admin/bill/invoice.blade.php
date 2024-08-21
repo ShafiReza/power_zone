@@ -84,7 +84,7 @@
                                                     <td>{{ $product->quantity }}</td>
                                                     <td>{{ $product->unit_price }}</td>
                                                     <td>
-                                                        @if($product->discount_type == 'Percentage')
+                                                        @if ($product->discount_type == 'Percentage')
                                                             {{ intval($product->discount) }}%
                                                         @else
                                                             {{ number_format($product->discount) }}
@@ -104,6 +104,35 @@
 
                             <div class="row">
                                 <!-- accepted payments column -->
+                                @if ($previousBills->count() > 0)
+
+                                        <div class="col-6">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Bill ID</th>
+                                                        <th>Bill Date</th>
+                                                        {{-- <th>Status</th> --}}
+                                                        <th>Paid Amount</th>
+                                                        <th>Due Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($previousBills as $previousBill)
+                                                        <tr>
+                                                            <td>{{ $previousBill->id }}</td>
+                                                            <td>{{$previousBill->created_at}}</td>
+                                                            <td>{{ $previousBill->receivable_amount }}</td>
+                                                            <td>{{ $previousBill->due_amount }}</td>
+
+
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                @endif
 
                                 <!-- /.col -->
                                 <div class="col-6 ml-auto">
@@ -113,7 +142,7 @@
                                                 <tr>
                                                     <th>Discount</th>
                                                     <td>
-                                                        @if($item->discount_type == 'Percentage')
+                                                        @if ($item->discount_type == 'Percentage')
                                                             {{ intval($item->discount) }}%
                                                         @else
                                                             {{ number_format($item->discount) }}
@@ -123,7 +152,7 @@
                                                 <tr>
                                                     <th>VAT</th>
                                                     <td>
-                                                        @if($item->discount_type == 'Percentage')
+                                                        @if ($item->discount_type == 'Percentage')
                                                             {{ intval($item->vat) }}%
                                                         @else
                                                             {{ number_format($item->vat) }}
@@ -138,44 +167,7 @@
                                         </table>
                                     </div>
                                 </div>
-                                {{-- @if ($previousBills->count() > 0) --}}
-                                <div class="col-6 table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Sl. No.</th>
-                                                <th>Status</th>
-                                                <th>Due Month</th>
-                                                <th>Due Amount</th>
-                                            </tr>
-                                        </thead>
-                                        {{-- <tbody>
-                                            @php
-                                                $sl = 0;
-                                            @endphp
-                                            @foreach ($previousBills as $previousBill)
-                                                @php
-                                                    $sl++;
-                                                @endphp
-                                                <tr>
-                                                    <td>{{ $sl }}</td>
-                                                    <td>
-                                                            Previous Due
-                                                    </td>
-                                                    <td>{{ \Carbon\Carbon::parse($previousBill->bill_month)->format('F Y') }}</td>
-                                                    <td>
-                                                        @if ($previousBill->status == 'pending')
-                                                        {{ $previousBill->amount }}
-                                                        @else
-                                                        {{ $previousBill->due_amount }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody> --}}
-                                    </table>
-                                </div>
-                                {{-- @endif --}}
+
                                 <!-- /.col -->
                             </div>
                             <!-- /.row -->
@@ -183,7 +175,8 @@
                             <!-- this row will not appear when printing -->
                             <div class="row no-print">
                                 <div class="col-12">
-                                    <a href="#" onclick="printPage()" class="btn btn-default"><i class="fas fa-print"></i> Print</a>
+                                    <a href="#" onclick="printPage()" class="btn btn-default"><i
+                                            class="fas fa-print"></i> Print</a>
                                 </div>
                             </div>
 
