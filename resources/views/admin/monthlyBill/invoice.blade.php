@@ -60,7 +60,7 @@
                                             <tr>
                                                 <th>Sl. No.</th> <!-- Add Sl. No. column -->
                                                 <th>Description</th>
-                                                <th>Service</th>
+                                                {{-- <th>Service</th> --}}
                                                 <th>Bill Month</th>
                                                 <th>Amount</th>
                                             </tr>
@@ -72,7 +72,7 @@
                                             <tr>
                                                 <td>{{ $serialNumber }}</td>
                                                 <td>{{ $bill->description }}</td>
-                                                <td>{{ ucfirst($bill->service) }}</td>
+                                                {{-- <td>{{ ucfirst($bill->service) }}</td> --}}
                                                 <td>{{ \Carbon\Carbon::parse($bill->bill_month)->format('F Y') }}</td>
                                                 <td>{{ $bill->amount }}</td>
                                             </tr>

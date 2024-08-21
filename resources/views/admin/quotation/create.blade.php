@@ -77,8 +77,8 @@
                                 <option value="Flat">Flat</option>
                                 <option value="Percentage">Percentage</option>
                             </select></td>
-                        <td><input type="number" class="form-control col-6 discount" name="bill_items2[0][discount]" onchange="calculateFinalAmount()"></td>
-                        <td><input type="number" class="form-control col-6 vat" name="bill_items2[0][vat]" onchange="calculateFinalAmount()"></td>
+                        <td><input type="number" class="form-control col-6 discount" name="bill_items2[0][discount]" value="0.00" onchange="calculateFinalAmount()"></td>
+                        <td><input type="number" class="form-control col-6 vat" name="bill_items2[0][vat]" value="0.00" onchange="calculateFinalAmount()"></td>
                         <td><input type="text" class="form-control col-6 final-amount" name="bill_items2[0][final_amount]" value="0.00" readonly></td>
                         {{-- <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td> --}}
                     </tr>
@@ -121,13 +121,14 @@
                     productId: productId
                 },
                 success: function(data) {
+                    const quantity = data.quantity > 0 ? 1 : 0;
                     const row = `
                         <tr>
                             <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
                             <td><textarea class="form-control" name="description[]"></textarea></td>
-                            <td><input type="number" class="form-control quantity" name="quantity[]" value="1" onchange="calculateTotal(this)"></td>
+                            <td><input type="number" class="form-control quantity" name="quantity[]" value="${quantity}" onchange="calculateTotal(this)"></td>
                             <td><input type="number" class="form-control unitPrice" name="unitPrice[]" value="${data.sell_price}" onchange="calculateTotal(this)"></td>
-                            <td><input type="number" class="form-control discount" name="discount[]" onchange="calculateTotal(this)"></td>
+                            <td><input type="number" class="form-control discount" name="discount[]" value="0.00" onchange="calculateTotal(this)"></td>
                             <td>
                                 <select class="form-control discountType" name="discountType[]" onchange="calculateTotal(this)">
                                     <option value="Percentage">Percentage(%)</option>

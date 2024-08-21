@@ -66,7 +66,7 @@ class BillController extends Controller
 
          // Fetch customer details, products, etc.
          $customer = RegularCustomer::find($id);
-         //$products = Product::all();
+         $product = Product::all();
 
         // Determine whether the customer is regular or irregular and fetch customer details accordingly
         $customer = $bill->regular_customer_id ? RegularCustomer::find($bill->regular_customer_id) : IrregularCustomer::find($bill->irregular_customer_id);
@@ -79,7 +79,7 @@ class BillController extends Controller
 
 
 
-        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills'));
+        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product'));
     }
 
 

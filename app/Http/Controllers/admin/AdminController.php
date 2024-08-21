@@ -38,6 +38,8 @@ class AdminController extends Controller
     $totalPaid = PaymentHistory::whereMonth('created_at', $currentMonth)
                      ->whereYear('created_at', $currentYear)
                      ->sum('receivable_amount');
+                   
+
 
     $totalDue = BillItem2::whereMonth('created_at', $currentMonth)
                     ->whereYear('created_at', $currentYear)

@@ -64,10 +64,19 @@
                             <div class="row">
                                 <div class="col-12 table-responsive">
                                     <table class="table table-striped">
+                                        @php
+                                            $hasDescription = $products->contains(
+                                                fn($product) => !empty($product->description),
+                                            );
+                                        @endphp
                                         <thead>
                                             <tr>
                                                 <th>Product Name</th>
-                                                <th>Description</th>
+                                                @if ($hasDescription)
+                                                    <th>Description</th>
+                                                @endif
+                                                <th>Brand Name</th>
+                                                <th>Origin</th>
                                                 <th>Quantity</th>
                                                 <th>Unit Price</th>
                                                 <th>Discount</th>
@@ -80,7 +89,11 @@
                                             @foreach ($products as $product)
                                                 <tr>
                                                     <td>{{ $product->product_name }}</td>
-                                                    <td>{{ $product->description }}</td>
+                                                    @if ($hasDescription && !empty($product->description))
+                                                        <td>{{ $product->description }}</td>
+                                                    @endif
+                                                    <td>{{ $product->product->brand_name }}</td>
+                                                    <td>{{ $product->product->origin }}</td>
                                                     <td>{{ $product->quantity }}</td>
                                                     <td>{{ $product->unit_price }}</td>
                                                     <td>
@@ -105,33 +118,31 @@
                             <div class="row">
                                 <!-- accepted payments column -->
                                 @if ($previousBills->count() > 0)
-
-                                        <div class="col-6">
-                                            <table class="table table-striped">
-                                                <thead>
+                                    <div class="col-6">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Bill ID</th>
+                                                    <th>Bill Date</th>
+                                                    {{-- <th>Status</th> --}}
+                                                    <th>Paid Amount</th>
+                                                    <th>Due Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($previousBills as $previousBill)
                                                     <tr>
-                                                        <th>Bill ID</th>
-                                                        <th>Bill Date</th>
-                                                        {{-- <th>Status</th> --}}
-                                                        <th>Paid Amount</th>
-                                                        <th>Due Amount</th>
+                                                        <td>{{ $previousBill->id }}</td>
+                                                        <td>{{ $previousBill->created_at }}</td>
+                                                        <td>{{ $previousBill->receivable_amount }}</td>
+                                                        <td>{{ $previousBill->due_amount }}</td>
+
+
                                                     </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($previousBills as $previousBill)
-                                                        <tr>
-                                                            <td>{{ $previousBill->id }}</td>
-                                                            <td>{{$previousBill->created_at}}</td>
-                                                            <td>{{ $previousBill->receivable_amount }}</td>
-                                                            <td>{{ $previousBill->due_amount }}</td>
-
-
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 @endif
 
                                 <!-- /.col -->
