@@ -102,7 +102,7 @@
             <button type="submit" class="btn btn-success">Submit</button>
         </form>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function getCustomers(customerType) {
             if (customerType) {
@@ -137,24 +137,28 @@
                     productId: productId
                 },
                 success: function(data) {
-                    const quantity = data.quantity > 0 ? 1 : 0;
+                    const availableQuantity = data.quantity;
+                    const initialQuantity = availableQuantity > 0 ? 1 : 0;
                     const row = `
-                        <tr>
-                            <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
-                            <td><textarea class="form-control" name="description[]"></textarea></td>
-                            <td><input type="number" class="form-control quantity" name="quantity[]" value="${quantity}" onchange="calculateTotal(this)"></td>
-                            <td><input type="number" class="form-control unitPrice" name="unitPrice[]" value="${data.sell_price}" onchange="calculateTotal(this)"></td>
-                            <td><input type="number" class="form-control discount" name="discount[]" value="0.00" onchange="calculateTotal(this)"></td>
-                            <td>
-                                <select class="form-control discountType" name="discountType[]" onchange="calculateTotal(this)">
-                                    <option value="Percentage">Percentage(%)</option>
-                                    <option value="Flat">Flat</option>
-                                </select>
-                            </td>
-                            <td><input type="number" class="form-control total-amount" name="total_amount[]" readonly></td>
-                            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td>
-                        </tr>
-                    `;
+                <tr>
+                    <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
+                    <td><textarea class="form-control" name="description[]"></textarea></td>
+                    <td>
+                        <input type="number" class="form-control quantity" name="quantity[]" value="${initialQuantity}" min="0" oninput="calculateTotal(this)">
+                        <input type="hidden" class="availableQuantity" value="${availableQuantity}">
+                    </td>
+                    <td><input type="number" class="form-control unitPrice" name="unitPrice[]" value="${data.sell_price}" oninput="calculateTotal(this)"></td>
+                    <td><input type="number" class="form-control discount" name="discount[]" value="0.00" oninput="calculateTotal(this)"></td>
+                    <td>
+                        <select class="form-control discountType" name="discountType[]" onchange="calculateTotal(this)">
+                            <option value="Percentage">Percentage(%)</option>
+                            <option value="Flat">Flat</option>
+                        </select>
+                    </td>
+                    <td><input type="number" class="form-control total-amount" name="total_amount[]" readonly></td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td>
+                </tr>
+            `;
                     $('#bill-items').append(row);
                 },
                 error: function(xhr, status, error) {
@@ -166,6 +170,19 @@
         function calculateTotal(element) {
             const row = $(element).closest('tr');
             const quantity = parseFloat(row.find('.quantity').val()) || 0;
+            const availableQuantity = parseFloat(row.find('.availableQuantity').val()) || 0;
+
+            if (quantity > availableQuantity) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'There is not enough quantity in your product.',
+                }).then(() => {
+                    row.find('.quantity').val(availableQuantity); // Reset to maximum available quantity
+                });
+                return; // Stop further calculations
+            }
+
             const unitPrice = parseFloat(row.find('.unitPrice').val()) || 0;
             const discount = parseFloat(row.find('.discount').val()) || 0;
             const discountType = row.find('.discountType').val();
