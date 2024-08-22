@@ -51,7 +51,14 @@ class MonthlyBillController extends Controller
         $query = MonthlyBill::query();
 
         if ($request->filled('month')) {
-            $query->whereMonth('bill_month', '=', $request->month);
+            // Split the 'month' value into year and month
+            $yearMonth = explode('-', $request->month);
+            $year = $yearMonth[0];
+            $month = $yearMonth[1];
+
+            // Filter by both year and month
+            $query->whereYear('bill_month', '=', $year)
+                  ->whereMonth('bill_month', '=', $month);
         }
 
         if ($request->filled('customer_name')) {

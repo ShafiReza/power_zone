@@ -8,6 +8,21 @@
             <p>{{ $message }}</p>
         </div>
     @endif
+    <form action="{{ route('admin.product.index') }}" method="GET">
+        <div class="form-row">
+            <div class="form-group col-2">
+                <label for="name">Product Name:</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ request('name') }}">
+            </div>
+            <div class="form-group col-2">
+                <label for="category">Category Name:</label>
+                <input type="text" class="form-control" id="category" name="category" value="{{ request('category') }}">
+            </div>
+            <div class="form-group col-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
 
     <a class="btn btn-success mb-3" href="{{ route('admin.product.create') }}">Create Product</a>
 

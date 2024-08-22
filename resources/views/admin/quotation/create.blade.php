@@ -126,9 +126,9 @@
                         <tr>
                             <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
                             <td><textarea class="form-control" name="description[]"></textarea></td>
-                            <td><input type="number" class="form-control quantity" name="quantity[]" value="${quantity}" onchange="calculateTotal(this)"></td>
-                            <td><input type="number" class="form-control unitPrice" name="unitPrice[]" value="${data.sell_price}" onchange="calculateTotal(this)"></td>
-                            <td><input type="number" class="form-control discount" name="discount[]" value="0.00" onchange="calculateTotal(this)"></td>
+                            <td><input type="number" class="form-control quantity" name="quantity[]" value="${quantity}" oninput="calculateTotal(this)"></td>
+                            <td><input type="number" class="form-control unitPrice" name="unitPrice[]" value="${data.sell_price}" oninput="calculateTotal(this)"></td>
+                            <td><input type="number" class="form-control discount" name="discount[]" value="0.00" oninput="calculateTotal(this)"></td>
                             <td>
                                 <select class="form-control discountType" name="discountType[]" onchange="calculateTotal(this)">
                                     <option value="Percentage">Percentage(%)</option>

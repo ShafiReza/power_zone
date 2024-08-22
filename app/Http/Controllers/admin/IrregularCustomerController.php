@@ -8,9 +8,16 @@ use App\Models\IrregularCustomer;
 use App\Models\Customer;
 class IrregularCustomerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $irregularCustomers = IrregularCustomer::all();
+        $query = IrregularCustomer::query();
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        $irregularCustomers = $query->get();
+
         return view('admin.irregularCustomer.index', compact('irregularCustomers'));
     }
 

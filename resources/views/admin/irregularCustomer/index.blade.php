@@ -8,6 +8,18 @@
             <p>{{ $message }}</p>
         </div>
     @endif
+    <form action="{{ route('admin.irregularCustomer.index') }}" method="GET">
+        <div class="form-row">
+            <div class="form-group col-2">
+                <label for="name">Client Name:</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ request('name') }}">
+            </div>
+            <div class="form-group col-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
+
 
     <a class="btn btn-success mb-3" href="{{ route('admin.irregularCustomer.create') }}">Create Customer</a>
 

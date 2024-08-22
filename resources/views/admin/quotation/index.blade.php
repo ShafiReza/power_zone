@@ -4,6 +4,14 @@
 @section('content')
     <div class="content-wrapper container-fluid col-11 table-responsive">
         <h2>Quotation List</h2>
+        <form method="GET" action="{{ route('admin.quotation.index') }}" class="mb-3">
+            <div class="input-group col-3">
+                <input type="text" name="client_name" class="form-control" placeholder="client name" value="{{ request()->client_name }}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Filter</button>
+                </div>
+            </div>
+        </form>
         <table class="table table-hover">
             <thead>
                 <tr>

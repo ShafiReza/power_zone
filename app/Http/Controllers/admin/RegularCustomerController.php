@@ -10,9 +10,15 @@ use App\Models\Bill;
 use Carbon\Carbon;
 class RegularCustomerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $regularCustomers = RegularCustomer::all();
+        $query = RegularCustomer::query();
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        $regularCustomers = $query->get();
 
         return view('admin.regularCustomer.index', compact('regularCustomers'));
     }

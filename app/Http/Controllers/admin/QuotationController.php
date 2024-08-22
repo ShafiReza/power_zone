@@ -12,9 +12,17 @@ use App\Models\QuotationItem2;
 use Illuminate\Support\Facades\Log;
 class QuotationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $quotations = Quotation::with(['irregularCustomer'])->get();
+        $query = Quotation::with(['irregularCustomer']);
+
+        if ($request->has('client_name') && !empty($request->client_name)) {
+            $query->whereHas('irregularCustomer', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->client_name . '%');
+            });
+        }
+
+        $quotations = $query->get();
 
         return view('admin.quotation.index', compact('quotations'));
     }

@@ -8,11 +8,19 @@ use App\Models\Supplier;
 
 class SupplierController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $suppliers = Supplier::all();
+        $query = Supplier::query();
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        $suppliers= $query->get();
+
         return view('admin.supplier.index', compact('suppliers'));
     }
+   
 
     public function create()
     {

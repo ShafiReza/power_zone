@@ -8,6 +8,14 @@
                 <p>{{ $message }}</p>
             </div>
         @endif
+        <form method="GET" action="{{ route('admin.bill.index') }}" class="mb-3">
+            <div class="input-group col-3">
+                <input type="text" name="client_name" class="form-control" placeholder="Search by client name" value="{{ request()->client_name }}">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
         <table class="table table-hover">
             <thead>
                 <tr>
