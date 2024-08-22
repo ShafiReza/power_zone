@@ -85,14 +85,14 @@
                             </select>
                         </td>
                         <td><input type="text" class="form-control discount" name="bill_items2[0][discount]"
-                                value="0.00" onchange="calculateFinalAmount()"></td>
+                                value="0.00" oninput="calculateFinalAmount()"></td>
                         <td><input type="text" class="form-control vat" name="bill_items2[0][vat]" value="0.00"
-                                onchange="calculateFinalAmount()"></td>
+                                oninput="calculateFinalAmount()"></td>
                         <td><input type="text" class="form-control receivable_amount"
-                                name="bill_items2[0][receivable_amount]" value="0.00" onchange="calculateFinalAmount()">
+                                name="bill_items2[0][receivable_amount]" value="0.00" oninput="calculateFinalAmount()">
                         </td>
                         <td><input type="text" class="form-control due_amount" name="bill_items2[0][due_amount]"
-                                value="0.00" onchange="calculateFinalAmount()"></td>
+                                value="0.00" oninput="calculateFinalAmount()"></td>
                         <td><input type="text" class="form-control final-amount" name="bill_items2[0][final_amount]"
                                 value="0.00" readonly></td>
                     </tr>

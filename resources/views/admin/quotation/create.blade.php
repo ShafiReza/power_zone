@@ -77,8 +77,8 @@
                                 <option value="Flat">Flat</option>
                                 <option value="Percentage">Percentage</option>
                             </select></td>
-                        <td><input type="number" class="form-control col-6 discount" name="bill_items2[0][discount]" value="0.00" onchange="calculateFinalAmount()"></td>
-                        <td><input type="number" class="form-control col-6 vat" name="bill_items2[0][vat]" value="0.00" onchange="calculateFinalAmount()"></td>
+                        <td><input type="number" class="form-control col-6 discount" name="bill_items2[0][discount]" value="0.00" oninput="calculateFinalAmount()"></td>
+                        <td><input type="number" class="form-control col-6 vat" name="bill_items2[0][vat]" value="0.00" oninput="calculateFinalAmount()"></td>
                         <td><input type="text" class="form-control col-6 final-amount" name="bill_items2[0][final_amount]" value="0.00" readonly></td>
                         {{-- <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td> --}}
                     </tr>
