@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -20,7 +20,7 @@ class SupplierController extends Controller
 
         return view('admin.supplier.index', compact('suppliers'));
     }
-   
+
 
     public function create()
     {

@@ -47,14 +47,6 @@
             <input type="number" step="0.01" class="form-control" id="initial_bill_amount" name="initial_bill_amount" value="{{ $customer->initial_bill_amount }}" required>
         </div>
         <div class="form-group col-4">
-            <label for="start_date">Start Date:</label>
-            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $customer->start_date }}" required>
-        </div>
-        <div class="form-group col-4">
-            <label for="next_bill_date">Next Bill Date:</label>
-            <input type="date" class="form-control" id="next_bill_date" name="next_bill_date" value="{{ $customer->next_bill_date }}" required>
-        </div>
-        <div class="form-group col-4">
             <label for="status">Status:</label>
             <select class="form-control" id="status" name="status" required>
                 <option value="Active" {{ $customer->status == 'Active' ? 'selected' : '' }}>Active</option>

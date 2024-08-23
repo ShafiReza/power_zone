@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\MonthlyBill;
 use App\Models\RegularCustomer;
 use Carbon\Carbon;
-use App\Http\Controllers\admin\MonthlyBillController;
+use App\Http\Controllers\MonthlyBillController;
 
 
 class GenerateMonthlyBills extends Command

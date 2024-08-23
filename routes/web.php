@@ -3,15 +3,15 @@
 use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\admin\AdminController;
-use App\Http\Controllers\Admin\RegularCustomerController;
-use App\Http\Controllers\Admin\IrregularCustomerController;
-use App\Http\Controllers\Admin\SupplierController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\RegularCustomerController;
+use App\Http\Controllers\IrregularCustomerController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BillController;
-use App\Http\Controllers\Admin\MonthlyBillController;
-use App\Http\Controllers\Admin\QuotationController;
+use App\Http\Controllers\MonthlyBillController;
+use App\Http\Controllers\QuotationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +31,7 @@ Route::get('/', function () {
         return redirect()->route('admin.login');
     }
 });
-Route::prefix("admin")->namespace("App\Http\Controllers\Admin")->group(function () {
+Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
     Route::match(['get', 'post'], 'login', [AdminController::class, "login"])->name('admin.login');
     Route::group(['middleware' => [\App\Http\Middleware\Admin::class]], function () {
         Route::get("dashboard", [AdminController::class, "dashboard"])->name('admin.dashboard');
