@@ -36,7 +36,7 @@
                                 <div class="col-12">
                                     <h4>
                                         <small
-                                            class="float-right">Date:{{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}</small>
+                                            class="float-right" style="margin-right: 120px">Date:{{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}</small>
                                             Challan No: {{ $bill->id  }}
                                     </h4>
                                 </div>
@@ -51,7 +51,7 @@
                                         Phone: 01722-533538, 01918-750912<br>
                                     </address>
                                 </div>
-                                <div class="col-sm-4 invoice-col">
+                                <div class="col-sm-4 invoice-col" style="margin-left: 530px;">
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>

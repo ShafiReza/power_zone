@@ -35,11 +35,12 @@
                             <div class="row">
                                 <h4 class="mx-auto">Invoice</h4>
                                 <div class="col-12">
-                                    <h4>
+                                    <h4 style="margin-right: 120px">
                                         <small class="float-right">Date:
                                             {{ \Carbon\Carbon::parse($bill->start_date)->format('d-m-Y') }}</small>
                                             Invoice No: {{ $bill->id  }}
                                     </h4>
+
                                 </div>
                                 <!-- /.col -->
                             </div>
@@ -54,7 +55,7 @@
                                     </address>
                                 </div>
                                 <!-- /.col -->
-                                <div class="col-sm-4 invoice-col">
+                                <div class="col-sm-4 invoice-col" style="margin-left: 530px;">
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>
