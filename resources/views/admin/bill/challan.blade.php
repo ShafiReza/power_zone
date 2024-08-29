@@ -29,6 +29,7 @@
                                     <h4>
                                         <small
                                             class="float-right">Date:{{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}</small>
+                                            Challan No: {{ $bill->id  }}
                                     </h4>
                                 </div>
                             </div>
