@@ -209,7 +209,7 @@
                 const receivableAmount = parseFloat(document.getElementById('receivableAmount').value);
 
                 // Check if receivable amount is less than the bill amount
-                if (receivableAmount < billAmount) {
+                if (receivableAmount < billAmount ||receivableAmount > billAmount) {
                     const errorMessage = 'Receivable amount is less than the Bill Amount';
                     // Display the error message
                     Swal.fire({
