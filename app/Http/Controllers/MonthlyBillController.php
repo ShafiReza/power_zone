@@ -14,8 +14,9 @@ class MonthlyBillController extends Controller
 {
     public function create()
     {
+        $title = "Monthly Bill";
         $customers = RegularCustomer::all();
-        return view('admin.monthlyBill.create', compact('customers'));
+        return view('admin.monthlyBill.create', compact('customers','title'));
     }
 
 
@@ -165,8 +166,9 @@ class MonthlyBillController extends Controller
 
     public function showBill($billId)
     {
+        $title = "Payment History";
         $payments = Payment::where('bill_id', $billId)->latest()->get();
-        return view('admin.monthlyBill.storePayment', compact('payments'));
+        return view('admin.monthlyBill.storePayment', compact('payments','title'));
     }
 
     public function generateMonthlyBills()
