@@ -14,6 +14,8 @@ class QuotationController extends Controller
 {
     public function index(Request $request)
     {
+
+        $title = "Quotation";
         $query = Quotation::with(['irregularCustomer']);
 
         if ($request->has('client_name') && !empty($request->client_name)) {
@@ -24,14 +26,15 @@ class QuotationController extends Controller
 
         $quotations = $query->get();
 
-        return view('admin.quotation.index', compact('quotations'));
+        return view('admin.quotation.index', compact('quotations','title'));
     }
 
     public function create()
     {
+        $title = "Quotation From";
         $irregularCustomers = IrregularCustomer::all();
         $products = Product::all();
-        return view('admin.quotation.create', ['irregularCustomers' => $irregularCustomers, 'products' => $products]);
+        return view('admin.quotation.create', ['irregularCustomers' => $irregularCustomers, 'products' => $products,'title'=>$title ]);
     }
 
     public function getProduct(Request $request)

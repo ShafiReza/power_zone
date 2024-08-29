@@ -10,6 +10,7 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
+        $title = "Category List";
         $query = Category::query();
 
         if ($request->filled('name')) {
@@ -18,16 +19,18 @@ class CategoryController extends Controller
 
         $categories = $query->get();
 
-        return view('admin.category.index', compact('categories'));
+        return view('admin.category.index', compact('categories','title'));
     }
 
     public function create()
     {
-        return view('admin.category.create');
+        $title = "Category List";
+        return view('admin.category.create', compact('title'));
     }
     public function edit(Category $category)
     {
-        return view('admin.category.edit', compact('category'));
+        $title = "Category List";
+        return view('admin.category.edit', compact('category','title'));
     }
     public function store(Request $request)
     {

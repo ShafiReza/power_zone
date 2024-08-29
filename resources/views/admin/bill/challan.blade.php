@@ -17,11 +17,11 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
-
-
-
                         <!-- Main content -->
                         <div class="invoice p-3 mb-3">
+                            <h1 style="color: rgb(85, 199, 85)">Power Zone</h1>
+                            <sub style="margin-left: 300px; color: rgb(85, 199, 85)"><i>The Source of power</i></sub>
+                            <hr>
                             <!-- title row -->
                             <div class="row">
                                 <h4 class="mx-auto">Challan</h4>
@@ -31,12 +31,10 @@
                                             class="float-right">Date:{{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}</small>
                                     </h4>
                                 </div>
-                                <!-- /.col -->
                             </div>
                             <!-- info row -->
                             <div class="row invoice-info">
                                 <div class="col-sm-4 invoice-col">
-
                                     <address>
                                         <strong>Power Zone</strong><br>
                                         Bosila Housing,<br>
@@ -44,21 +42,13 @@
                                         Phone: 01722-533538, 01918-750912<br>
                                     </address>
                                 </div>
-                                <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
-
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>
-                                   
-
                                     </address>
                                 </div>
-                                <!-- /.col -->
-
-                                <!-- /.col -->
                             </div>
-                            <!-- /.row -->
 
                             <!-- Table row -->
                             <div class="row">
@@ -69,8 +59,6 @@
                                                 <th>Product Name</th>
                                                 <th>Description</th>
                                                 <th>Quantity</th>
-
-
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -79,50 +67,12 @@
                                                     <td>{{ $product->product_name }}</td>
                                                     <td>{{ $product->description }}</td>
                                                     <td>{{ $product->quantity }}</td>
-
-
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 </div>
-                                <!-- /.col -->
                             </div>
-                            <!-- /.row -->
-
-                            <div class="row">
-                                <!-- accepted payments column -->
-
-                                <!-- /.col -->
-                                <div class="col-6">
-
-
-                                    <div class="table-responsive">
-                                        {{-- <table class="table">
-                                            @foreach ($billItems2 as $item)
-                                                <tr>
-                                                    <th style="width:50%">Discount Type</th>
-                                                    <td>{{ $item->discount_type }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Discount</th>
-                                                    <td>{{ $item->discount }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>VAT</th>
-                                                    <td>{{ $item->vat }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Final Amount</th>
-                                                    <td></td>
-                                                </tr>
-                                            @endforeach
-                                        </table> --}}
-                                    </div>
-                                </div>
-                                <!-- /.col -->
-                            </div>
-                            <!-- /.row -->
 
                             <!-- this row will not appear when printing -->
                             <div class="row no-print">
@@ -140,11 +90,57 @@
                             </script>
 
                         </div>
-                        <!-- /.invoice -->
-                    </div><!-- /.col -->
-                </div><!-- /.row -->
-            </div><!-- /.container-fluid -->
+                    </div>
+                </div>
+            </div>
         </section>
-        <!-- /.content -->
     </div>
 @endsection
+
+<style>
+    .invoice {
+        position: relative;
+        padding: 2rem;
+        background: none; /* No background color or gradient */
+        border: none;
+        height: 100vw;
+        box-shadow: none;
+        overflow: hidden;
+        z-index: 1; /* Ensure content is above the background */
+    }
+
+    .invoice::before {
+        content: "";
+        position: absolute;
+        top: 130;
+        left: 0;
+        width: 100%;
+        height: 90vw;
+        background: none;
+        border: none;
+        box-shadow: none;
+        background-image: url("{{ asset('admin/images/Capture.jpg') }}");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: cover;
+        opacity: 0.2; /* Adjust the opacity of the background image */
+        z-index: -1; /* Ensure the background is behind the content */
+    }
+
+    @media print {
+        .invoice {
+            height: 135vw;
+            padding: 1rem;
+        }
+
+        .invoice::before {
+            opacity: 0.2; /* Adjust the opacity for print if needed */
+            -webkit-print-color-adjust: exact; /* Ensures background image and color are printed */
+            print-color-adjust: exact; /* For modern browsers */
+        }
+
+        .no-print {
+            display: none; /* Hide print buttons during printing */
+        }
+    }
+</style>

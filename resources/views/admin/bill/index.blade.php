@@ -186,53 +186,7 @@
                 document.getElementById('dueAmount').value = dueAmount;
             });
 
-            // Calculate due amount on receivable amount change
-            // document.getElementById('receivableAmount').addEventListener('input', function() {
-            //     const finalAmount = parseFloat(document.getElementById('finalAmount').value) || 0;
-            //     const receivableAmount = parseFloat(this.value) || 0;
-            //     const previousPaidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
-
-            //     // Update due amount based on new payment
-            //     const newDueAmount = dueAmount - receivableAmount;
-            //     document.getElementById('dueAmount').value = newDueAmount.toFixed(2);
-            // });
-
-            // Handle form submission for marking as paid
-            // document.getElementById('markPaidForm').addEventListener('submit', function(e) {
-            //     e.preventDefault();
-            //     const formData = new FormData(this);
-
-            //     fetch('{{ route('bill.markPaid') }}', {
-            //             method: 'POST',
-            //             body: formData,
-            //             headers: {
-            //                 'Accept': 'application/json',
-            //             }
-            //         })
-            //         .then(response => response.json())
-            //         .then(data => {
-            //             if (data.success) {
-            //                 const markPaidButton = document.querySelector(
-            //                     `.mark-paid-button[data-id="${data.bill_id}"]`);
-
-            //                 if (data.due_amount === 0) {
-            //                     markPaidButton.outerHTML =
-            //                         '<button class="btn btn-sm btn-success">Paid</button>';
-            //                 } else {
-            //                     markPaidButton.outerHTML =
-            //                         '<button class="btn btn-sm btn-warning">Partial</button>';
-            //                 }
-            //                 $('#markPaidModal').modal('hide');
-            //                 location.reload(); // Reload the page to reflect changes
-            //             } else {
-            //                 alert('An error occurred');
-            //             }
-            //         })
-            //         .catch(error => {
-            //             console.error('Error:', error);
-            //             alert('An error occurred');
-            //         });
-            // });
+           
             document.getElementById('markPaidForm').addEventListener('submit', function(e) {
                 e.preventDefault();
 

@@ -22,6 +22,7 @@ class BillController extends Controller
 {
     public function index(Request $request)
 {
+    $title = "Bill";
     // Initialize the query with relationships
     $query = Bill::with(['regularCustomer', 'irregularCustomer']);
 
@@ -49,19 +50,21 @@ class BillController extends Controller
         return $paymentHistory->due_amount != 0;
     });
 
-    return view('admin.bill.index', compact('bills', 'hasPartial'));
+    return view('admin.bill.index', compact('bills', 'hasPartial','title'));
 }
 
     public function create()
     {
+        $title = "Bill";
         $customers = Customer::all();
         $products = Product::all();
-        return view('admin.bill.create', ['customers' => $customers, 'products' => $products]);
+        return view('admin.bill.create', ['customers' => $customers, 'products' => $products,'title'=>$title]);
     }
 
 
     public function invoice($id)
     {
+        $title = "Invoice";
         // Fetch bill items related to the bill
         $products = BillItem::where('bill_id', $id)->get();
         $billItems2 = BillItem2::where('bill_id', $id)->get();
@@ -87,13 +90,14 @@ class BillController extends Controller
 
 
 
-        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product'));
+        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product','title'));
     }
 
 
 
     public function challan($id)
     {
+        $title = "Challan";
         // Fetch bill items related to the bill
         $products = BillItem::where('bill_id', $id)->get();
         $billItems2 = BillItem2::where('bill_id', $id)->get();
@@ -103,7 +107,7 @@ class BillController extends Controller
         // Determine whether the customer is regular or irregular and fetch customer details accordingly
         $customer = $bill->regular_customer_id ? RegularCustomer::find($bill->regular_customer_id) : IrregularCustomer::find($bill->irregular_customer_id);
 
-        return view('admin.bill.challan', compact('customer', 'products', 'bill', 'billItems2'));
+        return view('admin.bill.challan', compact('customer', 'products', 'bill', 'billItems2','title'));
     }
 
     public function getCustomers(Request $request)
@@ -317,12 +321,13 @@ class BillController extends Controller
 
     public function paymentHistory($billId)
     {
+        $title = "Payment History";
         $bill = Bill::findOrFail($billId);
         $finalAmount = $bill->billItems2->first()->final_amount ?? 'N/A';
         $payments = PaymentHistory::where('bill_id', $billId)->latest()->get();
 
         $hasPartial = $payments->where('due_amount', '>', 0)->isNotEmpty();
-        return view('admin.bill.payment_history', compact('payments', 'bill', 'finalAmount', 'hasPartial'));
+        return view('admin.bill.payment_history', compact('payments', 'bill', 'finalAmount', 'hasPartial','title'));
     }
 
 

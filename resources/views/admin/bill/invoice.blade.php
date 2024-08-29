@@ -18,15 +18,21 @@
                     <div class="col-12">
                         <!-- Main content -->
                         <div class="invoice p-3 mb-3">
-
+                            <h1 style="color: rgb(85, 199, 85)">Power Zone</h1>
+                            <sub style="margin-left: 300px; color: rgb(85, 199, 85)"><i>The Source of power</i></sub>
+                            <hr>
                             <!-- title row -->
                             <div class="row">
                                 <h4 class="mx-auto">Invoice</h4>
                                 <div class="col-12">
                                     <h4>
                                         <small class="float-right">Date:
-                                            {{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}</small>
+                                            {{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}<br>
+                                            <!-- Adding the Invoice Number below the Date -->
+                                        </small>
+                                        Invoice No: {{ $bill->id  }}
                                     </h4>
+
                                 </div>
                             </div>
                             <!-- info row -->
@@ -180,33 +186,44 @@
 
 <style>
     .invoice {
-    position: relative;
-    padding: 2rem;
-    background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url("{{ asset('admin/images/Capture.jpg') }}") no-repeat center center / cover;
-    border: none;
-    height: 100vh;
-    box-shadow: none;
-    overflow: hidden;
-}
+        position: relative;
+        padding: 2rem;
+        background: none; /* No background color or gradient */
+        border: none;
+        height: 100vw;
+        box-shadow: none;
+        overflow: hidden;
+        z-index: 1; /* Ensure content is above the background */
+    }
 
     .invoice::before {
         content: "";
         position: absolute;
-        top: 0;
+        top: 130;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: 90vw;
+        background: none;
+        border: none;
+        box-shadow: none;
         background-image: url("{{ asset('admin/images/Capture.jpg') }}");
         background-repeat: no-repeat;
         background-position: center center;
         background-size: cover;
-        opacity: 1; /* Adjust the opacity as needed */
+        opacity: 0.2; /* Adjust the opacity of the background image */
         z-index: -1; /* Ensure the background is behind the content */
     }
 
     @media print {
+        .invoice {
+            height: 135vw;
+            padding: 1rem;
+        }
+
         .invoice::before {
-            opacity: 0.5; /* Adjust the opacity for print if needed */
+            opacity: 0.2; /* Adjust the opacity for print if needed */
+            -webkit-print-color-adjust: exact; /* Ensures background image and color are printed */
+            print-color-adjust: exact; /* For modern browsers */
         }
 
         .no-print {

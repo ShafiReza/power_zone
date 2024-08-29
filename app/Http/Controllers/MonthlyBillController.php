@@ -48,6 +48,7 @@ class MonthlyBillController extends Controller
     }
     public function index(Request $request)
     {
+        $title = "Monthly Bill";
         $query = MonthlyBill::query();
 
         if ($request->filled('month')) {
@@ -72,7 +73,7 @@ class MonthlyBillController extends Controller
 
         $bills = $query->with('regularCustomer')->get();
 
-        return view('admin.monthlyBill.index', compact('bills'));
+        return view('admin.monthlyBill.index', compact('bills','title'));
     }
 
     public function destroy($id)

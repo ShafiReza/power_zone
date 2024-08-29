@@ -12,6 +12,7 @@ class RegularCustomerController extends Controller
 {
     public function index(Request $request)
     {
+        $title = "Regular Customers";
         $query = RegularCustomer::query();
 
         if ($request->filled('name')) {
@@ -20,12 +21,13 @@ class RegularCustomerController extends Controller
 
         $regularCustomers = $query->get();
 
-        return view('admin.regularCustomer.index', compact('regularCustomers'));
+        return view('admin.regularCustomer.index', compact('regularCustomers','title'));
     }
 
     public function create()
     {
-        return view('admin.regularCustomer.create');
+        $title = "Regular Customers";
+        return view('admin.regularCustomer.create',compact('title'));
     }
 
     public function store(Request $request)
@@ -58,7 +60,8 @@ class RegularCustomerController extends Controller
 
     public function edit(RegularCustomer $customer)
     {
-        return view('admin.regularCustomer.edit', compact('customer'));
+        $title = "Regular Customers";
+        return view('admin.regularCustomer.edit', compact('customer','title'));
     }
 
     public function update(Request $request, RegularCustomer $customer)

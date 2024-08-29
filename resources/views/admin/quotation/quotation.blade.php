@@ -6,37 +6,33 @@
         <section class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-sm-6">
-
-                    </div>
+                    <div class="col-sm-6"></div>
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
 
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-12">
-
-
-
                         <!-- Main content -->
                         <div class="invoice p-3 mb-3">
+                            <h1 style="color: rgb(85, 199, 85)">Power Zone</h1>
+                            <sub style="margin-left: 300px; color: rgb(85, 199, 85)"><i>The Source of power</i></sub>
+                            <hr>
                             <!-- title row -->
                             <div class="row">
                                 <h4 class="mx-auto">Quotation</h4>
                                 <div class="col-12">
                                     <h4>
-                                        <small
-                                            class="float-right">Date:{{ \Carbon\Carbon::parse($quotation->quotation_date)->format('d-m-Y') }}</small>
+                                        <small class="float-right">Date:
+                                            {{ \Carbon\Carbon::parse($quotation->quotation_date)->format('d-m-Y') }}</small>
                                     </h4>
                                 </div>
-                                <!-- /.col -->
                             </div>
                             <!-- info row -->
                             <div class="row invoice-info">
                                 <div class="col-sm-4 invoice-col">
-
                                     <address>
                                         <strong>Power Zone</strong><br>
                                         Bosila Housing,<br>
@@ -44,21 +40,13 @@
                                         Phone: 01722-533538, 01918-750912<br>
                                     </address>
                                 </div>
-                                <!-- /.col -->
                                 <div class="col-sm-4 invoice-col">
-
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>
-
-
                                     </address>
                                 </div>
-                                <!-- /.col -->
-
-                                <!-- /.col -->
                             </div>
-                            <!-- /.row -->
 
                             <!-- Table row -->
                             <div class="row">
@@ -71,7 +59,6 @@
                                                 <th>Quantity</th>
                                                 <th>Unit Price</th>
                                                 <th>Total Amount</th>
-
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -82,27 +69,18 @@
                                                     <td>{{ $product->quantity }}</td>
                                                     <td>{{ $product->unit_price }}</td>
                                                     <td>{{ $product->total_amount }}</td>
-
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 </div>
-                                <!-- /.col -->
                             </div>
-                            <!-- /.row -->
 
                             <div class="row">
-                                <!-- accepted payments column -->
-
-                                <!-- /.col -->
-                                <div class="col-6">
-
-
+                                <div class="col-6 ml-auto">
                                     <div class="table-responsive">
                                         <table class="table">
                                             @foreach ($quotationItems2 as $item)
-                                               
                                                 <tr>
                                                     <th>Final Amount</th>
                                                     <td>{{ $item->final_amount }}</td>
@@ -111,17 +89,11 @@
                                         </table>
                                     </div>
                                 </div>
-                                <!-- /.col -->
                             </div>
-                            <!-- /.row -->
 
-                            <!-- this row will not appear when printing -->
                             <div class="row no-print">
                                 <div class="col-12">
-                                    <a href="#" onclick="printPage()" class="btn btn-default"><i
-                                            class="fas fa-print"></i> Print</a>
-
-
+                                    <a href="#" onclick="printPage()" class="btn btn-default"><i class="fas fa-print"></i> Print</a>
                                 </div>
                             </div>
 
@@ -134,11 +106,57 @@
                             </script>
 
                         </div>
-                        <!-- /.invoice -->
-                    </div><!-- /.col -->
-                </div><!-- /.row -->
-            </div><!-- /.container-fluid -->
+                    </div>
+                </div>
+            </div>
         </section>
-        <!-- /.content -->
     </div>
 @endsection
+
+<style>
+    .invoice {
+        position: relative;
+        padding: 2rem;
+        background: none; /* No background color or gradient */
+        border: none;
+        height: 100vw;
+        box-shadow: none;
+        overflow: hidden;
+        z-index: 1; /* Ensure content is above the background */
+    }
+
+    .invoice::before {
+        content: "";
+        position: absolute;
+        top: 130;
+        left: 0;
+        width: 100%;
+        height: 90vw;
+        background: none;
+        border: none;
+        box-shadow: none;
+        background-image: url("{{ asset('admin/images/Capture.jpg') }}");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: cover;
+        opacity: 0.2; /* Adjust the opacity of the background image */
+        z-index: -1; /* Ensure the background is behind the content */
+    }
+
+    @media print {
+        .invoice {
+            height: 135vw;
+            padding: 1rem;
+        }
+
+        .invoice::before {
+            opacity: 0.2; /* Adjust the opacity for print if needed */
+            -webkit-print-color-adjust: exact; /* Ensures background image and color are printed */
+            print-color-adjust: exact; /* For modern browsers */
+        }
+
+        .no-print {
+            display: none; /* Hide print buttons during printing */
+        }
+    }
+</style>

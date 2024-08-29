@@ -10,6 +10,7 @@ class SupplierController extends Controller
 {
     public function index(Request $request)
     {
+        $title = "Supplier";
         $query = Supplier::query();
 
         if ($request->filled('name')) {
@@ -18,7 +19,7 @@ class SupplierController extends Controller
 
         $suppliers= $query->get();
 
-        return view('admin.supplier.index', compact('suppliers'));
+        return view('admin.supplier.index', compact('suppliers','title'));
     }
 
 

@@ -10,6 +10,7 @@ class IrregularCustomerController extends Controller
 {
     public function index(Request $request)
     {
+        $title = "Irregular Customers";
         $query = IrregularCustomer::query();
 
         if ($request->filled('name')) {
@@ -18,12 +19,13 @@ class IrregularCustomerController extends Controller
 
         $irregularCustomers = $query->get();
 
-        return view('admin.irregularCustomer.index', compact('irregularCustomers'));
+        return view('admin.irregularCustomer.index', compact('irregularCustomers','title'));
     }
 
     public function create()
     {
-        return view('admin.irregularCustomer.create');
+        $title = "Irregular Customers";
+        return view('admin.irregularCustomer.create', compact('title'));
     }
 
     public function store(Request $request)
@@ -53,7 +55,8 @@ class IrregularCustomerController extends Controller
 
     public function edit(IrregularCustomer $customer)
     {
-        return view('admin.irregularCustomer.edit', compact('customer'));
+        $title = "Irregular Customers";
+        return view('admin.irregularCustomer.edit', compact('customer','title'));
     }
 
     public function update(Request $request, IrregularCustomer $customer)

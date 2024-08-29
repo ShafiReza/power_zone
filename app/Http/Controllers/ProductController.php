@@ -15,6 +15,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        $title = "Product";
         $query = Product::query();
 
         if ($request->filled('name')) {
@@ -28,14 +29,15 @@ class ProductController extends Controller
 
         $products = $query->get();
 
-        return view('admin.product.index', compact('products'));
+        return view('admin.product.index', compact('products','title'));
     }
 
     public function create()
     {
+        $title = "Product";
 
         $categories = Category::where('status', 'active')->get(); // Fetch only active categories
-        return view('admin.product.create', compact('categories'));
+        return view('admin.product.create', compact('categories','title'));
     }
 
     public function store(Request $request)
@@ -62,8 +64,9 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+        $title = "Product";
         $categories = Category::where('status', 'active')->get(); // Fetch only active categories
-        return view('admin.product.edit', compact('product', 'categories'));
+        return view('admin.product.edit', compact('product', 'categories','title'));
     }
 
     public function update(Request $request, Product $product)
@@ -113,6 +116,8 @@ class ProductController extends Controller
 
     public function sales($id)
     {
+
+        $title = "Sales List";
         // Fetch bills with billItems containing the specified product ID
         $bills = Bill::whereHas('billItems', function ($query) use ($id) {
             $query->where('product_id', $id); // Assuming 'product_id' is the correct field
@@ -121,12 +126,13 @@ class ProductController extends Controller
         }, 'billItems2'])->get();
 
         // Pass the product ID to the view
-        return view('admin.product.sales', compact('bills', 'id'));
+        return view('admin.product.sales', compact('bills', 'id','title'));
     }
 
 
     public function addProduct(Request $request)
     {
+
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'entry_date' => 'required|date',
@@ -151,9 +157,10 @@ class ProductController extends Controller
 
     public function stockList($id)
     {
+        $title = "StocK List";
         $product = Product::findOrFail($id);
         $stockEntries = StockEntry::where('product_id', $id)->get();
 
-        return view('admin.product.stockList', compact('product', 'stockEntries'));
+        return view('admin.product.stockList', compact('product', 'stockEntries','title'));
     }
 }
