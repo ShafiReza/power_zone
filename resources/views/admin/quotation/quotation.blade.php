@@ -17,8 +17,16 @@
                     <div class="col-12">
                         <!-- Main content -->
                         <div class="invoice p-3 mb-3">
-                            <h1 style="color: rgb(85, 199, 85)">Power Zone</h1>
-                            <sub style="margin-left: 300px; color: rgb(85, 199, 85)"><i>The Source of power</i></sub>
+                            <div class="header-with-images">
+                                <div class="text-container">
+                                    <h1 style="color: rgb(85, 199, 85); font-size: 80px;">Power Zone</h1>
+                                    <sub style="margin-left:500px;color: rgb(85, 199, 85); font-size: 20px;"><i>The Source of Power</i></sub>
+                                </div>
+                                <div class="images-container">
+                                    <img src="{{ asset('admin/images/Sub-Station2.png') }}" alt="Image 1">
+                                    <img src="{{ asset('admin/images/generator.jpg') }}" alt="Image 2">
+                                </div>
+                            </div>
                             <hr>
                             <!-- title row -->
                             <div class="row">
@@ -112,7 +120,6 @@
         </section>
     </div>
 @endsection
-
 <style>
     .invoice {
         position: relative;
@@ -141,6 +148,26 @@
         background-size: cover;
         opacity: 0.2; /* Adjust the opacity of the background image */
         z-index: -1; /* Ensure the background is behind the content */
+    }
+
+    .header-with-images {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .text-container {
+        flex-grow: 1;
+    }
+
+    .images-container {
+        display: flex;
+        gap: 10px;
+    }
+
+    .images-container img {
+        width: 100px;
+        height: auto;
     }
 
     @media print {
