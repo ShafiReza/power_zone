@@ -16,7 +16,7 @@ class MonthlyBillController extends Controller
     {
         $title = "Monthly Bill";
         $customers = RegularCustomer::all();
-        return view('admin.monthlyBill.create', compact('customers','title'));
+        return view('admin.monthlyBill.create', compact('customers', 'title'));
     }
 
 
@@ -60,7 +60,7 @@ class MonthlyBillController extends Controller
 
             // Filter by both year and month
             $query->whereYear('bill_month', '=', $year)
-                  ->whereMonth('bill_month', '=', $month);
+                ->whereMonth('bill_month', '=', $month);
         }
 
         if ($request->filled('customer_name')) {
@@ -74,7 +74,7 @@ class MonthlyBillController extends Controller
 
         $bills = $query->with('regularCustomer')->get();
 
-        return view('admin.monthlyBill.index', compact('bills','title'));
+        return view('admin.monthlyBill.index', compact('bills', 'title'));
     }
 
     public function destroy($id)
@@ -117,8 +117,8 @@ class MonthlyBillController extends Controller
         $previousBills = MonthlyBill::where('regular_customer_id', $bill->regular_customer_id)
             ->where(function ($q) {
                 $q->where('status', 'Due')
-                  ->orWhere('status', 'partial')
-                  ->orWhere('status', 'Mark as Paid');
+                    ->orWhere('status', 'partial')
+                    ->orWhere('status', 'Mark as Paid');
             })
             ->where('bill_month', '<', $bill->bill_month) // Exclude the current bill's month
             ->orderBy('bill_month', 'asc')
@@ -131,7 +131,7 @@ class MonthlyBillController extends Controller
     {
         $bill = MonthlyBill::findOrFail($request->bill_id);
 
-        if ($bill->status === 'pending'|| $bill->status === 'due') {
+        if ($bill->status === 'pending' || $bill->status === 'due') {
             $billAmount = $bill->amount;
         } else {
             $billAmount = $bill->due_amount;
@@ -168,7 +168,7 @@ class MonthlyBillController extends Controller
     {
         $title = "Payment History";
         $payments = Payment::where('bill_id', $billId)->latest()->get();
-        return view('admin.monthlyBill.storePayment', compact('payments','title'));
+        return view('admin.monthlyBill.storePayment', compact('payments', 'title'));
     }
 
     public function generateMonthlyBills()
@@ -214,7 +214,33 @@ class MonthlyBillController extends Controller
             'amount' => $amount,
             'description' => $description,
             'service' => $lastBill ? $lastBill->service : 'default_service', // Use previous service or set a default
-            'next_generation_date'=> $next_generation_date
+            'next_generation_date' => $next_generation_date
         ];
     }
+
+    public function edit($id)
+{
+    $bill = MonthlyBill::findOrFail($id);
+    $customers = RegularCustomer::all(); // Assuming RegularCustomer is the model for customers
+    return view('admin.monthlyBill.edit', compact('bill', 'customers'));
+}
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'amount' => 'required|numeric',
+        'description' => 'nullable|string',
+        'service' => 'required|string',
+
+    ]);
+
+    $bill = MonthlyBill::findOrFail($id);
+    $bill->amount = $request->amount;
+    $bill->description = $request->description;
+    $bill->service = $request->service;
+    $bill->save();
+
+    return redirect()->route('admin.monthlyBill.index')->with('success', 'Bill updated successfully');
+}
+
 }

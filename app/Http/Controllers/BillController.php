@@ -262,12 +262,47 @@ class BillController extends Controller
 
 
     public function edit($id)
-    {
-        $bill = Bill::find($id);
-        $customers = Customer::all();
-        $products = Product::all();
-        return view('admin.bill.edit', compact('bill', 'customers', 'products'));
+{
+    $bill = Bill::with('billItems.product')->findOrFail($id);
+    $products = Product::all();
+    $customers = Customer::all(); // Assuming you have a Customer model
+
+    return view('admin.bill.edit', compact('bill', 'products', 'customers'));
+}
+
+public function update(Request $request, $id)
+{
+    $bill = Bill::findOrFail($id);
+    $bill->update($request->only('customerType', 'customerName', 'billType', 'billDate'));
+
+    // Clear existing bill items
+    $bill->billItems()->delete();
+
+    // Recreate bill items
+    foreach ($request->product_name as $index => $productName) {
+        $bill->billItems()->create([
+            'product_id' => $request->product_id[$index],
+            'description' => $request->description[$index],
+            'quantity' => $request->quantity[$index],
+            'unit_price' => $request->unitPrice[$index],
+            'discount' => $request->discount[$index],
+            'discount_type' => $request->discountType[$index],
+            'total_amount' => $request->total_amount[$index],
+        ]);
     }
+
+    // Update additional fields
+    $bill->update([
+        'discount' => $request->bill_items2[0]['discount'],
+        'discount_type' => $request->bill_items2[0]['discount_type'],
+        'vat' => $request->bill_items2[0]['vat'],
+        'receivable_amount' => $request->bill_items2[0]['receivable_amount'],
+        'due_amount' => $request->bill_items2[0]['due_amount'],
+        'final_amount' => $request->bill_items2[0]['final_amount'],
+    ]);
+
+    return redirect()->route('bill.index')->with('success', 'Bill updated successfully');
+}
 
 
     public function destroy(Bill $bill)

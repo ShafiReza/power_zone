@@ -82,6 +82,9 @@
                                 <button type="button" class="btn btn-danger delete-button">Delete</button>
                             </form>
                         </td>
+                        <td>
+                            <a href="{{ route('admin.monthlyBill.edit', $bill->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        </td>
                         <td><a class="btn btn-primary mb-3"
                                 href="{{ route('admin.monthlyBill.showBill', ['id' => $bill->id]) }}">Payment History</a>
                         </td>

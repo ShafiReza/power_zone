@@ -98,6 +98,8 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
 
         Route::post('/bill/markPaid', [BillController::class, 'markPaid'])->name('bill.markPaid');
         Route::get('/admin/bill/payment-history/{bill}', [BillController::class, 'paymentHistory'])->name('admin.bill.paymentHistory');
+        Route::get('bill/{id}/edit', [BillController::class, 'edit'])->name('admin.bill.edit');
+        Route::post('bill/{id}/update', [BillController::class, 'update'])->name('bill.update');
         // Route::delete('/payment/{id}', [BillController::class, 'PaymentDestroy'])->name('payment.delete');
 
 
@@ -109,6 +111,8 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         Route::post('monthlyBill/{id}/toggle-status', [MonthlyBillController::class, 'toggleStatus'])->name('monthlyBill.toggleStatus');
         Route::get('admin/invoice/{clientId}/{month}', [MonthlyBillController::class, 'showInvoice'])->name('admin.monthlyBill.invoice');
         Route::get('admin/monthly-bill/{bill}/print', [MonthlyBillController::class, 'showInvoicePrint'])->name('admin.monthlyBill.showInvoicePrint');
+        Route::get('monthlyBill/{customer}/edit', [MonthlyBillController::class, 'edit'])->name('admin.monthlyBill.edit');
+        Route::put('/monthlyBill/{id}', [MonthlyBillController::class, 'update'])->name('monthlyBill.update');
         Route::post('/monthlyBill/payment', [MonthlyBillController::class, 'storePayment'])->name('monthlyBill.storePayment');
         Route::get('/monthly-bills/{id}', [MonthlyBillController::class, 'showBill'])->name('admin.monthlyBill.showBill');
         Route::post('/monthlyBill/paid', [MonthlyBillController::class, 'Paid'])->name('monthlyBill.Paid');
