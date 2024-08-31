@@ -198,7 +198,7 @@ class BillController extends Controller
         $unitPrices = $request->input('unitPrice', []);
         $discounts = $request->input('discount', []);
         $discountTypes = $request->input('discountType', []);
-        $category = $request->input('category', ''); // Assuming category is passed with the request
+        $category = $request->input('productType', ''); // Assuming category is passed with the request
 
         foreach ($productNames as $index => $productName) {
             $quantity = $quantities[$index];
