@@ -292,9 +292,11 @@ class BillController extends Controller
     }
 
 
-    public function edit($id)
+ 
+
+public function edit($id)
 {
-    $bill = Bill::with('billItems.product')->findOrFail($id);
+    $bill = Bill::with(['billItems.product', 'billItems2'])->findOrFail($id);
     $products = Product::all();
     $customers = Customer::all(); // Assuming you have a Customer model
 
@@ -304,36 +306,98 @@ class BillController extends Controller
 public function update(Request $request, $id)
 {
     $bill = Bill::findOrFail($id);
-    $bill->update($request->only('customerType', 'customerName', 'billType', 'billDate'));
+
+    // Update bill details
+    $bill->update([
+        'customerType' => $request->input('customerType'),
+        'customerName' => $request->input('customerName'),
+        'billType' => $request->input('billType'),
+        'billDate' => $request->input('billDate'),
+    ]);
 
     // Clear existing bill items
     $bill->billItems()->delete();
 
     // Recreate bill items
-    foreach ($request->product_name as $index => $productName) {
-        $bill->billItems()->create([
-            'product_id' => $request->product_id[$index],
-            'description' => $request->description[$index],
-            'quantity' => $request->quantity[$index],
-            'unit_price' => $request->unitPrice[$index],
-            'discount' => $request->discount[$index],
-            'discount_type' => $request->discountType[$index],
-            'total_amount' => $request->total_amount[$index],
-        ]);
+    $productNames = $request->input('product_name', []);
+    $descriptions = $request->input('description', []);
+    $quantities = $request->input('quantity', []);
+    $unitPrices = $request->input('unitPrice', []);
+    $discounts = $request->input('discount', []);
+    $discountTypes = $request->input('discountType', []);
+    $category = $request->input('productType', '');
+
+    $finalAmount = 0;
+
+    foreach ($productNames as $index => $productName) {
+        $quantity = $quantities[$index];
+        $unitPrice = $unitPrices[$index];
+        $discount = $discounts[$index];
+        $discountType = $discountTypes[$index];
+        $totalAmount = $quantity * $unitPrice;
+
+        if ($discountType === 'Percentage') {
+            $totalAmount -= $totalAmount * ($discount / 100);
+        } else {
+            $totalAmount -= $discount;
+        }
+
+        $billItem = new BillItem();
+        $billItem->bill_id = $bill->id;
+
+        if ($category === 'inventory') {
+            $product = Product::where('name', $productName)->first();
+        } else {
+            $product = NonInventory::where('name', $productName)->first();
+        }
+
+        if ($product) {
+            $billItem->product_id = $product->id;
+        } else {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        $billItem->product_name = $productName;
+        $billItem->description = $descriptions[$index];
+        $billItem->quantity = $quantity;
+        $billItem->unit_price = $unitPrice;
+        $billItem->discount = $discount;
+        $billItem->discount_type = $discountType;
+        $billItem->total_amount = $totalAmount;
+
+        $billItem->save();
+
+        $finalAmount += $totalAmount;
+
+        // Update product quantity
+        if ($category === 'inventory') {
+            $product->quantity -= $quantity;
+            $product->total_amount = $product->quantity * $product->purchase_price;
+            $product->save();
+        }
     }
 
     // Update additional fields
-    $bill->update([
-        'discount' => $request->bill_items2[0]['discount'],
-        'discount_type' => $request->bill_items2[0]['discount_type'],
-        'vat' => $request->bill_items2[0]['vat'],
-        'receivable_amount' => $request->bill_items2[0]['receivable_amount'],
-        'due_amount' => $request->bill_items2[0]['due_amount'],
-        'final_amount' => $request->bill_items2[0]['final_amount'],
-    ]);
+    $billItems2 = $request->input('bill_items2', []);
+    if (!empty($billItems2)) {
+        $billItem2Data = $billItems2[0];
+        $bill->update([
+            'discount' => $billItem2Data['discount'],
+            'discount_type' => $billItem2Data['discount_type'],
+            'vat' => $billItem2Data['vat'],
+            'receivable_amount' => $billItem2Data['receivable_amount'],
+            'due_amount' => $billItem2Data['due_amount'],
+            'final_amount' => $billItem2Data['final_amount'],
+        ]);
+    }
 
-    return redirect()->route('bill.index')->with('success', 'Bill updated successfully');
+    // Update final amount of the bill
+    $bill->final_amount = $finalAmount;
+    $bill->save();
+
+    return redirect()->route('admin.bill.index')->with('success', 'Bill updated successfully');
 }
+
 
 
     public function destroy(Bill $bill)

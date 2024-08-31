@@ -5,7 +5,7 @@
         <h2>Edit Bill</h2>
         <form id="billing-form" method="POST" action="{{ route('bill.update', $bill->id) }}">
             @csrf
-            {{-- <div class="form-row">
+            <div class="form-row">
                 <div class="form-group col-3">
                     <label for="customerType">Customer Type</label>
                     <select id="customerType" name="customerType" class="form-control" onchange="getCustomers(this.value)">
@@ -47,7 +47,7 @@
                         @endforeach
                     </select>
                 </div>
-            </div> --}}
+            </div>
             <table class="table table-hover">
                 <thead>
                     <tr>

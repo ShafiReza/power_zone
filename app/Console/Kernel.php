@@ -7,6 +7,10 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Models\MonthlyBill;
 class Kernel extends ConsoleKernel
 {
+    protected $commands = [
+        \App\Console\Commands\GenerateMonthlyBills::class,
+    ];
+
     /**
      * Define the application's command schedule.
      */
