@@ -88,6 +88,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         // routes/web.php
         Route::get('get_customers', [BillController::class, 'getCustomers'])->name('get_customers');
         Route::get('get-product', [BillController::class, 'getProduct'])->name('get-product');
+        Route::get('getProductsByCategory', [BillController::class, 'getProductsByCategory'])->name('getProductsByCategory');
         Route::get('bill/', [BillController::class, 'index'])->name('admin.bill.index');
         Route::get('bill/create', [BillController::class, 'create'])->name('admin.bill.create');
         Route::post('bill/', [BillController::class, 'store'])->name('bill.store');

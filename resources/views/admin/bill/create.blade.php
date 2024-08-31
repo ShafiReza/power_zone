@@ -36,13 +36,18 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-3">
-                    <label for="products">Products</label>
-                    <select id="products" class="form-control" onchange="addProductRow(this.value)">
+                    <label for="productType">Category</label>
+                    <select id="productType" name="productType" class="form-control"
+                        onchange="getProductsByCategory(this.value)">
+                        <option value="">Select Product Type</option>
+                        <option value="inventory">Inventory</option>
+                        <option value="noninventory">Noninventory</option>
+                    </select>
+                </div>
+                <div class="form-group col-3">
+                    <label for="productName">Product Name</label>
+                    <select id="productName"  class="form-control" onchange="addProductRow(this.value)">
                         <option value="">Select Product</option>
-                        <option value="">-</option>
-                        @foreach ($products as $product)
-                            <option value="{{ $product->id }}">{{ $product->name }}</option>
-                        @endforeach
                     </select>
                 </div>
             </div>
@@ -104,6 +109,30 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function getProductsByCategory(productType) {
+            if (productType) {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('getProductsByCategory') }}",
+                    data: {
+                        productType: productType
+                    },
+                    success: function(data) {
+                        $('#productName').empty().append("<option value=''>Select product</option>");
+                        $.each(data, function(index, product) {
+                            $('#productName').append('<option value="' + product.id + '">' + product
+                                .name + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            } else {
+                $('#productName').empty().append('<option value="">Select Product</option>');
+            }
+        }
+
         function getCustomers(customerType) {
             if (customerType) {
                 $.ajax({
@@ -130,11 +159,14 @@
 
         function addProductRow(productId) {
             if (!productId) return;
+            const productType = $('#productType').val(); // Get the selected product type
+
             $.ajax({
                 type: "GET",
                 url: "{{ route('get-product') }}",
                 data: {
-                    productId: productId
+                    productId: productId,
+                    productType: productType // Pass the product type
                 },
                 success: function(data) {
                     const availableQuantity = data.quantity;
@@ -166,6 +198,7 @@
                 }
             });
         }
+
 
         function calculateTotal(element) {
             const row = $(element).closest('tr');

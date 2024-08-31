@@ -14,6 +14,7 @@ use App\Models\MonthlyBill;
 use App\Models\BillItem;
 use App\Models\BillItem2;
 use App\Models\PaymentHistory;
+use App\Models\NonInventory;
 
 use Carbon\Carbon;
 
@@ -122,21 +123,42 @@ class BillController extends Controller
         }
         return response()->json($customers);
     }
+    public function getProductsByCategory(Request $request)
+    {
+        $productType = $request->input('productType');
+        // Assuming you have a Product model
+        if ($productType === 'inventory') {
+            $products = Product::all();
+        } elseif($productType === 'noninventory') {
+            $products = NonInventory::all();
+        }else{
+            $products = [];
+        }
 
-
+        return response()->json($products);
+    }
     public function getProduct(Request $request)
     {
         $productId = $request->input('productId');
-        $product = Product::find($productId);
+        $productType = $request->input('productType');
+
+        if ($productType === 'inventory') {
+            $product = Product::find($productId);
+        } else {
+            $product = NonInventory::find($productId);
+        }
+
         if ($product) {
             return response()->json([
                 'name' => $product->name,
                 'sell_price' => $product->sell_price,
-                'quantity' => $product->quantity // Add quantity here
+                'quantity' => $product->quantity
             ]);
         }
+
         return response()->json($product);
     }
+
     public function store(Request $request)
     {
         // Create a new bill instance
@@ -176,6 +198,7 @@ class BillController extends Controller
         $unitPrices = $request->input('unitPrice', []);
         $discounts = $request->input('discount', []);
         $discountTypes = $request->input('discountType', []);
+        $category = $request->input('category', ''); // Assuming category is passed with the request
 
         foreach ($productNames as $index => $productName) {
             $quantity = $quantities[$index];
@@ -192,12 +215,20 @@ class BillController extends Controller
 
             $billItem = new BillItem();
             $billItem->bill_id = $bill->id;
-            $product = Product::where('name', $productName)->first();
+
+            // Determine if the product is from the inventory or non-inventory list
+            if ($category === 'inventory') {
+                $product = Product::where('name', $productName)->first();
+            } else {
+                $product = NonInventory::where('name', $productName)->first();
+            }
+
             if ($product) {
                 $billItem->product_id = $product->id;
             } else {
                 return response()->json(['error' => 'Product not found'], 404);
             }
+
             $billItem->product_name = $productName;
             $billItem->description = $descriptions[$index];
             $billItem->quantity = $quantity;
