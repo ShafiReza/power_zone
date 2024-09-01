@@ -20,12 +20,7 @@ class NonInventoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'purchase_price' => 'required|numeric',
-            'sell_price' => 'required|numeric',
-            'quantity' => 'required|numeric',
-        ]);
+
 
         $nonInventory = new NonInventory($request->all());
         $nonInventory->total_amount = $nonInventory->purchase_price * $nonInventory->quantity;
@@ -43,12 +38,7 @@ class NonInventoryController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required',
-            'purchase_price' => 'required|numeric',
-            'sell_price' => 'required|numeric',
-            'quantity' => 'required|numeric',
-        ]);
+       
 
         $nonInventory = NonInventory::findOrFail($id);
         $nonInventory->fill($request->all());

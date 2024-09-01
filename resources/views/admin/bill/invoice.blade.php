@@ -89,8 +89,20 @@
                                                     @if ($hasDescription && !empty($product->description))
                                                         <td>{{ $product->description }}</td>
                                                     @endif
-                                                    <td>{{ $product->product->brand_name }}</td>
-                                                    <td>{{ $product->product->origin }}</td>
+                                                    <td>
+                                                        @if ($product->category == 'inventory') 
+                                                            {{ $productsList->where('id', $product->product_id)->first()->brand_name ?? 'None' }}
+                                                        @else
+                                                            {{ $nonInventoryItems->where('id', $product->non_inventory_id)->first()->brand_name ?? 'None' }}
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if ($product->category == 'inventory')
+                                                            {{ $productsList->where('id', $product->product_id)->first()->origin ?? 'None' }}
+                                                        @else
+                                                            {{ $nonInventoryItems->where('id', $product->non_inventory_id)->first()->origin ?? 'None' }}
+                                                        @endif
+                                                    </td>
                                                     <td>{{ $product->quantity }}</td>
                                                     <td>{{ $product->unit_price }}</td>
                                                     <td>
@@ -124,7 +136,7 @@
                                                 @foreach ($previousBills as $previousBill)
                                                     <tr>
                                                         <td>{{ $previousBill->id }}</td>
-                                                        <td>{{ $previousBill->created_at }}</td>
+                                                        <td>{{ $previousBill->receive_date }}</td>
                                                         <td>{{ $previousBill->receivable_amount }}</td>
                                                         <td>{{ $previousBill->due_amount }}</td>
                                                     </tr>

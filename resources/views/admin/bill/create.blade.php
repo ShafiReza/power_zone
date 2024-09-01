@@ -46,7 +46,7 @@
                 </div>
                 <div class="form-group col-3">
                     <label for="productName">Product Name</label>
-                    <select id="productName"  class="form-control" onchange="addProductRow(this.value)">
+                    <select id="productName" class="form-control" onchange="addProductRow(this.value)">
                         <option value="">Select Product</option>
                     </select>
                 </div>
@@ -158,21 +158,25 @@
         }
 
         function addProductRow(productId) {
-            if (!productId) return;
-            const productType = $('#productType').val(); // Get the selected product type
+    if (!productId) return;
 
-            $.ajax({
-                type: "GET",
-                url: "{{ route('get-product') }}",
-                data: {
-                    productId: productId,
-                    productType: productType // Pass the product type
-                },
-                success: function(data) {
-                    const availableQuantity = data.quantity;
-                    const initialQuantity = availableQuantity > 0 ? 1 : 0;
-                    const row = `
+    const productType = $('#productType').val(); // Get the selected product type
+
+    $.ajax({
+        type: "GET",
+        url: "{{ route('get-product') }}",
+        data: {
+            productId: productId,
+            productType: productType // Pass the product type
+        },
+        success: function(data) {
+            const availableQuantity = data.quantity;
+            const initialQuantity = availableQuantity > 0 ? 1 : 0;
+
+            // Now, dynamically insert the product ID into the hidden input field
+            const row = `
                 <tr>
+                    <input type="hidden" name="product_id[]" value="${productId}">
                     <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
                     <td><textarea class="form-control" name="description[]"></textarea></td>
                     <td>
@@ -186,18 +190,21 @@
                             <option value="Percentage">Percentage(%)</option>
                             <option value="Flat">Flat</option>
                         </select>
+                        <input type="hidden" name="productType[]" value="${productType}">
                     </td>
                     <td><input type="number" class="form-control total-amount" name="total_amount[]" readonly></td>
                     <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td>
                 </tr>
             `;
-                    $('#bill-items').append(row);
-                },
-                error: function(xhr, status, error) {
-                    console.error(error);
-                }
-            });
+            $('#bill-items').append(row);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
         }
+    });
+}
+
+
 
 
         function calculateTotal(element) {
