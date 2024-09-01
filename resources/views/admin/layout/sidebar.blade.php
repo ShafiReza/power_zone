@@ -72,6 +72,12 @@
                                 <p>Product List</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.nonInventory.index') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Non Inventory List</p>
+                            </a>
+                        </li>
 
                     </ul>
                 </li>

@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\MonthlyBillController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\NonInventoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,6 +83,15 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         Route::get('/product/{id}/sales', [ProductController::class, 'sales'])->name('admin.product.sales');
         Route::post('product/add-product', [ProductController::class, 'addProduct'])->name('admin.product.addProduct');
         Route::get('product/{id}/stock-list', [ProductController::class, 'stockList'])->name('admin.product.stockList');
+
+        Route::get('non-inventory-items', [NonInventoryController::class, 'index'])->name('admin.nonInventory.index');
+        Route::get('non-inventory-items/create', [NonInventoryController::class, 'create'])->name('admin.nonInventory.create');
+        Route::post('non-inventory-items', [NonInventoryController::class, 'store'])->name('admin.nonInventory.store');
+        Route::get('non-inventory-item/{id}/edit', [NonInventoryController::class, 'edit'])->name('admin.nonInventory.edit');
+        Route::put('non-inventory-item/{id}/update', [NonInventoryController::class, 'update'])->name('admin.nonInventory.update');
+        Route::post('non-inventory-item/{id}/toggle-status', [NonInventoryController::class, 'toggleStatus'])->name('admin.nonInventory.toggleStatus');
+        Route::delete('non-inventory-item/{id}', [NonInventoryController::class, 'destroy'])->name('admin.nonInventory.destroy');
+
 
 
 
