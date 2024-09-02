@@ -7,15 +7,25 @@ use Illuminate\Http\Request;
 
 class NonInventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $nonInventories = NonInventory::all();
-        return view('admin.nonInventory.index', compact('nonInventories'));
+        $title="NonInventory";
+        $query = NonInventory::query();
+
+        if ($request->has('name') && $request->name) {
+            $query->where('name', 'LIKE', '%' . $request->name . '%');
+        }
+
+        $nonInventories = $query->get();
+
+        return view('admin.nonInventory.index', compact('nonInventories','title'));
     }
+
 
     public function create()
     {
-        return view('admin.nonInventory.create');
+        $title="NonInventory";
+        return view('admin.nonInventory.create', compact('title'));
     }
 
     public function store(Request $request)
@@ -38,7 +48,7 @@ class NonInventoryController extends Controller
 
     public function update(Request $request, $id)
     {
-       
+
 
         $nonInventory = NonInventory::findOrFail($id);
         $nonInventory->fill($request->all());

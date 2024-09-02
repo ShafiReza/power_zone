@@ -67,7 +67,7 @@
                             <a href="{{ route('admin.bill.challan', $bill->id) }}" class="btn btn-info btn-sm">Challan</a>
                             <a href="{{ route('admin.bill.invoice', $bill->id) }}"
                                 class="btn btn-success btn-sm">Invoice</a>
-                                <a href="{{ route('admin.bill.edit', $bill->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                {{-- <a href="{{ route('admin.bill.edit', $bill->id) }}" class="btn btn-warning btn-sm">Edit</a> --}}
                             <form action="{{ route('bill.destroy', $bill->id) }}" method="POST" style="display:inline;"
                                 class="delete-form">
                                 @csrf

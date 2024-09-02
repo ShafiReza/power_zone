@@ -8,6 +8,14 @@
             <p>{{ $message }}</p>
         </div>
     @endif
+    <form method="GET" action="{{ route('admin.nonInventory.index') }}" class="mb-3">
+        <div class="input-group col-2">
+            <input type="text" name="name" class="form-control" placeholder="Filter by Name" value="{{ request('name') }}">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">Filter</button>
+            </div>
+        </div>
+    </form>
 
     <a class="btn btn-success mb-3" href="{{ route('admin.nonInventory.create') }}">Add New Non-Inventory Item</a>
     <table class="table table-hover">

@@ -143,7 +143,23 @@
                         </a>
                     </div>
                     <!-- ./col -->
-
+                    <div class="col-lg-3 col-6">
+                        <!-- small box -->
+                        <div class="small-box bg-info">
+                            <div class="inner d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h3>{{ $totalProductAmount }}</h3>
+                                    <p>Total Product Amount</p>
+                                </div>
+                                <div class="mb-5">
+                                    <h6>{{ \Carbon\Carbon::now()->format('F Y') }}</h6>
+                                </div>
+                            </div>
+                            <div class="icon">
+                                <i class="ion ion-bag mt-4"></i>
+                            </div>
+                        </div>
+                    </div>
                     <!-- ./col -->
 
                     <!-- ./col -->
