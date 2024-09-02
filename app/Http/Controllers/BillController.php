@@ -24,6 +24,7 @@ class BillController extends Controller
     public function index(Request $request)
     {
         $title = "Bill";
+
         // Initialize the query with relationships
         $query = Bill::with(['regularCustomer', 'irregularCustomer']);
 
@@ -63,12 +64,16 @@ class BillController extends Controller
     }
 
 
-    public function invoice($id)
+    public function invoice(Request $request, $id)
     {
         $title = "Invoice";
         // Fetch bill items related to the bill
 
-        $products = BillItem::where('bill_id', $id)->get();
+        $products = BillItem::where('bill_id', $id)
+            ->with(['product' => function ($query) {
+                $query->select('id', 'brand_name', 'origin');
+            }])
+            ->get();
         $billItems2 = BillItem2::where('bill_id', $id)->get();
         // Fetch the bill details
         $bill = Bill::find($id);
@@ -80,7 +85,7 @@ class BillController extends Controller
         // Fetch customer details, products, etc.
         $customer = RegularCustomer::find($id);
         $product = Product::all();
-
+        $productType = $request->input('productType');
         // Determine whether the customer is regular or irregular and fetch customer details accordingly
         $customer = $bill->regular_customer_id ? RegularCustomer::find($bill->regular_customer_id) : IrregularCustomer::find($bill->irregular_customer_id);
 
@@ -92,10 +97,10 @@ class BillController extends Controller
         $nonInventoryItems = NonInventory::all();
 
         // Fetch all products for Inventory
-        $productsList = Product::all();
 
 
-        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product', 'title', 'productsList', 'nonInventoryItems',));
+
+        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product', 'title', 'nonInventoryItems',));
     }
 
 
@@ -452,7 +457,6 @@ class BillController extends Controller
 
 
         return redirect()->route('admin.bill.index')->with('success', 'Bill marked as paid successfully.');
-
     }
 
 

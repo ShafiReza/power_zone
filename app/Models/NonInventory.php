@@ -14,4 +14,5 @@ class NonInventory extends Model
     ];
 
     public $timestamps = true;
+    
 }

@@ -22,6 +22,7 @@ class Product extends Model
         'total_amount',
         'status',
     ];
+   
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';
     public function category()

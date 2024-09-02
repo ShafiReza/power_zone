@@ -19,4 +19,8 @@ class BillItem extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+    public function nonInventory()
+    {
+        return $this->belongsTo(NonInventory::class, 'non_inventory_id');
+    }
 }

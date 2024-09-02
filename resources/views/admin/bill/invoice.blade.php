@@ -85,22 +85,25 @@
                                         <tbody>
                                             @foreach ($products as $product)
                                                 <tr>
+
                                                     <td>{{ $product->product_name }}</td>
                                                     @if ($hasDescription && !empty($product->description))
                                                         <td>{{ $product->description }}</td>
                                                     @endif
+
                                                     <td>
-                                                        @if ($product->category == 'inventory') 
-                                                            {{ $productsList->where('id', $product->product_id)->first()->brand_name ?? 'None' }}
+                                                        @if ($product->productType == 'inventory')
+
+                                                            {{ $product->brand_name ?? 'None' }}
                                                         @else
-                                                            {{ $nonInventoryItems->where('id', $product->non_inventory_id)->first()->brand_name ?? 'None' }}
+                                                            {{ $nonInventoryItems->where('name', $product->product_name)->first()->brand_name ?? 'None' }}
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if ($product->category == 'inventory')
-                                                            {{ $productsList->where('id', $product->product_id)->first()->origin ?? 'None' }}
+                                                        @if ($product->productType == 'inventory')
+                                                            {{ $product->origin ?? 'None' }}
                                                         @else
-                                                            {{ $nonInventoryItems->where('id', $product->non_inventory_id)->first()->origin ?? 'None' }}
+                                                            {{ $nonInventoryItems->where('name', $product->product_name)->first()->origin ?? 'None' }}
                                                         @endif
                                                     </td>
                                                     <td>{{ $product->quantity }}</td>
