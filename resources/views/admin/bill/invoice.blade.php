@@ -94,16 +94,16 @@
                                                     <td>
                                                         @if ($product->productType == 'inventory')
 
-                                                            {{ $product->brand_name ?? 'None' }}
+                                                            {{  'None' }}
                                                         @else
-                                                            {{ $nonInventoryItems->where('name', $product->product_name)->first()->brand_name ?? 'None' }}
+                                                            {{ $nonInventoryItems->where('name', $product->product_name)->first()->brand_name ?? $product->product->brand_name  }}
                                                         @endif
                                                     </td>
                                                     <td>
                                                         @if ($product->productType == 'inventory')
-                                                            {{ $product->origin ?? 'None' }}
+                                                            {{ 'None' }}
                                                         @else
-                                                            {{ $nonInventoryItems->where('name', $product->product_name)->first()->origin ?? 'None' }}
+                                                            {{ $nonInventoryItems->where('name', $product->product_name)->first()->origin ?? $product->product->origin }}
                                                         @endif
                                                     </td>
                                                     <td>{{ $product->quantity }}</td>
