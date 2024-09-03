@@ -123,15 +123,32 @@
                             $('#productName').append('<option value="' + product.id + '">' + product
                                 .name + '</option>');
                         });
+
                     },
                     error: function(xhr, status, error) {
                         console.error(error);
                     }
                 });
+
             } else {
                 $('#productName').empty().append('<option value="">Select Product</option>');
             }
         }
+        $('#productName').on('input', function() {
+            var productId = $(this).val();
+            var productName = $(this).find('option:selected').text();
+
+            if (productId) {
+                addProductRow(productId, productName);
+            }
+        });
+
+        $(document).ready(function() {
+            $('#customerName').select2({
+                placeholder: "Select Customer",
+                allowClear: true
+            });
+        });
 
         function getCustomers(customerType) {
             if (customerType) {
@@ -147,6 +164,10 @@
                             $('#customerName').append('<option value="' + customer.id + '">' + customer
                                 .name + '</option>');
                         });
+                        $('#customerName').select2({
+                            placeholder: "Select Customer",
+                            allowClear: true
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.error(error);
@@ -154,27 +175,32 @@
                 });
             } else {
                 $('#customerName').empty().append('<option value="">Select Customer</option>');
+                $('#customerName').select2({
+                    placeholder: "Select Customer",
+                    allowClear: true
+                });
             }
         }
 
-        function addProductRow(productId) {
-    if (!productId) return;
 
-    const productType = $('#productType').val(); // Get the selected product type
+        function addProductRow(productId, productName) {
+            if (!productId) return;
 
-    $.ajax({
-        type: "GET",
-        url: "{{ route('get-product') }}",
-        data: {
-            productId: productId,
-            productType: productType // Pass the product type
-        },
-        success: function(data) {
-            const availableQuantity = data.quantity;
-            const initialQuantity = availableQuantity > 0 ? 1 : 0;
+            const productType = $('#productType').val(); // Get the selected product type
 
-            // Now, dynamically insert the product ID into the hidden input field
-            const row = `
+            $.ajax({
+                type: "GET",
+                url: "{{ route('get-product') }}",
+                data: {
+                    productId: productId,
+                    productType: productType // Pass the product type
+                },
+                success: function(data) {
+                    const availableQuantity = data.quantity;
+                    const initialQuantity = availableQuantity > 0 ? 1 : 0;
+
+                    // Now, dynamically insert the product ID into the hidden input field
+                    const row = `
                 <tr>
                     <input type="hidden" name="product_id[]" value="${productId}">
                     <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
@@ -196,13 +222,13 @@
                     <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td>
                 </tr>
             `;
-            $('#bill-items').append(row);
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
+                    $('#bill-items').append(row);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
         }
-    });
-}
 
 
 
@@ -212,16 +238,16 @@
             const quantity = parseFloat(row.find('.quantity').val()) || 0;
             const availableQuantity = parseFloat(row.find('.availableQuantity').val()) || 0;
 
-            if (quantity > availableQuantity) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'There is not enough quantity in your product.',
-                }).then(() => {
-                    row.find('.quantity').val(availableQuantity); // Reset to maximum available quantity
-                });
-                return; // Stop further calculations
-            }
+            // if (quantity > availableQuantity) {
+            //     Swal.fire({
+            //         icon: 'error',
+            //         title: 'Oops...',
+            //         text: 'There is not enough quantity in your product.',
+            //     }).then(() => {
+            //         row.find('.quantity').val(availableQuantity); // Reset to maximum available quantity
+            //     });
+            //     return; // Stop further calculations
+            // }
 
             const unitPrice = parseFloat(row.find('.unitPrice').val()) || 0;
             const discount = parseFloat(row.find('.discount').val()) || 0;

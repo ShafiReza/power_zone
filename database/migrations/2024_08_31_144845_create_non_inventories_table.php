@@ -17,10 +17,10 @@ return new class extends Migration
             $table->text('details')->nullable();
             $table->string('brand_name')->nullable();
             $table->string('origin')->nullable();
-            $table->decimal('purchase_price', 8, 2);
-            $table->decimal('sell_price', 8, 2);
+            $table->decimal('purchase_price', 8, 2)->nullable();
+            $table->decimal('sell_price', 8, 2)->nullable();
             $table->decimal('wholesale_price', 8, 2)->nullable();
-            $table->integer('quantity');
+            $table->integer('quantity')->nullable();
             $table->decimal('total_amount', 8, 2);
             $table->string('status')->default('active');
             $table->timestamps();
