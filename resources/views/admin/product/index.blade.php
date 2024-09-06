@@ -33,6 +33,7 @@
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Part No</th>
                 <th>Details</th>
                 <th>Brand Name</th>
                 <th>Category</th>
@@ -51,6 +52,9 @@
                 <tr class="{{ $product->status == 'active' ? '' : 'table-danger' }}">
                     <td>{{ $product->id }}</td>
                     <td>{{ $product->name }}</td>
+                    <td>
+                        {{ $product->part_no ? $product->part_no : 'None' }} 
+                    </td>
                     <td>{{ $product->details }}</td>
                     <td>{{ $product->brand_name }}</td>
                     <td>{{ $product->category->name }}</td>

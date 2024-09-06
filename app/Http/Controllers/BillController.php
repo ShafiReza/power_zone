@@ -160,6 +160,7 @@ class BillController extends Controller
         if ($product) {
             return response()->json([
                 'name' => $product->name,
+                'part_no'=>$product->part_no,
                 'sell_price' => $product->sell_price,
                 'quantity' => $product->quantity
             ]);

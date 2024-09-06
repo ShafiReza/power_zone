@@ -46,7 +46,7 @@
                     <td>{{ $item->wholesale_price }}</td>
                     <td>{{ $item->quantity }}</td>
                     <td>{{ $item->total_amount }}</td>
-                    <td>{{ $item->status }}</td>
+                   
                     <td>
                         <form action="{{ route('admin.nonInventory.toggleStatus', $item->id) }}" method="POST">
 

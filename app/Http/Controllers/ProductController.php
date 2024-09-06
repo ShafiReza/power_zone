@@ -11,6 +11,7 @@ use App\Models\BillItem;
 use App\Models\BillItem2;
 use App\Models\StockEntry;
 
+
 class ProductController extends Controller
 {
     public function index(Request $request)
@@ -51,6 +52,7 @@ class ProductController extends Controller
             'purchase_price' => 'required|numeric',
             'sell_price' => 'required|numeric',
             'wholesale_price' => 'required|numeric',
+            'part_no' => 'nullable|string',
 
         ]);
 
@@ -163,4 +165,5 @@ class ProductController extends Controller
 
         return view('admin.product.stockList', compact('product', 'stockEntries','title'));
     }
+
 }

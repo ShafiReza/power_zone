@@ -50,6 +50,11 @@
                         <option value="">Select Product</option>
                     </select>
                 </div>
+                <div class="form-group col-3">
+                    <label for="part_no">Part No</label>
+                    <input type="text" class="form-control part-no" name="part_no" value="">
+                </div>
+
             </div>
             <table class="table table-hover">
                 <thead>
@@ -158,23 +163,32 @@
         }
 
         function addProductRow(productId) {
-    if (!productId) return;
+            if (!productId) return;
 
-    const productType = $('#productType').val(); // Get the selected product type
+            const productType = $('#productType').val(); // Get the selected product type
 
-    $.ajax({
-        type: "GET",
-        url: "{{ route('get-product') }}",
-        data: {
-            productId: productId,
-            productType: productType // Pass the product type
-        },
-        success: function(data) {
-            const availableQuantity = data.quantity;
-            const initialQuantity = availableQuantity > 0 ? 1 : 0;
+            $.ajax({
+                type: "GET",
+                url: "{{ route('get-product') }}", // Ensure this route is correctly defined in your Laravel app
+                data: {
+                    productId: productId,
+                    productType: productType // Pass the product type to the server
+                },
+                success: function(data) {
+                    const availableQuantity = data.quantity;
+                    const initialQuantity = availableQuantity > 0 ? 1 : 0;
 
-            // Now, dynamically insert the product ID into the hidden input field
-            const row = `
+
+                    if (data && data.part_no) {
+                        // Set the part_no value if it exists in the response
+                        document.querySelector('.part-no').value = data.part_no;
+                    } else {
+                        // If part_no is missing, show a default or empty value
+                        document.querySelector('.part-no').value = 'None'; // Or any default message
+                    }
+
+                    // Now, dynamically insert the product ID into the hidden input field and append a row to the table
+                    const row = `
                 <tr>
                     <input type="hidden" name="product_id[]" value="${productId}">
                     <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
@@ -196,13 +210,13 @@
                     <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td>
                 </tr>
             `;
-            $('#bill-items').append(row);
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
+                    $('#bill-items').append(row);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
         }
-    });
-}
 
 
 
@@ -211,18 +225,22 @@
             const row = $(element).closest('tr');
             const quantity = parseFloat(row.find('.quantity').val()) || 0;
             const availableQuantity = parseFloat(row.find('.availableQuantity').val()) || 0;
+            const productType = $('#productType').val();// Get the product type
 
-            if (quantity > availableQuantity) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'There is not enough quantity in your product.',
-                }).then(() => {
-                    row.find('.quantity').val(availableQuantity); // Reset to maximum available quantity
-                });
-                return; // Stop further calculations
+            if (productType === 'inventory') { // Check if it's an inventory product
+                if (quantity > availableQuantity) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'There is not enough quantity in your product.',
+                    }).then(() => {
+                        row.find('.quantity').val(availableQuantity); // Reset to maximum available quantity
+                    });
+                    return; // Stop further calculations
+                }
             }
 
+            // Rest of the code remains the same
             const unitPrice = parseFloat(row.find('.unitPrice').val()) || 0;
             const discount = parseFloat(row.find('.discount').val()) || 0;
             const discountType = row.find('.discountType').val();
@@ -236,7 +254,6 @@
             }
 
             row.find('.total-amount').val(totalAmount.toFixed(2));
-
             calculateFinalAmount();
         }
 

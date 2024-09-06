@@ -21,6 +21,10 @@
             <input type="text" class="form-control" id="name" name="name" required>
         </div>
         <div class="form-group col-4">
+            <label for="part_no">Part No:</label>
+            <input type="text" class="form-control" id="part_no" name="part_no" >
+        </div>
+        <div class="form-group col-4">
             <label for="details">Details:</label>
             <textarea class="form-control" id="details" name="details" rows="4"></textarea>
         </div>

@@ -23,6 +23,10 @@
             <input type="text" class="form-control" id="name" name="name" value="{{ $product->name }}" required>
         </div>
         <div class="form-group col-4">
+            <label for="part_no">Part No:</label>
+            <input class="form-control" id="part_no" name="part_no" rows="4" value="{{ $product->part_no }}">
+        </div>
+        <div class="form-group col-4">
             <label for="details">Details:</label>
             <textarea class="form-control" id="details" name="details" rows="4">{{ $product->details }}</textarea>
         </div>
@@ -56,7 +60,7 @@
             <label for="wholesale_price">Wholesale Price:</label>
             <input type="number" step="0.01" class="form-control" id="wholesale_price" name="wholesale_price" value="{{ $product->wholesale_price }}" required>
         </div>
-       
+
         <button type="submit" class="btn btn-primary">Update</button>
         <a class="btn btn-secondary" href="{{ route('admin.product.index') }}">Back</a>
     </form>
