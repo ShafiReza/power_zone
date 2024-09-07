@@ -21,6 +21,7 @@
     <table class="table table-hover">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Name</th>
                 <th>Details</th>
                 <th>Brand Name</th>
@@ -37,6 +38,7 @@
         <tbody>
             @foreach($nonInventories as $item)
                 <tr class="{{ $item->status == 'active' ? '' : 'table-danger' }}">
+                    <td>{{ $item->id }}</td>
                     <td>{{ $item->name }}</td>
                     <td>{{ $item->details }}</td>
                     <td>{{ $item->brand_name }}</td>
