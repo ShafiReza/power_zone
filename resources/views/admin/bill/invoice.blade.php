@@ -21,12 +21,11 @@
                             <div class="header-with-images">
                                 <div class="text-container">
                                     <h1 style="color: rgb(85, 199, 85); font-size: 80px;">Power Zone</h1>
-                                    <sub style="margin-left:500px;color: rgb(85, 199, 85); font-size: 20px;"><i>The Source
-                                            of Power</i></sub>
+                                    <sub style="margin-left:500px;color: rgb(85, 199, 85); font-size: 20px;"><i>The Source of Power</i></sub>
                                 </div>
                                 <div class="images-container">
-                                    <img src="{{ asset('admin/images/pic2.png') }}" alt="Image 1">
-                                    <img src="{{ asset('admin/images/pic1.png') }}" alt="Image 2">
+                                    <img src="{{ asset('admin/images/pic2.PNG') }}" alt="Image 1">
+                                    <img src="{{ asset('admin/images/pic1.PNG') }}" alt="Image 2">
                                 </div>
                             </div>
                             <hr>
@@ -35,11 +34,11 @@
                                 <h4 class="mx-auto">Invoice</h4>
                                 <div class="col-12">
                                     <h4>
-                                        <small class="float-right" style="margin-right: 120px">Date:
+                                        <small class="float-right">Date:
                                             {{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}<br>
                                             <!-- Adding the Invoice Number below the Date -->
                                         </small>
-                                        Invoice No: {{ $bill->id }}
+                                        Invoice No: {{ $bill->id  }}
                                     </h4>
                                 </div>
                             </div>
@@ -53,7 +52,7 @@
                                         Phone: 01722-533538, 01918-750912<br>
                                     </address>
                                 </div>
-                                <div class="col-sm-4 invoice-col" style="margin-left: 530px;">
+                                <div class="col-sm-4 invoice-col" style="margin-left: 300px;">
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>
@@ -71,12 +70,13 @@
                                         @endphp
                                         <thead>
                                             <tr>
+                                                <th>Sl No</th>
                                                 <th>Product Name</th>
                                                 @if ($hasDescription)
                                                     <th>Description</th>
                                                 @endif
-                                                <th>Brand Name</th>
-                                                <th>Origin</th>
+                                                {{-- <th>Brand Name</th>
+                                                <th>Origin</th> --}}
                                                 <th>Quantity</th>
                                                 <th>Unit Price</th>
                                                 <th>Discount</th>
@@ -86,28 +86,22 @@
                                         <tbody>
                                             @foreach ($products as $product)
                                                 <tr>
-
+                                                    <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $product->product_name }}</td>
-                                                    @if ($hasDescription)
+                                                     @if ($hasDescription)
                                                         <td>
                                                             {{ !empty($product->description) ? $product->description : 'None' }}
                                                         </td>
                                                     @endif
 
-                                                    <td>
-                                                        @if ($product->productType == 'inventory')
-                                                            {{ 'None' }}
-                                                        @else
-                                                            {{ $nonInventoryItems->where('name', $product->product_name)->first()->brand_name ?? $product->product->brand_name ?? "None" }}
-                                                        @endif
+                                                    {{-- <td>
+                                                        {{ $nonInventoryItems->where('id', $product->id)->first()->brand_name ?? $product->product->brand_name ?? "None" }}
+
                                                     </td>
                                                     <td>
-                                                        @if ($product->productType == 'inventory')
-                                                            {{ 'None' }}
-                                                        @else
-                                                            {{ $nonInventoryItems->where('name', $product->product_name)->first()->origin ?? $product->product->origin ?? "None" }}
-                                                        @endif
-                                                    </td>
+                                                   {{ $nonInventoryItems->where('id', $product->id)->first()->origin ?? $product->product->origin ?? "None" }}
+
+                                                    </td> --}}
                                                     <td>{{ $product->quantity }}</td>
                                                     <td>{{ $product->unit_price }}</td>
                                                     <td>
@@ -211,14 +205,12 @@
     .invoice {
         position: relative;
         padding: 2rem;
-        background: none;
-        /* No background color or gradient */
+        background: none; /* No background color or gradient */
         border: none;
         height: 100vw;
         box-shadow: none;
         overflow: hidden;
-        z-index: 1;
-        /* Ensure content is above the background */
+        z-index: 1; /* Ensure content is above the background */
     }
 
     .invoice::before {
@@ -235,10 +227,8 @@
         background-repeat: no-repeat;
         background-position: center center;
         background-size: cover;
-        opacity: 0.2;
-        /* Adjust the opacity of the background image */
-        z-index: -1;
-        /* Ensure the background is behind the content */
+        opacity: 0.2; /* Adjust the opacity of the background image */
+        z-index: -1; /* Ensure the background is behind the content */
     }
 
     .header-with-images {
@@ -268,17 +258,13 @@
         }
 
         .invoice::before {
-            opacity: 0.2;
-            /* Adjust the opacity for print if needed */
-            -webkit-print-color-adjust: exact;
-            /* Ensures background image and color are printed */
-            print-color-adjust: exact;
-            /* For modern browsers */
+            opacity: 0.2; /* Adjust the opacity for print if needed */
+            -webkit-print-color-adjust: exact; /* Ensures background image and color are printed */
+            print-color-adjust: exact; /* For modern browsers */
         }
 
         .no-print {
-            display: none;
-            /* Hide print buttons during printing */
+            display: none; /* Hide print buttons during printing */
         }
     }
 </style>

@@ -128,32 +128,15 @@
                             $('#productName').append('<option value="' + product.id + '">' + product
                                 .name + '</option>');
                         });
-
                     },
                     error: function(xhr, status, error) {
                         console.error(error);
                     }
                 });
-
             } else {
                 $('#productName').empty().append('<option value="">Select Product</option>');
             }
         }
-        $('#productName').on('input', function() {
-            var productId = $(this).val();
-            var productName = $(this).find('option:selected').text();
-
-            if (productId) {
-                addProductRow(productId, productName);
-            }
-        });
-
-        $(document).ready(function() {
-            $('#customerName').select2({
-                placeholder: "Select Customer",
-                allowClear: true
-            });
-        });
 
         function getCustomers(customerType) {
             if (customerType) {
@@ -169,10 +152,6 @@
                             $('#customerName').append('<option value="' + customer.id + '">' + customer
                                 .name + '</option>');
                         });
-                        $('#customerName').select2({
-                            placeholder: "Select Customer",
-                            allowClear: true
-                        });
                     },
                     error: function(xhr, status, error) {
                         console.error(error);
@@ -180,60 +159,36 @@
                 });
             } else {
                 $('#customerName').empty().append('<option value="">Select Customer</option>');
-                $('#customerName').select2({
-                    placeholder: "Select Customer",
-                    allowClear: true
-                });
             }
         }
 
-<<<<<<< HEAD
         function addProductRow(productId) {
-            if (!productId) return;
+    if (!productId) return;
 
-            const productType = $('#productType').val(); // Get the selected product type
+    const productType = $('#productType').val(); // Get the selected product type
 
-            $.ajax({
-                type: "GET",
-                url: "{{ route('get-product') }}", // Ensure this route is correctly defined in your Laravel app
-                data: {
-                    productId: productId,
-                    productType: productType // Pass the product type to the server
-                },
-                success: function(data) {
-                    const availableQuantity = data.quantity;
-                    const initialQuantity = availableQuantity > 0 ? 1 : 0;
-
-
-                    if (data && data.part_no) {
-                        // Set the part_no value if it exists in the response
-                        document.querySelector('.part-no').value = data.part_no;
-                    } else {
-                        // If part_no is missing, show a default or empty value
-                        document.querySelector('.part-no').value = 'None'; // Or any default message
-                    }
-
-                    // Now, dynamically insert the product ID into the hidden input field and append a row to the table
-=======
-
-        function addProductRow(productId, productName) {
-            if (!productId) return;
-
-            const productType = $('#productType').val(); // Get the selected product type
-
-            $.ajax({
-                type: "GET",
-                url: "{{ route('get-product') }}",
-                data: {
-                    productId: productId,
-                    productType: productType // Pass the product type
-                },
-                success: function(data) {
-                    const availableQuantity = data.quantity;
-                    const initialQuantity = availableQuantity > 0 ? 1 : 0;
+    $.ajax({
+        type: "GET",
+        url: "{{ route('get-product') }}", // Ensure this route is correctly defined in your Laravel app
+        data: {
+            productId: productId,
+            productType: productType // Pass the product type to the server
+        },
+        success: function(data) {
+            const availableQuantity = data.quantity;
+            const initialQuantity = availableQuantity > 0 ? 1 : 0;
 
 
-                    const row = `
+            if (data && data.part_no) {
+                // Set the part_no value if it exists in the response
+                document.querySelector('.part-no').value = data.part_no;
+            } else {
+                // If part_no is missing, show a default or empty value
+                document.querySelector('.part-no').value = 'None';  // Or any default message
+            }
+
+            // Now, dynamically insert the product ID into the hidden input field and append a row to the table
+            const row = `
                 <tr>
                     <input type="hidden" name="product_id[]" value="${productId}">
                     <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
@@ -255,13 +210,13 @@
                     <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td>
                 </tr>
             `;
-                    $('#bill-items').append(row);
-                },
-                error: function(xhr, status, error) {
-                    console.error(error);
-                }
-            });
+            $('#bill-items').append(row);
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
         }
+    });
+}
 
 
 
@@ -272,7 +227,6 @@
             const availableQuantity = parseFloat(row.find('.availableQuantity').val()) || 0;
             const productType = $('#productType').val();// Get the product type
 
-<<<<<<< HEAD
             if (productType === 'inventory') { // Check if it's an inventory product
                 if (quantity > availableQuantity) {
                     Swal.fire({
@@ -285,18 +239,6 @@
                     return; // Stop further calculations
                 }
             }
-=======
-            // if (quantity > availableQuantity) {
-            //     Swal.fire({
-            //         icon: 'error',
-            //         title: 'Oops...',
-            //         text: 'There is not enough quantity in your product.',
-            //     }).then(() => {
-            //         row.find('.quantity').val(availableQuantity); // Reset to maximum available quantity
-            //     });
-            //     return; // Stop further calculations
-            // }
->>>>>>> 88560bd40a0c1733e33e5d1eebadecacc54b11d7
 
             // Rest of the code remains the same
             const unitPrice = parseFloat(row.find('.unitPrice').val()) || 0;
