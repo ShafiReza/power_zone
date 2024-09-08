@@ -21,7 +21,8 @@
                             <div class="header-with-images">
                                 <div class="text-container">
                                     <h1 style="color: rgb(85, 199, 85); font-size: 80px;">Power Zone</h1>
-                                    <sub style="margin-left:500px;color: rgb(85, 199, 85); font-size: 20px;"><i>The Source of Power</i></sub>
+                                    <sub style="margin-left:500px;color: rgb(85, 199, 85); font-size: 20px;"><i>The Source
+                                            of Power</i></sub>
                                 </div>
                                 <div class="images-container">
                                     <img src="{{ asset('admin/images/pic2.PNG') }}" alt="Image 1">
@@ -38,7 +39,7 @@
                                             {{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}<br>
                                             <!-- Adding the Invoice Number below the Date -->
                                         </small>
-                                        Invoice No: {{ $bill->id  }}
+                                        Invoice No: {{ $bill->id }}
                                     </h4>
                                 </div>
                             </div>
@@ -75,8 +76,8 @@
                                                 @if ($hasDescription)
                                                     <th>Description</th>
                                                 @endif
-                                                {{-- <th>Brand Name</th>
-                                                <th>Origin</th> --}}
+                                                <th>Brand Name</th>
+                                                <th>Origin</th>
                                                 <th>Quantity</th>
                                                 <th>Unit Price</th>
                                                 <th>Discount</th>
@@ -88,20 +89,38 @@
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $product->product_name }}</td>
-                                                     @if ($hasDescription)
+
+                                                    @if ($hasDescription)
                                                         <td>
                                                             {{ !empty($product->description) ? $product->description : 'None' }}
                                                         </td>
                                                     @endif
 
                                                     <td>
-                                                        {{ $nonInventoryItems->where('id', $product->id)->first()->brand_name ?? $product->product->brand_name ?? "None" }}
-
+                                                        {{-- Check if the product is from the inventory list --}}
+                                                        @if ($product->product_id)
+                                                            {{-- Check if product has brand_name and origin; show 'None' if absent --}}
+                                                            {{ $product->product->brand_name ?? 'None' }}
+                                                        @elseif ($product->non_inventory_id)
+                                                            {{-- Check if the product is from the non-inventory list and display brand_name --}}
+                                                            {{ $product->nonInventory->brand_name ?? 'None' }}
+                                                        @else
+                                                            None
+                                                        @endif
                                                     </td>
+
                                                     <td>
-                                                   {{ $nonInventoryItems->where('id', $product->id)->first()->origin ?? $product->product->origin ?? "None" }}
-
+                                                        {{-- Same logic for origin --}}
+                                                        @if ($product->product_id)
+                                                            {{ $product->product->origin ?? 'None' }}
+                                                        @elseif ($product->non_inventory_id)
+                                                           
+                                                            {{ $product->nonInventory->origin ?? 'None' }}
+                                                        @else
+                                                            None
+                                                        @endif
                                                     </td>
+
                                                     <td>{{ $product->quantity }}</td>
                                                     <td>{{ $product->unit_price }}</td>
                                                     <td>
@@ -114,6 +133,7 @@
                                                     <td>{{ $product->total_amount }}</td>
                                                 </tr>
                                             @endforeach
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -205,12 +225,14 @@
     .invoice {
         position: relative;
         padding: 2rem;
-        background: none; /* No background color or gradient */
+        background: none;
+        /* No background color or gradient */
         border: none;
         height: 100vw;
         box-shadow: none;
         overflow: hidden;
-        z-index: 1; /* Ensure content is above the background */
+        z-index: 1;
+        /* Ensure content is above the background */
     }
 
     .invoice::before {
@@ -227,8 +249,10 @@
         background-repeat: no-repeat;
         background-position: center center;
         background-size: cover;
-        opacity: 0.2; /* Adjust the opacity of the background image */
-        z-index: -1; /* Ensure the background is behind the content */
+        opacity: 0.2;
+        /* Adjust the opacity of the background image */
+        z-index: -1;
+        /* Ensure the background is behind the content */
     }
 
     .header-with-images {
@@ -258,13 +282,17 @@
         }
 
         .invoice::before {
-            opacity: 0.2; /* Adjust the opacity for print if needed */
-            -webkit-print-color-adjust: exact; /* Ensures background image and color are printed */
-            print-color-adjust: exact; /* For modern browsers */
+            opacity: 0.2;
+            /* Adjust the opacity for print if needed */
+            -webkit-print-color-adjust: exact;
+            /* Ensures background image and color are printed */
+            print-color-adjust: exact;
+            /* For modern browsers */
         }
 
         .no-print {
-            display: none; /* Hide print buttons during printing */
+            display: none;
+            /* Hide print buttons during printing */
         }
     }
 </style>

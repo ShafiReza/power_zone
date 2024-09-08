@@ -16,9 +16,10 @@
                 </div>
                 <div class="form-group col-3">
                     <label for="customerName">Customer Name</label>
+                    <input type="hidden" id="customerId" name="customerId" value="">
                     <input type="text" id="customerSearch" placeholder="Search.." class="form-control"
                         onkeyup="filterCustomers()">
-                    <div id="customerDropdown" class="dropdown-content">
+                    <div id="customerDropdown" class="dropdown-content" onchange="getCustomers(this.value)">
                         <!-- Customer list will be populated here -->
                     </div>
                 </div>
@@ -221,6 +222,7 @@
             $('#customerSearch').val(customerName); // Set the selected customer in the search input
             $('#customerDropdown').hide(); // Hide the dropdown after selection
             // You can perform further actions here (e.g., save customerId or trigger an event)
+            $('#customerId').val(customerId);
         }
 
         // Hide the dropdown if clicked outside

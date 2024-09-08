@@ -172,7 +172,7 @@ class BillController extends Controller
     public function store(Request $request)
     {
         $customerType = $request->input('customerType');
-        $customerId = $request->input('customerName');
+        $customerId = $request->input('customerId');
 
         $bill = new Bill();
         if ($customerType == 'regularCustomer') {
