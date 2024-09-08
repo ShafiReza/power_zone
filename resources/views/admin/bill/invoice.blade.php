@@ -94,14 +94,14 @@
                                                         </td>
                                                     @endif
 
-                                                    {{-- <td>
+                                                    <td>
                                                         {{ $nonInventoryItems->where('id', $product->id)->first()->brand_name ?? $product->product->brand_name ?? "None" }}
 
                                                     </td>
                                                     <td>
                                                    {{ $nonInventoryItems->where('id', $product->id)->first()->origin ?? $product->product->origin ?? "None" }}
 
-                                                    </td> --}}
+                                                    </td>
                                                     <td>{{ $product->quantity }}</td>
                                                     <td>{{ $product->unit_price }}</td>
                                                     <td>

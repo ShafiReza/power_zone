@@ -46,9 +46,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required',
             'details' => 'nullable',
-            'brand_name' => 'required',
             'category_id' => 'required',
-            'origin' => 'required',
             'purchase_price' => 'required|numeric',
             'sell_price' => 'required|numeric',
             'wholesale_price' => 'required|numeric',

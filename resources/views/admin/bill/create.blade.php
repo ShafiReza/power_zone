@@ -16,9 +16,11 @@
                 </div>
                 <div class="form-group col-3">
                     <label for="customerName">Customer Name</label>
-                    <select id="customerName" name="customerName" class="form-control">
-                        <option value="">Select Customer</option>
-                    </select>
+                    <input type="text" id="customerSearch" placeholder="Search.." class="form-control"
+                        onkeyup="filterCustomers()">
+                    <div id="customerDropdown" class="dropdown-content">
+                        <!-- Customer list will be populated here -->
+                    </div>
                 </div>
             </div>
             <div class="form-row">
@@ -46,9 +48,11 @@
                 </div>
                 <div class="form-group col-3">
                     <label for="productName">Product Name</label>
-                    <select id="productName" class="form-control" onchange="addProductRow(this.value)">
-                        <option value="">Select Product</option>
-                    </select>
+                    <input type="text" id="productSearch" placeholder="Search for products..." class="form-control"
+                        onkeyup="filterProducts()">
+                    <div id="productDropdown" class="dropdown-content">
+                        <!-- Product list will be populated here -->
+                    </div>
                 </div>
                 <div class="form-group col-3">
                     <label for="part_no">Part No</label>
@@ -123,10 +127,11 @@
                         productType: productType
                     },
                     success: function(data) {
-                        $('#productName').empty().append("<option value=''>Select product</option>");
+                        $('#productDropdown').empty().show(); // Clear previous products and show dropdown
                         $.each(data, function(index, product) {
-                            $('#productName').append('<option value="' + product.id + '">' + product
-                                .name + '</option>');
+                            $('#productDropdown').append('<a href="#" onclick="selectProduct(\'' +
+                                product.id + '\', \'' + product.name + '\')">' + product.name +
+                                '</a>');
                         });
                     },
                     error: function(xhr, status, error) {
@@ -134,9 +139,43 @@
                     }
                 });
             } else {
-                $('#productName').empty().append('<option value="">Select Product</option>');
+                $('#productDropdown').empty().hide();
             }
         }
+
+        function filterProducts() {
+            const input = document.getElementById("productSearch");
+            const filter = input.value.toUpperCase();
+            const div = document.getElementById("productDropdown");
+            const a = div.getElementsByTagName("a");
+            for (let i = 0; i < a.length; i++) {
+                const txtValue = a[i].textContent || a[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    a[i].style.display = "";
+                } else {
+                    a[i].style.display = "none";
+                }
+            }
+        }
+
+        function selectProduct(productId, productName) {
+            // Set the selected product in the search input
+            $('#productSearch').val(productName);
+
+            // Hide the dropdown
+            $('#productDropdown').hide();
+
+            // Trigger the addProductRow function to add the product to the row
+            addProductRow(productId);
+        }
+
+        // Hide the dropdown if clicked outside
+        $(document).click(function(e) {
+            if (!$(e.target).closest('#productSearch, #productDropdown').length) {
+                $('#productDropdown').hide();
+            }
+        });
+
 
         function getCustomers(customerType) {
             if (customerType) {
@@ -147,10 +186,11 @@
                         customerType: customerType
                     },
                     success: function(data) {
-                        $('#customerName').empty().append("<option value=''>Select Customer</option>");
+                        $('#customerDropdown').empty().show(); // Clear previous customers and show dropdown
                         $.each(data, function(index, customer) {
-                            $('#customerName').append('<option value="' + customer.id + '">' + customer
-                                .name + '</option>');
+                            $('#customerDropdown').append('<a href="#" onclick="selectCustomer(\'' +
+                                customer.id + '\', \'' + customer.name + '\')">' + customer.name +
+                                '</a>');
                         });
                     },
                     error: function(xhr, status, error) {
@@ -158,37 +198,64 @@
                     }
                 });
             } else {
-                $('#customerName').empty().append('<option value="">Select Customer</option>');
+                $('#customerDropdown').empty().hide();
             }
         }
 
-        function addProductRow(productId) {
-    if (!productId) return;
-
-    const productType = $('#productType').val(); // Get the selected product type
-
-    $.ajax({
-        type: "GET",
-        url: "{{ route('get-product') }}", // Ensure this route is correctly defined in your Laravel app
-        data: {
-            productId: productId,
-            productType: productType // Pass the product type to the server
-        },
-        success: function(data) {
-            const availableQuantity = data.quantity;
-            const initialQuantity = availableQuantity > 0 ? 1 : 0;
-
-
-            if (data && data.part_no) {
-                // Set the part_no value if it exists in the response
-                document.querySelector('.part-no').value = data.part_no;
-            } else {
-                // If part_no is missing, show a default or empty value
-                document.querySelector('.part-no').value = 'None';  // Or any default message
+        function filterCustomers() {
+            const input = document.getElementById("customerSearch");
+            const filter = input.value.toUpperCase();
+            const div = document.getElementById("customerDropdown");
+            const a = div.getElementsByTagName("a");
+            for (let i = 0; i < a.length; i++) {
+                const txtValue = a[i].textContent || a[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    a[i].style.display = "";
+                } else {
+                    a[i].style.display = "none";
+                }
             }
+        }
 
-            // Now, dynamically insert the product ID into the hidden input field and append a row to the table
-            const row = `
+        function selectCustomer(customerId, customerName) {
+            $('#customerSearch').val(customerName); // Set the selected customer in the search input
+            $('#customerDropdown').hide(); // Hide the dropdown after selection
+            // You can perform further actions here (e.g., save customerId or trigger an event)
+        }
+
+        // Hide the dropdown if clicked outside
+        $(document).click(function(e) {
+            if (!$(e.target).closest('#customerSearch, #customerDropdown').length) {
+                $('#customerDropdown').hide();
+            }
+        });
+
+        function addProductRow(productId) {
+            if (!productId) return;
+
+            const productType = $('#productType').val(); // Get the selected product type
+
+            $.ajax({
+                type: "GET",
+                url: "{{ route('get-product') }}", // Ensure this route is correctly defined in your Laravel app
+                data: {
+                    productId: productId,
+                    productType: productType // Pass the product type to the server
+                },
+                success: function(data) {
+                    const availableQuantity = data.quantity;
+                    const initialQuantity = availableQuantity > 0 ? 1 : 0;
+
+                    if (data && data.part_no) {
+                        // Set the part_no value if it exists in the response
+                        document.querySelector('.part-no').value = data.part_no;
+                    } else {
+                        // If part_no is missing, show a default or empty value
+                        document.querySelector('.part-no').value = 'None'; // Or any default message
+                    }
+
+                    // Now, dynamically insert the product ID into the hidden input field and append a row to the table
+                    const row = `
                 <tr>
                     <input type="hidden" name="product_id[]" value="${productId}">
                     <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
@@ -200,7 +267,7 @@
                     <td><input type="number" class="form-control unitPrice" name="unitPrice[]" value="${data.sell_price}" oninput="calculateTotal(this)"></td>
                     <td><input type="number" class="form-control discount" name="discount[]" value="0.00" oninput="calculateTotal(this)"></td>
                     <td>
-                        <select class="form-control discountType" name="discountType[]" onchange="calculateTotal(this)">
+                        <select class="form-control discountType" name="discountType[]" oninput="calculateTotal(this)">
                             <option value="Percentage">Percentage(%)</option>
                             <option value="Flat">Flat</option>
                         </select>
@@ -210,14 +277,21 @@
                     <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td>
                 </tr>
             `;
-            $('#bill-items').append(row);
-        },
-        error: function(xhr, status, error) {
-            console.error(error);
-        }
-    });
-}
+                    const newRow = $(row);
+                    $('#bill-items').append(newRow);
 
+                    // Calculate the total amount based on the initial quantity and unit price
+                    const quantity = initialQuantity;
+                    const unitPrice = data.sell_price;
+                    const totalAmount = quantity * unitPrice;
+                    newRow.find('.total-amount').val(totalAmount.toFixed(2));
+                    calculateFinalAmount();
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
 
 
 
@@ -225,7 +299,7 @@
             const row = $(element).closest('tr');
             const quantity = parseFloat(row.find('.quantity').val()) || 0;
             const availableQuantity = parseFloat(row.find('.availableQuantity').val()) || 0;
-            const productType = $('#productType').val();// Get the product type
+            const productType = $('#productType').val(); // Get the product type
 
             if (productType === 'inventory') { // Check if it's an inventory product
                 if (quantity > availableQuantity) {
@@ -296,4 +370,51 @@
             calculateFinalAmount();
         }
     </script>
+    <style>
+        #customerDropdown {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            width: 100%;
+            z-index: 9999;
+            /* Ensures dropdown appears on top */
+            overflow-y: auto;
+        }
+
+        #customerDropdown a {
+            padding: 8px 16px;
+            display: block;
+            text-decoration: none;
+            color: black;
+        }
+
+        #customerDropdown a:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+    <style>
+        #productDropdown {
+          display: none;
+          position: absolute;
+          background-color: white;
+          border: 1px solid #ddd;
+          max-height: 200px;
+          width: 100%;
+          z-index: 9999; /* Ensures dropdown appears on top */
+          overflow-y: auto;
+        }
+
+        #productDropdown a {
+          padding: 8px 16px;
+          display: block;
+          text-decoration: none;
+          color: black;
+        }
+
+        #productDropdown a:hover {
+          background-color: #f1f1f1;
+        }
+      </style>
 @endsection
