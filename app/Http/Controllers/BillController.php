@@ -160,6 +160,8 @@ class BillController extends Controller
         if ($product) {
             return response()->json([
                 'name' => $product->name,
+                'brandName' => $product->brand_name,
+                'origin'=> $product->origin,
                 'part_no'=>$product->part_no,
                 'sell_price' => $product->sell_price,
                 'quantity' => $product->quantity
@@ -235,6 +237,9 @@ class BillController extends Controller
 
             if ($product) {
                 $billItem->product_id = $product->id;
+                $billItem->product_name = $product->name;
+                $billItem->brand_name = $product->brand_name ?? 'None'; // Assuming brand_name is in the product
+                $billItem->origin = $product->origin ?? 'None';
             } else {
                 return response()->json(['error' => "Product not found for ID: $productId"], 404);
             }
@@ -248,6 +253,8 @@ class BillController extends Controller
             $billItem->unit_price = $unitPrice;
             $billItem->discount = $discount;
             $billItem->discount_type = $discountType;
+            $billItem->brand_name = $product->brand_name ?? 'None'; 
+            $billItem->origin = $product->origin ?? 'None';
             $billItem->total_amount = $totalAmount;
 
             $billItem->save();

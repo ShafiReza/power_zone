@@ -20,7 +20,9 @@ return new class extends Migration
         $table->integer('quantity');
         $table->decimal('unit_price', 10, 2);
         $table->decimal('discount', 10, 2)->nullable();
-        $table->string('discount_type')->nullable();
+        $table->string('discount_type');
+        $table->string('brand_name');  // New field
+        $table->string('origin')->nullable();
         $table->text('total_amount');
         $table->timestamps();
 

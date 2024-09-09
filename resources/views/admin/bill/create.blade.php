@@ -23,6 +23,7 @@
                         <!-- Customer list will be populated here -->
                     </div>
                 </div>
+
             </div>
             <div class="form-row">
                 <div class="form-group col-3">
@@ -32,10 +33,12 @@
                         <option value="Month">Month</option>
                     </select>
                 </div>
+
                 <div class="form-group col-3">
                     <label for="billDate">Date</label>
                     <input type="date" name="billDate" class="form-control" id="billDate" value="{{ date('Y-m-d') }}">
                 </div>
+
             </div>
             <div class="form-row">
                 <div class="form-group col-3">
@@ -55,12 +58,15 @@
                         <!-- Product list will be populated here -->
                     </div>
                 </div>
+
                 <div class="form-group col-3">
                     <label for="part_no">Part No</label>
                     <input type="text" class="form-control part-no" name="part_no" value="">
                 </div>
 
+
             </div>
+
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -70,6 +76,8 @@
                         <th>Unit Price</th>
                         <th>Discount</th>
                         <th>Discount Type</th>
+                        <th>Brand Name</th>
+                        <th>Origin</th>
                         <th>Total Amount</th>
                         <th>Action</th>
                     </tr>
@@ -245,16 +253,20 @@
                     productType: productType // Pass the product type to the server
                 },
                 success: function(data) {
+                    console.log(data); // Log the response to see if it's correct
+
                     const availableQuantity = data.quantity;
                     const initialQuantity = availableQuantity > 0 ? 1 : 0;
 
+                    // Check for missing fields like `part_no`, `brandName`, `origin` and display default values if necessary
                     if (data && data.part_no) {
-                        // Set the part_no value if it exists in the response
                         document.querySelector('.part-no').value = data.part_no;
                     } else {
-                        // If part_no is missing, show a default or empty value
-                        document.querySelector('.part-no').value = 'None'; // Or any default message
+                        document.querySelector('.part-no').value = 'None'; // Default message
                     }
+
+                    const brandName = data.brandName || 'None'; // Default value
+                    const origin = data.origin || 'None'; // Default value
 
                     // Now, dynamically insert the product ID into the hidden input field and append a row to the table
                     const row = `
@@ -275,10 +287,13 @@
                         </select>
                         <input type="hidden" name="productType[]" value="${productType}">
                     </td>
+                    <td><input type="text" class="form-control brand-name" name="brand_name[]" value="${brandName}" readonly></td>
+                    <td><input type="text" class="form-control origin" name="origin[]" value="${origin}" readonly></td>
                     <td><input type="number" class="form-control total-amount" name="total_amount[]" readonly></td>
                     <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Delete</button></td>
                 </tr>
             `;
+
                     const newRow = $(row);
                     $('#bill-items').append(newRow);
 
@@ -288,12 +303,14 @@
                     const totalAmount = quantity * unitPrice;
                     newRow.find('.total-amount').val(totalAmount.toFixed(2));
                     calculateFinalAmount();
+
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
                 }
             });
         }
+
 
 
 
@@ -398,25 +415,26 @@
     </style>
     <style>
         #productDropdown {
-          display: none;
-          position: absolute;
-          background-color: white;
-          border: 1px solid #ddd;
-          max-height: 200px;
-          width: 100%;
-          z-index: 9999; /* Ensures dropdown appears on top */
-          overflow-y: auto;
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            width: 100%;
+            z-index: 9999;
+            /* Ensures dropdown appears on top */
+            overflow-y: auto;
         }
 
         #productDropdown a {
-          padding: 8px 16px;
-          display: block;
-          text-decoration: none;
-          color: black;
+            padding: 8px 16px;
+            display: block;
+            text-decoration: none;
+            color: black;
         }
 
         #productDropdown a:hover {
-          background-color: #f1f1f1;
+            background-color: #f1f1f1;
         }
-      </style>
+    </style>
 @endsection

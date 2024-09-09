@@ -96,30 +96,9 @@
                                                         </td>
                                                     @endif
 
-                                                    <td>
-                                                        {{-- Check if the product is from the inventory list --}}
-                                                        @if ($product->product_id)
-                                                            {{-- Check if product has brand_name and origin; show 'None' if absent --}}
-                                                            {{ $product->product->brand_name ?? 'None' }}
-                                                        @elseif ($product->non_inventory_id)
-                                                            {{-- Check if the product is from the non-inventory list and display brand_name --}}
-                                                            {{ $product->nonInventory->brand_name ?? 'None' }}
-                                                        @else
-                                                            None
-                                                        @endif
-                                                    </td>
+                                                    <td>{{ $product->brand_name }}</td>
 
-                                                    <td>
-                                                        {{-- Same logic for origin --}}
-                                                        @if ($product->product_id)
-                                                            {{ $product->product->origin ?? 'None' }}
-                                                        @elseif ($product->non_inventory_id)
-                                                           
-                                                            {{ $product->nonInventory->origin ?? 'None' }}
-                                                        @else
-                                                            None
-                                                        @endif
-                                                    </td>
+                                                    <td>{{ $product->origin }}</td>
 
                                                     <td>{{ $product->quantity }}</td>
                                                     <td>{{ $product->unit_price }}</td>

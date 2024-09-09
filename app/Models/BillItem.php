@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class BillItem extends Model
 {
     use HasFactory;
-    protected $fillable = ['bill_id','product_id','non_inventory_id','product_name', 'description', 'quantity', 'unit_price', 'discount', 'total_amount'];
+    protected $fillable = [
+        'bill_id', 'product_id', 'non_inventory_id',
+        'product_name', 'description', 'quantity',
+        'unit_price', 'discount', 'total_amount',
+        'brand_name', 'origin' // Add brand_name and origin
+    ];
 
     public function bill()
     {
