@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('part_no')->nullable();
             $table->text('details')->nullable();
-            $table->string('brand_name');
+            $table->string('brand_name')->nullable();
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories');
             $table->text('origin')->nullable();

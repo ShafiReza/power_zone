@@ -22,7 +22,7 @@ return new class extends Migration
         $table->decimal('discount', 10, 2)->nullable();
         $table->string('discount_type');
         $table->string('brand_name');  // New field
-        $table->string('origin')->nullable();
+        $table->string('origin');
         $table->text('total_amount');
         $table->timestamps();
 
