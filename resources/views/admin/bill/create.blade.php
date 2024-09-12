@@ -213,17 +213,21 @@
                 // Find the selected option text
                 const selectedOption = $('#productDropdown option:selected').text();
 
-                // Set the selected product in the search input
+                // Set the selected product in the search input (this is optional if you want to show it in the input field)
                 $('#productSearch').val(selectedOption);
 
-                // Hide the dropdown
+                // Hide the dropdown after selection
                 $('#productDropdown').hide();
                 $('#dropdownSearch').remove(); // Remove search input when hiding dropdown
 
-                // Optionally, trigger additional actions here
+                // Add the product row (can add the same product again)
                 addProductRow(productId);
+
+                // Clear the selected value so that the same product can be selected again
+                $('#productDropdown').val('');
             }
         }
+
         $('#productSearch').on('keyup', filterProducts);
         // Hide the dropdown if clicked outside
         $(document).click(function(e) {
@@ -305,17 +309,11 @@
                     const availableQuantity = data.quantity;
                     const initialQuantity = availableQuantity > 0 ? 1 : 0;
 
-                    // Check for missing fields like `part_no`, `brandName`, `origin` and display default values if necessary
-                    if (data && data.part_no) {
-                        document.querySelector('.part-no').value = data.part_no;
-                    } else {
-                        document.querySelector('.part-no').value = 'None'; // Default message
-                    }
-
+                    // Handle missing fields with default values
                     const brandName = data.brandName || 'None'; // Default value
                     const origin = data.origin || 'None'; // Default value
 
-                    // Now, dynamically insert the product ID into the hidden input field and append a row to the table
+                    // Dynamically insert the product ID into the hidden input field and append a row to the table
                     const row = `
                 <tr>
                     <input type="hidden" name="product_id[]" value="${productId}">
@@ -349,8 +347,9 @@
                     const unitPrice = data.sell_price;
                     const totalAmount = quantity * unitPrice;
                     newRow.find('.total-amount').val(totalAmount.toFixed(2));
-                    calculateFinalAmount();
 
+                    // Recalculate the final amount if needed
+                    calculateFinalAmount();
                 },
                 error: function(xhr, status, error) {
                     console.error(error);

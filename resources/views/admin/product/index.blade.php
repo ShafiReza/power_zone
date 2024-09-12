@@ -49,12 +49,10 @@
         </thead>
         <tbody>
             @foreach ($products as $product)
-                <tr class="{{ $product->status == 'active' ? '' : 'table-danger' }}">
+                <tr style="{{ $product->quantity <= 2 ? 'background-color: #42f59b;' : ($product->status == 'active' ? '' : 'background-color: #f5c6cb;') }}">
                     <td>{{ $product->id }}</td>
                     <td>{{ $product->name }}</td>
-                    <td>
-                        {{ $product->part_no ? $product->part_no : 'None' }} 
-                    </td>
+                    <td>{{ $product->part_no ? $product->part_no : 'None' }}</td>
                     <td>{{ $product->details }}</td>
                     <td>{{ $product->brand_name }}</td>
                     <td>{{ $product->category->name }}</td>
@@ -66,13 +64,12 @@
                     <td>{{ $product->total_amount }}</td>
                     <td>
                         <form action="{{ route('admin.product.toggleStatus', $product->id) }}" method="POST">
-
-                             @csrf
-                             <button type="submit" class="btn btn-link {{ $product->status == 'active' ? 'text-success' : 'text-danger' }}">
-                                 {{ ucfirst($product->status) }}
-                             </button>
-                         </form>
-                     </td>
+                            @csrf
+                            <button type="submit" class="btn btn-link {{ $product->status == 'active' ? 'text-success' : 'text-danger' }}">
+                                {{ ucfirst($product->status) }}
+                            </button>
+                        </form>
+                    </td>
                     <td>
                         <a class="btn btn-primary" href="{{ route('admin.product.edit', $product->id) }}"><i class="fas fa-edit"></i></a>
                         <form action="{{ route('admin.product.destroy', $product->id) }}" method="POST" style="display:inline;" class="delete-form">
@@ -80,14 +77,14 @@
                             @method('DELETE')
                             <button type="button" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button>
                         </form>
-                        <a class="btn btn-success " href="{{ route('admin.product.sales', ['id' => $product->id]) }}">Sales List</a>
-                    <button type="button" class="btn btn-info add-product-btn" data-product-id="{{ $product->id }}">Add Product</button>
-                        <a class="btn btn-warning " href="{{ route('admin.product.stockList', ['id' => $product->id]) }}">Stock List</a>
+                        <a class="btn btn-success" href="{{ route('admin.product.sales', ['id' => $product->id]) }}"><i class="fas fa-list"></i></a>
+                        <button type="button" class="btn btn-info add-product-btn" data-product-id="{{ $product->id }}"><i class="fas fa-plus"></i></button>
+                        <a class="btn btn-warning" href="{{ route('admin.product.stockList', ['id' => $product->id]) }}"><i class="fas fa-warehouse"></i> </a>
                     </td>
-
                 </tr>
             @endforeach
         </tbody>
+
     </table>
 </div>
 <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
