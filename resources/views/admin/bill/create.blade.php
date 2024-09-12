@@ -50,12 +50,16 @@
                         <option value="noninventory">Noninventory</option>
                     </select>
                 </div>
+
                 <div class="form-group col-3">
                     <label for="productName">Product Name</label>
-                    <input type="text" id="productSearch" placeholder="Search for products..." class="form-control"
-                        onkeyup="filterProducts()">
-                    <div id="productDropdown" class="dropdown-content">
-                        <!-- Product list will be populated here -->
+                    <div id="productDropdownWrapper">
+                        <input type="text" id="productSearch" placeholder="Search for products..." class="form-control"
+                            readonly onclick="toggleDropdown()">
+                        <select id="productDropdown" class="form-control" onchange="selectProduct(this.value)"
+                            size="5" style="display: none;">
+                            <!-- Product list will be populated here -->
+                        </select>
                     </div>
                 </div>
 
@@ -131,53 +135,96 @@
             if (productType) {
                 $.ajax({
                     type: "GET",
-                    url: "{{ route('getProductsByCategory') }}",
+                    url: "{{ route('getProductsByCategory') }}", // Ensure this route is correct
                     data: {
                         productType: productType
                     },
                     success: function(data) {
-                        $('#productDropdown').empty().show(); // Clear previous products and show dropdown
+                        const select = $('#productDropdown');
+                        select.empty(); // Clear previous options
+
+                        // Add the default "Select a product" option
+                        select.append('<option value="" disabled selected>Select a product</option>');
+
+                        // Populate the dropdown with products
                         $.each(data, function(index, product) {
-                            $('#productDropdown').append('<a href="#" onclick="selectProduct(\'' +
-                                product.id + '\', \'' + product.name + '\')">' + product.name +
-                                '</a>');
+                            select.append(
+                                '<option value="' + product.id + '">' +
+                                product.name + ' (' + product.part_no + ')' +
+                                '</option>'
+                            );
                         });
+
+                        // Show the dropdown
+                        $('#productDropdown').show();
                     },
                     error: function(xhr, status, error) {
                         console.error(error);
                     }
                 });
             } else {
-                $('#productDropdown').empty().hide();
+                $('#productDropdown').empty().append('<option value="" disabled selected>Select a product</option>').hide();
+            }
+        }
+
+
+        function toggleDropdown() {
+            const select = $('#productDropdown');
+            if (select.is(':hidden')) {
+                select.show();
+                $('#productSearch').attr('readonly', false).focus();
+
+                // Add search input only if it doesn't exist
+
+                const searchInput = $('<input>', {
+                    type: 'text',
+                    id: 'dropdownSearch',
+                    class: 'form-control',
+                    placeholder: 'Search...',
+                    keyup: filterProducts
+                });
+
+                // Prepend search input to dropdown
+
+                select.before(searchInput);
+
+            } else {
+                select.hide();
+                $('#dropdownSearch').remove(); // Remove search input when hiding dropdown
+                $('#productSearch').attr('readonly', true);
             }
         }
 
         function filterProducts() {
-            const input = document.getElementById("productSearch");
-            const filter = input.value.toUpperCase();
-            const div = document.getElementById("productDropdown");
-            const a = div.getElementsByTagName("a");
-            for (let i = 0; i < a.length; i++) {
-                const txtValue = a[i].textContent || a[i].innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    a[i].style.display = "";
-                } else {
-                    a[i].style.display = "none";
+            const input = $('#dropdownSearch').val().toUpperCase();
+            const select = $('#productDropdown');
+            const options = select.find('option');
+
+            options.each(function() {
+                if (this.value) {
+                    const txtValue = $(this).text().toUpperCase();
+                    $(this).toggle(txtValue.indexOf(input) > -1);
                 }
+            });
+        }
+
+        function selectProduct(productId) {
+            if (productId) {
+                // Find the selected option text
+                const selectedOption = $('#productDropdown option:selected').text();
+
+                // Set the selected product in the search input
+                $('#productSearch').val(selectedOption);
+
+                // Hide the dropdown
+                $('#productDropdown').hide();
+                $('#dropdownSearch').remove(); // Remove search input when hiding dropdown
+
+                // Optionally, trigger additional actions here
+                addProductRow(productId);
             }
         }
-
-        function selectProduct(productId, productName) {
-            // Set the selected product in the search input
-            $('#productSearch').val(productName);
-
-            // Hide the dropdown
-            $('#productDropdown').hide();
-
-            // Trigger the addProductRow function to add the product to the row
-            addProductRow(productId);
-        }
-
+        $('#productSearch').on('keyup', filterProducts);
         // Hide the dropdown if clicked outside
         $(document).click(function(e) {
             if (!$(e.target).closest('#productSearch, #productDropdown').length) {
