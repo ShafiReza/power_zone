@@ -71,15 +71,22 @@
                         </form>
                     </td>
                     <td>
-                        <a class="btn btn-primary" href="{{ route('admin.product.edit', $product->id) }}"><i class="fas fa-edit"></i></a>
-                        <form action="{{ route('admin.product.destroy', $product->id) }}" method="POST" style="display:inline;" class="delete-form">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-danger delete-button"><i class="fas fa-trash-alt"></i></button>
-                        </form>
-                        <a class="btn btn-success" href="{{ route('admin.product.sales', ['id' => $product->id]) }}"><i class="fas fa-list"></i></a>
-                        <button type="button" class="btn btn-info add-product-btn" data-product-id="{{ $product->id }}"><i class="fas fa-plus"></i></button>
-                        <a class="btn btn-warning" href="{{ route('admin.product.stockList', ['id' => $product->id]) }}"><i class="fas fa-warehouse"></i> </a>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="{{ route('admin.product.edit', $product->id) }}"><i class="fas fa-edit"></i> Edit</a>
+                                <form action="{{ route('admin.product.destroy', $product->id) }}" method="POST" style="display:inline;" class="delete-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="dropdown-item btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
+                                </form>
+                                <a class="dropdown-item" href="{{ route('admin.product.sales', ['id' => $product->id]) }}"><i class="fas fa-list"></i> Sales</a>
+                                <button type="button" class="dropdown-item btn btn-info add-product-btn" data-product-id="{{ $product->id }}"><i class="fas fa-plus"></i> Add Product</button>
+                                <a class="dropdown-item" href="{{ route('admin.product.stockList', ['id' => $product->id]) }}"><i class="fas fa-warehouse"></i> Stock List</a>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             @endforeach
