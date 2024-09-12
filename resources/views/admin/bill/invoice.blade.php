@@ -145,7 +145,14 @@
                                 @endif
                                 <div class="col-6 ml-auto">
                                     <div class="table-responsive">
+                                        @php
+                                            $totalAmountSum = $products->sum('total_amount');
+                                        @endphp
                                         <table class="table">
+                                            <tr>
+                                                <th>Total Amount</th>
+                                                <td>{{ number_format($totalAmountSum, 2) }}</td>
+                                            </tr>
                                             @foreach ($billItems2 as $item)
                                                 <tr>
                                                     <th>Discount</th>

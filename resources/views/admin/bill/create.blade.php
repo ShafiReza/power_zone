@@ -54,7 +54,7 @@
                 <div class="form-group col-3">
                     <label for="productName">Product Name</label>
                     <div id="productDropdownWrapper">
-                        <input type="text" id="productSearch" placeholder="Search for products..." class="form-control"
+                        <input type="text" id="productSearch" placeholder="Select products..." class="form-control"
                             readonly onclick="toggleDropdown()">
                         <select id="productDropdown" class="form-control" onchange="selectProduct(this.value)"
                             size="5" style="display: none;">
@@ -144,7 +144,7 @@
                         select.empty(); // Clear previous options
 
                         // Add the default "Select a product" option
-                        select.append('<option value="" disabled selected>Select a product</option>');
+
 
                         // Populate the dropdown with products
                         $.each(data, function(index, product) {
