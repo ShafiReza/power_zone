@@ -63,10 +63,10 @@
                     </div>
                 </div>
 
-                <div class="form-group col-3">
+                <!-- <div class="form-group col-3">
                     <label for="part_no">Part No</label>
                     <input type="text" class="form-control part-no" name="part_no" value="">
-                </div>
+                </div>-->
 
 
             </div>
@@ -144,7 +144,7 @@
                         select.empty(); // Clear previous options
 
                         // Add the default "Select a product" option
-
+                        //select.append('<option value="" disabled selected>Select a product</option>');
 
                         // Populate the dropdown with products
                         $.each(data, function(index, product) {
@@ -227,7 +227,6 @@
                 $('#productDropdown').val('');
             }
         }
-
         $('#productSearch').on('keyup', filterProducts);
         // Hide the dropdown if clicked outside
         $(document).click(function(e) {
@@ -356,10 +355,6 @@
                 }
             });
         }
-
-
-
-
         function calculateTotal(element) {
             const row = $(element).closest('tr');
             const quantity = parseFloat(row.find('.quantity').val()) || 0;

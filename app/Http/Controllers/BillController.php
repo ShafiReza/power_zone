@@ -42,6 +42,12 @@ class BillController extends Controller
             });
         }
 
+        $bills = $query
+        ->select('bills.*')
+        ->withSum('billItems2 as total_due_amount', 'due_amount') // Sum the due_amount for each bill
+        ->orderByRaw("CASE WHEN total_due_amount = 0 THEN 1 ELSE 0 END, bills.id") // Sort by total_due_amount
+        ->get();
+
         $bills = $query->get();
 
         // Fetch payment histories
@@ -70,9 +76,11 @@ class BillController extends Controller
         // Fetch bill items related to the bill
 
         $products = BillItem::where('bill_id', $id)
-            ->with(['product' => function ($query) {
-                $query->select('id', 'brand_name', 'origin');
-            }])
+            ->with([
+                'product' => function ($query) {
+                    $query->select('id', 'brand_name', 'origin');
+                }
+            ])
             ->get();
         $billItems2 = BillItem2::where('bill_id', $id)->get();
         // Fetch the bill details
@@ -100,7 +108,7 @@ class BillController extends Controller
 
 
 
-        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product', 'title', 'nonInventoryItems',));
+        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product', 'title', 'nonInventoryItems', ));
     }
 
 
@@ -161,8 +169,8 @@ class BillController extends Controller
             return response()->json([
                 'name' => $product->name,
                 'brandName' => $product->brand_name,
-                'origin'=> $product->origin,
-                'part_no'=>$product->part_no,
+                'origin' => $product->origin,
+                'part_no' => $product->part_no,
                 'sell_price' => $product->sell_price,
                 'quantity' => $product->quantity
             ]);
@@ -253,7 +261,7 @@ class BillController extends Controller
             $billItem->unit_price = $unitPrice;
             $billItem->discount = $discount;
             $billItem->discount_type = $discountType;
-            $billItem->brand_name = $product->brand_name ?? 'None'; 
+            $billItem->brand_name = $product->brand_name ?? 'None';
             $billItem->origin = $product->origin ?? 'None';
             $billItem->total_amount = $totalAmount;
 

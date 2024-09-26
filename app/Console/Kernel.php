@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('generate:monthlybills')->monthly();
+        $schedule->command('generatemonthlybills:cron')->monthlyOn(1, '00:00');
         $schedule->call(function () {
             MonthlyBill::where('status', 'pending')->each->updateStatus();
         })->daily();

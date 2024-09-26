@@ -145,14 +145,14 @@
                                 @endif
                                 <div class="col-6 ml-auto">
                                     <div class="table-responsive">
-                                        @php
+                                         @php
                                             $totalAmountSum = $products->sum('total_amount');
                                         @endphp
                                         <table class="table">
                                             <tr>
-                                                <th>Total Amount</th>
-                                                <td>{{ number_format($totalAmountSum, 2) }}</td>
-                                            </tr>
+                                                    <th>Total Amount</th>
+                                                    <td>{{ number_format($totalAmountSum, 2) }}</td>
+                                                </tr>
                                             @foreach ($billItems2 as $item)
                                                 <tr>
                                                     <th>Discount</th>
@@ -181,6 +181,18 @@
                                             @endforeach
                                         </table>
                                     </div>
+                                </div>
+                            </div>
+                             <div class="row signature-row">
+                                <div class="col-7 ml-5">
+
+                                    <p>__________________________</p>
+                                    <p><strong>Client Signature</strong></p>
+                                </div>
+                                <div class="col-4 text-right ml-1">
+                                     <img src="{{ asset('admin/images/img001.jpg') }}" alt="Authorized Signature" style="max-width: 100px; margin-left: 150px;" >
+                                    <p>__________________________</p>
+                                    <p><strong>Authorized Signature</strong></p>
                                 </div>
                             </div>
 
@@ -280,5 +292,32 @@
             display: none;
             /* Hide print buttons during printing */
         }
+    }
+     .signature-row {
+        margin-top: 80px;
+    }
+
+    .signature-row .col-7 {
+        display: flex;
+        flex-direction: column;
+        align-items: justify;
+        justify-content: justify;
+        height: 100px;
+        margin-left: 60px;
+        /* Add margin-left to move client signature to the right */
+    }
+
+    .signature-row .col-4 {
+        display: flex;
+        flex-direction: column;
+        align-items: justify;
+        justify-content: justify;
+        height: 100px;
+        margin-left: 150px;
+        /* Adjust margin-left for more space */
+    }
+
+    .signature-row .text-right {
+        text-align: right;
     }
 </style>

@@ -30,7 +30,7 @@ class ProductController extends Controller
 
         $products = $query->get();
 
-        return view('admin.product.index', compact('products','title'));
+        return view('admin.product.index', compact('products', 'title'));
     }
 
     public function create()
@@ -38,7 +38,7 @@ class ProductController extends Controller
         $title = "Product";
 
         $categories = Category::where('status', 'active')->get(); // Fetch only active categories
-        return view('admin.product.create', compact('categories','title'));
+        return view('admin.product.create', compact('categories', 'title'));
     }
 
     public function store(Request $request)
@@ -51,22 +51,34 @@ class ProductController extends Controller
             'sell_price' => 'required|numeric',
             'wholesale_price' => 'required|numeric',
             'part_no' => 'nullable|string',
-
         ]);
 
+        // Check if the product with the same name and part_no already exists
+        $existingProduct = Product::where('name', $request->name)
+            ->where('part_no', $request->part_no)
+            ->first();
+
+        if ($existingProduct) {
+            // Flash error to session and redirect back
+            return redirect()->back()->with('error', 'Product with the same name and part number already exists.');
+        }
+
+        // Calculate total amount
         $total_amount = $request->quantity * $request->purchase_price;
 
-        // Create the product with the total_amount
+        // Create the product
         Product::create(array_merge($request->all(), ['total_amount' => $total_amount]));
 
+        // Flash success message and redirect
         return redirect()->route('admin.product.index')->with('success', 'Product created successfully.');
     }
+
 
     public function edit(Product $product)
     {
         $title = "Product";
         $categories = Category::where('status', 'active')->get(); // Fetch only active categories
-        return view('admin.product.edit', compact('product', 'categories','title'));
+        return view('admin.product.edit', compact('product', 'categories', 'title'));
     }
 
     public function update(Request $request, Product $product)
@@ -121,12 +133,15 @@ class ProductController extends Controller
         // Fetch bills with billItems containing the specified product ID
         $bills = Bill::whereHas('billItems', function ($query) use ($id) {
             $query->where('product_id', $id); // Assuming 'product_id' is the correct field
-        })->with(['billItems' => function ($query) use ($id) {
-            $query->where('product_id', $id); // Assuming 'product_id' is the correct field
-        }, 'billItems2'])->get();
+        })->with([
+                    'billItems' => function ($query) use ($id) {
+                        $query->where('product_id', $id); // Assuming 'product_id' is the correct field
+                    },
+                    'billItems2'
+                ])->get();
 
         // Pass the product ID to the view
-        return view('admin.product.sales', compact('bills', 'id','title'));
+        return view('admin.product.sales', compact('bills', 'id', 'title'));
     }
 
 
@@ -161,7 +176,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $stockEntries = StockEntry::where('product_id', $id)->get();
 
-        return view('admin.product.stockList', compact('product', 'stockEntries','title'));
+        return view('admin.product.stockList', compact('product', 'stockEntries', 'title'));
     }
 
 }

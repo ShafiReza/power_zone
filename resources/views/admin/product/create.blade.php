@@ -66,4 +66,27 @@
         <a class="btn btn-secondary" href="{{ route('admin.product.index') }}">Back</a>
     </form>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // If there is an error (existing product), display SweetAlert
+    @if (session('error'))
+        Swal.fire({
+            title: 'Error!',
+            text: '{{ session('error') }}',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    @endif
+
+    // If the product is created successfully
+    @if (session('success'))
+        Swal.fire({
+            title: 'Success!',
+            text: '{{ session('success') }}',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    @endif
+</script>
 @endsection
