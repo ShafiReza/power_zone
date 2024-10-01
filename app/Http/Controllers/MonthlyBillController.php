@@ -201,46 +201,50 @@ class MonthlyBillController extends Controller
     }
     public function getBillDetails(RegularCustomer $customer)
     {
-        // Fetch the most recent bill amount or set a default amount
+        // Fetch the most recent bill
         $lastBill = MonthlyBill::where('regular_customer_id', $customer->id)
             ->orderBy('created_at', 'desc')
             ->first();
 
-        $amount = $lastBill ? $lastBill->amount : 0; // Replace with default logic if necessary
-        $description = $lastBill->description;
-        $next_generation_date = $lastBill->next_generation_date;
+        // Safely handle defaults
+        $amount = $lastBill ? $lastBill->amount : 0; // Default to 0 if no bill
+        $description = $lastBill->description ?? 'None'; // Default description
+        $next_generation_date = $lastBill ? $lastBill->next_generation_date : Carbon::now()->addMonth(); // Default date
+
+        // Define max length for service
+        $maxServiceLength = 255; // Adjust based on your schema
+        $service = $lastBill ? substr($lastBill->service, 0, $maxServiceLength) : 'default_service'; // Truncate if necessary
 
         return [
             'amount' => $amount,
             'description' => $description,
-            'service' => $lastBill ? $lastBill->service : 'default_service', // Use previous service or set a default
+            'service' => $service,
             'next_generation_date' => $next_generation_date
         ];
     }
 
     public function edit($id)
-{
-    $bill = MonthlyBill::findOrFail($id);
-    $customers = RegularCustomer::all(); // Assuming RegularCustomer is the model for customers
-    return view('admin.monthlyBill.edit', compact('bill', 'customers'));
-}
+    {
+        $bill = MonthlyBill::findOrFail($id);
+        $customers = RegularCustomer::all(); // Assuming RegularCustomer is the model for customers
+        return view('admin.monthlyBill.edit', compact('bill', 'customers'));
+    }
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'amount' => 'required|numeric',
-        'description' => 'nullable|string',
-        'service' => 'required|string',
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric',
+            'description' => 'nullable|string',
+            'service' => 'required|string',
 
-    ]);
+        ]);
 
-    $bill = MonthlyBill::findOrFail($id);
-    $bill->amount = $request->amount;
-    $bill->description = $request->description;
-    $bill->service = $request->service;
-    $bill->save();
+        $bill = MonthlyBill::findOrFail($id);
+        $bill->amount = $request->amount;
+        $bill->description = $request->description;
+        $bill->service = $request->service;
+        $bill->save();
 
-    return redirect()->route('admin.monthlyBill.index')->with('success', 'Bill updated successfully');
-}
-
+        return redirect()->route('admin.monthlyBill.index')->with('success', 'Bill updated successfully');
+    }
 }
