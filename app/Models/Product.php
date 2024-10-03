@@ -34,5 +34,9 @@ class Product extends Model
     {
         return $this->hasMany(BillItem::class, 'product_name', 'name');
     }
+    public function bill()
+    {
+        return $this->belongsTo(Bill::class);
+    }
 }
 

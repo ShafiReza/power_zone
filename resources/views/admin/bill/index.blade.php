@@ -16,9 +16,17 @@
                 </div>
             </div>
         </form>
+         <form id="bulk-action-form" method="POST" action="{{ route('admin.bill.bulkInvoice') }}">
+            @csrf
+            <input type="hidden" name="selected_bills" id="selected-bills">
+            <button type="button" id="bulk-print-invoice" class="btn btn-success">Print Selected Invoices</button>
+        </form>
         <table class="table table-hover">
             <thead>
                 <tr>
+                     <th>
+                        <input type="checkbox" id="select-all">
+                    </th>
                     <th>ID</th>
                     <th>Customer Name</th>
                     <th>Bill Date</th>
@@ -39,6 +47,9 @@
                         $isPaid = $dueAmount == 0 ? 1 : 0;
                     @endphp
                     <tr>
+                         <td>
+                            <input type="checkbox" name="bill_ids[]" class="bill-checkbox" value="{{ $bill->id }}">
+                        </td>
                         <td>{{ $bill->id }}</td>
                         <td>{{ $bill->customer_name }}</td>
                         <td>{{ $bill->bill_date }}</td>
@@ -67,7 +78,6 @@
                             <a href="{{ route('admin.bill.challan', $bill->id) }}" class="btn btn-info btn-sm">Challan</a>
                             <a href="{{ route('admin.bill.invoice', $bill->id) }}"
                                 class="btn btn-success btn-sm">Invoice</a>
-                                {{-- <a href="{{ route('admin.bill.edit', $bill->id) }}" class="btn btn-warning btn-sm">Edit</a> --}}
                             <form action="{{ route('bill.destroy', $bill->id) }}" method="POST" style="display:inline;"
                                 class="delete-form">
                                 @csrf
@@ -135,6 +145,40 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select All checkbox functionality
+            const selectAllCheckbox = document.getElementById('select-all');
+            const billCheckboxes = document.querySelectorAll('.bill-checkbox');
+
+            selectAllCheckbox.addEventListener('change', function() {
+                billCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            // Collect selected bills and submit for bulk action (e.g., print invoices)
+            document.getElementById('bulk-print-invoice').addEventListener('click', function() {
+                const selectedBills = [];
+                billCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedBills.push(checkbox.value);
+                    }
+                });
+
+                if (selectedBills.length > 0) {
+                    document.getElementById('selected-bills').value = selectedBills.join(',');
+                    document.getElementById('bulk-action-form').submit();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Please select at least one bill to proceed.',
+                    });
+                }
+            });
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Delete button functionality
@@ -187,7 +231,53 @@
                 document.getElementById('dueAmount').value = dueAmount;
             });
 
+            // Calculate due amount on receivable amount change
+            // document.getElementById('receivableAmount').addEventListener('input', function() {
+            //     const finalAmount = parseFloat(document.getElementById('finalAmount').value) || 0;
+            //     const receivableAmount = parseFloat(this.value) || 0;
+            //     const previousPaidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
 
+            //     // Update due amount based on new payment
+            //     const newDueAmount = dueAmount - receivableAmount;
+            //     document.getElementById('dueAmount').value = newDueAmount.toFixed(2);
+            // });
+
+            // Handle form submission for marking as paid
+            // document.getElementById('markPaidForm').addEventListener('submit', function(e) {
+            //     e.preventDefault();
+            //     const formData = new FormData(this);
+
+            //     fetch('{{ route('bill.markPaid') }}', {
+            //             method: 'POST',
+            //             body: formData,
+            //             headers: {
+            //                 'Accept': 'application/json',
+            //             }
+            //         })
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             if (data.success) {
+            //                 const markPaidButton = document.querySelector(
+            //                     `.mark-paid-button[data-id="${data.bill_id}"]`);
+
+            //                 if (data.due_amount === 0) {
+            //                     markPaidButton.outerHTML =
+            //                         '<button class="btn btn-sm btn-success">Paid</button>';
+            //                 } else {
+            //                     markPaidButton.outerHTML =
+            //                         '<button class="btn btn-sm btn-warning">Partial</button>';
+            //                 }
+            //                 $('#markPaidModal').modal('hide');
+            //                 location.reload(); // Reload the page to reflect changes
+            //             } else {
+            //                 alert('An error occurred');
+            //             }
+            //         })
+            //         .catch(error => {
+            //             console.error('Error:', error);
+            //             alert('An error occurred');
+            //         });
+            // });
             document.getElementById('markPaidForm').addEventListener('submit', function(e) {
                 e.preventDefault();
 

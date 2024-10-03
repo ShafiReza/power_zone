@@ -42,6 +42,7 @@ class BillController extends Controller
             });
         }
 
+
         $bills = $query
         ->select('bills.*')
         ->withSum('billItems2 as total_due_amount', 'due_amount') // Sum the due_amount for each bill
@@ -76,11 +77,9 @@ class BillController extends Controller
         // Fetch bill items related to the bill
 
         $products = BillItem::where('bill_id', $id)
-            ->with([
-                'product' => function ($query) {
-                    $query->select('id', 'brand_name', 'origin');
-                }
-            ])
+            ->with(['product' => function ($query) {
+                $query->select('id', 'brand_name', 'origin');
+            }])
             ->get();
         $billItems2 = BillItem2::where('bill_id', $id)->get();
         // Fetch the bill details
@@ -108,8 +107,55 @@ class BillController extends Controller
 
 
 
-        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product', 'title', 'nonInventoryItems', ));
+        return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product', 'title', 'nonInventoryItems',));
     }
+     public function bulkInvoice(Request $request)
+    {
+        // Retrieve selected bill IDs
+        $billIds = explode(',', $request->input('selected_bills'));
+
+        // Fetch the bills and associated data for each selected bill
+        $bills = Bill::whereIn('id', $billIds)->get();
+
+        foreach ($bills as $bill) {
+            // Fetch products associated with the bill
+            $bill->products = BillItem::where('bill_id', $bill->id)
+                ->with([
+                    'product' => function ($query) {
+                        $query->select('id', 'brand_name', 'origin');
+                    }
+                ])
+                ->get();
+
+            // Fetch bill items2 and other related data
+            $bill->billItems2 = BillItem2::where('bill_id', $bill->id)->get();
+
+            // Fetch customer details
+            $bill->customer = $bill->regular_customer_id
+                ? RegularCustomer::find($bill->regular_customer_id)
+                : IrregularCustomer::find($bill->irregular_customer_id);
+
+            // Fetch payment history for previous bills
+            $bill->previousBills = PaymentHistory::where('bill_id', $bill->id)->get();
+
+            // Fetch non-inventory items
+            $bill->nonInventoryItems = NonInventory::all();
+        }
+
+        if ($bills->isEmpty()) {
+            return redirect()->back()->with('error', 'No bills found for the selected IDs.');
+        }
+
+        // Check if a single invoice or multiple invoices are being processed
+        // if (count($bills) == 1) {
+        //     return view('admin.bill.invoice', compact('bills')); // Render single invoice view
+        // } else {
+            // Render multiple invoices view for bulk printing
+            return view('admin.bill.bulk_invoice', compact('bills')); // Render multiple invoices view
+       // }
+    }
+
+
 
 
 
@@ -169,8 +215,8 @@ class BillController extends Controller
             return response()->json([
                 'name' => $product->name,
                 'brandName' => $product->brand_name,
-                'origin' => $product->origin,
-                'part_no' => $product->part_no,
+                'origin'=> $product->origin,
+                'part_no'=>$product->part_no,
                 'sell_price' => $product->sell_price,
                 'quantity' => $product->quantity
             ]);
