@@ -83,7 +83,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         Route::get('/product/{id}/sales', [ProductController::class, 'sales'])->name('admin.product.sales');
         Route::post('product/add-product', [ProductController::class, 'addProduct'])->name('admin.product.addProduct');
         Route::get('product/{id}/stock-list', [ProductController::class, 'stockList'])->name('admin.product.stockList');
-   
+
         Route::get('non-inventory-items', [NonInventoryController::class, 'index'])->name('admin.nonInventory.index');
         Route::get('non-inventory-items/create', [NonInventoryController::class, 'create'])->name('admin.nonInventory.create');
         Route::post('non-inventory-items', [NonInventoryController::class, 'store'])->name('admin.nonInventory.store');
@@ -111,6 +111,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         Route::get('/admin/bill/payment-history/{bill}', [BillController::class, 'paymentHistory'])->name('admin.bill.paymentHistory');
         Route::get('bill/{id}/edit', [BillController::class, 'edit'])->name('admin.bill.edit');
         Route::post('bill/{id}/update', [BillController::class, 'update'])->name('bill.update');
+        Route::post('bill/bulk-invoice', [BillController::class, 'bulkInvoice'])->name('admin.bill.bulkInvoice');
         // Route::delete('/payment/{id}', [BillController::class, 'PaymentDestroy'])->name('payment.delete');
 
 
