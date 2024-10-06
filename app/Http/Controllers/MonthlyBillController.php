@@ -51,12 +51,14 @@ class MonthlyBillController extends Controller
     {
         $title = "Monthly Bill";
         $query = MonthlyBill::query();
+        $month = $request->filled('month') ? explode('-', $request->month)[1] : date('m'); // Initialize the month variable
+        $clientId = null; // Initialize the clientId variable
 
         if ($request->filled('month')) {
             // Split the 'month' value into year and month
             $yearMonth = explode('-', $request->month);
             $year = $yearMonth[0];
-            $month = $yearMonth[1];
+            $month = $yearMonth[1]; // Set the month variable
 
             // Filter by both year and month
             $query->whereYear('bill_month', '=', $year)
@@ -68,13 +70,18 @@ class MonthlyBillController extends Controller
                 $q->where('name', 'like', '%' . $request->customer_name . '%');
             });
         }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
+        // Get the bills with the associated regular customers
         $bills = $query->with('regularCustomer')->get();
 
-        return view('admin.monthlyBill.index', compact('bills', 'title'));
+        // Get the clientId if needed (example logic)
+        $clientId = $bills->isNotEmpty() ? $bills->first()->regular_customer_id : null;
+
+        return view('admin.monthlyBill.index', compact('bills', 'title', 'clientId', 'month'));
     }
 
     public function destroy($id)
@@ -107,7 +114,30 @@ class MonthlyBillController extends Controller
 
         return view('admin.monthlyBill.invoice', compact('bills', 'previousDues', 'customer'));
     }
+    public function bulkInvoice(Request $request, $clientId, $month)
+    {
+        $billIds = explode(',', $request->input('selected_bills'));
+        $bills = MonthlyBill::whereIn('id', $billIds)->get();
 
+        $previousBills = [];
+
+        foreach ($bills as $bill) {
+            $bill->customer = RegularCustomer::findOrFail($clientId);
+
+            $previousBills[$bill->id] = MonthlyBill::where('regular_customer_id', $bill->regular_customer_id)
+                ->where(function ($q) {
+                    $q->where('status', 'Due')
+                        ->orWhere('status', 'partial')
+                        ->orWhere('status', 'Mark as Paid');
+                })
+                ->where('bill_month', '<', $bill->bill_month) // Exclude the current bill's month
+                ->orderBy('bill_month', 'asc')
+                ->get(['bill_month', 'amount', 'due_amount', 'status']);
+        }
+        //dd($previousBills);
+        // Pass $clientId, $month, $bills, and $previousBills to the view
+        return view('admin.monthlyBill.bulkInvoice', compact('bills', 'clientId', 'month', 'previousBills'));
+    }
 
     public function showInvoicePrint(MonthlyBill $bill)
     {

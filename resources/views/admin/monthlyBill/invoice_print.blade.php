@@ -26,8 +26,8 @@
                                     <sub style="margin-left:500px;color: rgb(85, 199, 85); font-size: 20px;"><i>The Source of Power</i></sub>
                                 </div>
                                 <div class="images-container">
-                                    <img src="{{ asset('admin/images/pic2.png') }}" alt="Image 1">
-                                    <img src="{{ asset('admin/images/pic1.png') }}" alt="Image 2">
+                                    <img src="{{ asset('admin/images/pic2.PNG') }}" alt="Image 1">
+                                    <img src="{{ asset('admin/images/pic1.PNG') }}" alt="Image 2">
                                 </div>
                             </div>
                             <hr>
@@ -35,7 +35,7 @@
                             <div class="row">
                                 <h4 class="mx-auto">Invoice</h4>
                                 <div class="col-12">
-                                    <h4 style="margin-right: 120px">
+                                    <h4>
                                         <small class="float-right">Date:
                                             {{ \Carbon\Carbon::parse($bill->start_date)->format('d-m-Y') }}</small>
                                             Invoice No: {{ $bill->id  }}
@@ -55,7 +55,7 @@
                                     </address>
                                 </div>
                                 <!-- /.col -->
-                                <div class="col-sm-4 invoice-col" style="margin-left: 530px;">
+                                <div class="col-sm-4 invoice-col" style="margin-left: 300px;">
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>

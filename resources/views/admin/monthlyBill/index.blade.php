@@ -25,10 +25,17 @@
                 </div>
             </div>
         </form>
+
         <a class="btn btn-success mb-3" href="{{ route('admin.monthlyBill.create') }}">Create Monthly Bill</a>
+        <form id="bulk-action-form" method="POST" action="{{ route('admin.monthlyBill.bulkInvoice', ['clientId' => $clientId, 'month' => $month]) }}">
+            @csrf
+            <input type="hidden" name="selected_bills" id="selected-bills">
+            <button type="button" id="bulk-print-invoice" class="btn btn-success">Print Selected Invoices</button>
+        </form>
         <table class="table table-hover">
             <thead>
                 <tr>
+                    <th><input type="checkbox" id="select-all"></th>
                     <th>ID</th>
                     <th>Customer Name</th>
                     <th>Customer Address</th>
@@ -44,6 +51,7 @@
             <tbody>
                 @foreach ($bills as $bill)
                     <tr>
+                        <td><input type="checkbox" name="bill_ids[]" class="bill-checkbox" value="{{ $bill->id }}"></td>
                         <td>{{ $bill->id }}</td>
                         <td>{{ $bill->regularCustomer ? $bill->regularCustomer->name : 'N/A' }}</td>
                         <td>{{ $bill->customer_address }}</td>
@@ -83,7 +91,8 @@
                             </form>
                         </td>
                         <td>
-                            <a href="{{ route('admin.monthlyBill.edit', $bill->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{{ route('admin.monthlyBill.edit', $bill->id) }}"
+                                class="btn btn-warning btn-sm">Edit</a>
                         </td>
                         <td><a class="btn btn-primary mb-3"
                                 href="{{ route('admin.monthlyBill.showBill', ['id' => $bill->id]) }}">Payment History</a>
@@ -123,7 +132,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="receivable_amount">Receivable Amount</label>
-                                <input type="text" name="receivable_amount" id="receivableAmount" class="form-control">
+                                <input type="text" name="receivable_amount" id="receivableAmount"
+                                    class="form-control">
                             </div>
                             <div class="form-group">
                                 <label for="due_amount">Due Amount</label>
@@ -145,6 +155,40 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select All checkbox functionality
+            const selectAllCheckbox = document.getElementById('select-all');
+            const billCheckboxes = document.querySelectorAll('.bill-checkbox');
+
+            selectAllCheckbox.addEventListener('change', function() {
+                billCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            // Collect selected bills and submit for bulk action (e.g., print invoices)
+            document.getElementById('bulk-print-invoice').addEventListener('click', function() {
+                const selectedBills = [];
+                billCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedBills.push(checkbox.value);
+                    }
+                });
+
+                if (selectedBills.length > 0) {
+                    document.getElementById('selected-bills').value = selectedBills.join(',');
+                    document.getElementById('bulk-action-form').submit();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Please select at least one bill to proceed.',
+                    });
+                }
+            });
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Attach click event listeners to delete buttons
@@ -212,7 +256,7 @@
                 const receivableAmount = parseFloat(document.getElementById('receivableAmount').value);
 
                 // Check if receivable amount is less than the bill amount
-                if (receivableAmount < billAmount ||receivableAmount > billAmount) {
+                if (receivableAmount < billAmount || receivableAmount > billAmount) {
                     const errorMessage = 'Receivable amount is less than the Bill Amount';
                     // Display the error message
                     Swal.fire({

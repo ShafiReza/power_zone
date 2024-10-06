@@ -129,6 +129,10 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         Route::get('/monthly-bills/{id}', [MonthlyBillController::class, 'showBill'])->name('admin.monthlyBill.showBill');
         Route::post('/monthlyBill/paid', [MonthlyBillController::class, 'Paid'])->name('monthlyBill.Paid');
         Route::get('monthlyBill/generateMonthlyBills', [MonthlyBillController::class, 'generateMonthlyBills'])->name('monthlyBill.generateMonthlyBills');
+       // Route::post('admin/monthlyBill/bulkInvoice', [MonthlyBillController::class, 'bulkInvoice'])->name('admin.monthlyBill.bulkInvoice');
+       Route::post('admin/monthlyBill/bulkInvoice/{clientId}/{month}', [MonthlyBillController::class, 'bulkInvoice'])->name('admin.monthlyBill.bulkInvoice');
+
+
 
 
 
