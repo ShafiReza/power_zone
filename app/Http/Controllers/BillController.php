@@ -46,7 +46,7 @@ class BillController extends Controller
         $bills = $query
         ->select('bills.*')
         ->withSum('billItems2 as total_due_amount', 'due_amount') // Sum the due_amount for each bill
-        ->orderByRaw("CASE WHEN total_due_amount = 0 THEN 1 ELSE 0 END, bills.id") // Sort by total_due_amount
+        ->orderByRaw("CASE WHEN total_due_amount = 0 THEN 1 ELSE 0 END, bills.id DESC") // Sort by total_due_amount
         ->get();
 
         $bills = $query->get();
