@@ -44,10 +44,10 @@ class BillController extends Controller
 
 
         $bills = $query
-        ->select('bills.*')
-        ->withSum('billItems2 as total_due_amount', 'due_amount') // Sum the due_amount for each bill
-        ->orderByRaw("CASE WHEN total_due_amount = 0 THEN 1 ELSE 0 END, bills.id DESC") // Sort by total_due_amount
-        ->get();
+            ->select('bills.*')
+            ->withSum('billItems2 as total_due_amount', 'due_amount') // Sum the due_amount for each bill
+            ->orderByRaw("CASE WHEN total_due_amount = 0 THEN 1 ELSE 0 END, bills.id DESC") // Sort by total_due_amount
+            ->get();
 
         $bills = $query->get();
 
@@ -109,7 +109,7 @@ class BillController extends Controller
 
         return view('admin.bill.invoice', compact('customer', 'products', 'bill', 'billItems2', 'previousBills', 'product', 'title', 'nonInventoryItems',));
     }
-     public function bulkInvoice(Request $request)
+    public function bulkInvoice(Request $request)
     {
         // Retrieve selected bill IDs
         $billIds = explode(',', $request->input('selected_bills'));
@@ -150,9 +150,9 @@ class BillController extends Controller
         // if (count($bills) == 1) {
         //     return view('admin.bill.invoice', compact('bills')); // Render single invoice view
         // } else {
-            // Render multiple invoices view for bulk printing
-            return view('admin.bill.bulk_invoice', compact('bills')); // Render multiple invoices view
-       // }
+        // Render multiple invoices view for bulk printing
+        return view('admin.bill.bulk_invoice', compact('bills')); // Render multiple invoices view
+        // }
     }
 
 
@@ -215,8 +215,8 @@ class BillController extends Controller
             return response()->json([
                 'name' => $product->name,
                 'brandName' => $product->brand_name,
-                'origin'=> $product->origin,
-                'part_no'=>$product->part_no,
+                'origin' => $product->origin,
+                'part_no' => $product->part_no,
                 'sell_price' => $product->sell_price,
                 'quantity' => $product->quantity
             ]);
@@ -541,5 +541,24 @@ class BillController extends Controller
         $payment->delete();
 
         return redirect()->back()->with('success', 'Payment record deleted successfully.');
+    }
+    public function storeRegularCustomer(Request $request)
+    {
+        // Validate and store the regular customer
+        $regularCustomer = new RegularCustomer($request->all());
+        $regularCustomer->save();
+
+        // After saving the customer, redirect to the bill creation page
+        return redirect()->route('admin.bill.create')->with('success', 'Regular customer created successfully!');
+    }
+
+    public function storeIrregularCustomer(Request $request)
+    {
+        // Validate and store the irregular customer
+        $irregularCustomer = new IrregularCustomer($request->all());
+        $irregularCustomer->save();
+
+        // After saving the customer, redirect to the bill creation page
+        return redirect()->route('admin.bill.create')->with('success', 'Irregular customer created successfully!');
     }
 }

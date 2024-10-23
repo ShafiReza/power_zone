@@ -14,11 +14,17 @@
                         <option value="irregularCustomer">Irregular Customer</option>
                     </select>
                 </div>
-                <div class="form-group col-3">
+                <div class="form-group col-3" style="position: relative;">
                     <label for="customerName">Customer Name</label>
                     <input type="hidden" id="customerId" name="customerId" value="">
                     <input type="text" id="customerSearch" placeholder="Search.." class="form-control"
                         onkeyup="filterCustomers()">
+
+                    <!-- Plus Icon aligned to the right -->
+                    <i class="fas fa-plus-circle" id="addCustomer"
+                        style="position: absolute; left: 450px; top: 35px; cursor: pointer;"
+                        onclick="openCustomerModal()"></i>
+
                     <div id="customerDropdown" class="dropdown-content" onchange="getCustomers(this.value)">
                         <!-- Customer list will be populated here -->
                     </div>
@@ -62,13 +68,6 @@
                         </select>
                     </div>
                 </div>
-
-                <!-- <div class="form-group col-3">
-                    <label for="part_no">Part No</label>
-                    <input type="text" class="form-control part-no" name="part_no" value="">
-                </div>-->
-
-
             </div>
 
             <table class="table table-hover">
@@ -128,6 +127,27 @@
 
             <button type="submit" class="btn btn-success">Submit</button>
         </form>
+        <div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="customerModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content shadow-lg">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="customerModalLabel">Add New Customer</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="customerForm" action="" method="POST">
+                            @csrf
+                            <!-- Dynamic Form Content will be injected here -->
+                            <div id="customerFormContent"></div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -355,6 +375,7 @@
                 }
             });
         }
+
         function calculateTotal(element) {
             const row = $(element).closest('tr');
             const quantity = parseFloat(row.find('.quantity').val()) || 0;
@@ -429,6 +450,104 @@
             $(button).closest('tr').remove();
             calculateFinalAmount();
         }
+        // Function to open the modal and load the correct form based on customer type
+        function openCustomerModal() {
+            const customerType = document.getElementById("customerType").value;
+
+            let modalTitle = "Add New Customer";
+            let formContent = "";
+
+            if (customerType === "regularCustomer") {
+                document.getElementById("customerForm").action = "{{ route('admin.regularCustomer.store') }}";
+                formContent = `
+            <div class="form-group col-12">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="phone">Phone:</label>
+                <input type="text" class="form-control" id="phone" name="phone" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="address">Address:</label>
+                <input type="text" class="form-control" id="address" name="address" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="area">Area:</label>
+                <input type="text" class="form-control" id="area" name="area" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="city">City:</label>
+                <input type="text" class="form-control" id="city" name="city" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="note">Note:</label>
+                <textarea class="form-control" id="note" name="note" rows="4" cols="4"></textarea>
+            </div>
+            <div class="form-group col-12">
+                <label for="initial_bill_amount">Initial Bill Amount:</label>
+                <input type="number" step="0.01" class="form-control" id="initial_bill_amount" name="initial_bill_amount" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="status">Status:</label>
+                <select class="form-control" id="status" name="status" required>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="form-group col-12">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        `;
+            } else if (customerType === "irregularCustomer") {
+                document.getElementById("customerForm").action = "{{ route('admin.irregularCustomer.store') }}";
+                formContent = `
+            <div class="form-group col-12">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="phone">Phone:</label>
+                <input type="text" class="form-control" id="phone" name="phone" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="address">Address:</label>
+                <input type="text" class="form-control" id="address" name="address" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="area">Area:</label>
+                <input type="text" class="form-control" id="area" name="area" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="city">City:</label>
+                <input type="text" class="form-control" id="city" name="city" required>
+            </div>
+            <div class="form-group col-12">
+                <label for="note">Note:</label>
+                <textarea class="form-control" id="note" name="note" rows="4" cols="4"></textarea>
+            </div>
+            <div class="form-group col-12">
+                <label for="status">Status:</label>
+                <select class="form-control" id="status" name="status" required>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="form-group col-12">
+                <button type="submit" class="btn btn-primary">Submit</button>
+
+            </div>
+        `;
+            } else {
+                formContent = `<p>Please select a customer type first.</p>`;
+            }
+
+            document.getElementById("customerModalLabel").innerText = modalTitle;
+            document.getElementById("customerFormContent").innerHTML = formContent;
+
+            // Show modal
+            $('#customerModal').modal('show');
+        }
     </script>
     <style>
         #customerDropdown {
@@ -436,9 +555,9 @@
             position: absolute;
             background-color: white;
             border: 1px solid #ddd;
-            max-height: 200px;
+            max-height: 150px;
             width: 100%;
-            z-index: 9999;
+            z-index: 100;
             /* Ensures dropdown appears on top */
             overflow-y: auto;
         }
@@ -476,6 +595,175 @@
 
         #productDropdown a:hover {
             background-color: #f1f1f1;
+        }
+    </style>
+    <style>
+        #addCustomer {
+            color: #007bff;
+            font-size: 20px;
+            position: absolute;
+            right: 10px;
+            /* Aligns the icon to the right of the input field */
+            top: 35px;
+            /* Adjust this value based on the input field's height */
+        }
+
+        #addCustomer:hover {
+            color: #0056b3;
+        }
+
+        #addCustomer {
+            position: absolute;
+            left: 450px;
+            top: 35px;
+            cursor: pointer;
+            font-size: 36px;
+            /* Adjust the size */
+            color: #4CAF50;
+            /* Icon color */
+            transition: transform 0.3s, color 0.3s;
+            /* Smooth transitions */
+        }
+
+        #addCustomer:hover {
+            transform: scale(1.1);
+            /* Slightly increase size on hover */
+            color: #FF5722;
+            /* Change color on hover */
+        }
+
+        #addCustomer:active {
+            transform: scale(0.95);
+            /* Slightly decrease size when clicked */
+        }
+
+        /* Ensure the modal appears over the customer list */
+        .modal-dialog-centered {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* Full height to center vertically */
+        }
+
+        #customerModal {
+            z-index: 1050;
+            /* Higher than #customerDropdown to ensure it appears above */
+        }
+
+        .modal-backdrop {
+            z-index: 1040;
+            /* Ensures backdrop is behind the modal but above the dropdown */
+        }
+
+        /* Beautify Modal Background and Box Shadow */
+        .modal-content {
+            border-radius: 10px;
+            /* Rounded corners */
+            border: none;
+            /* Remove default border */
+            background-color: #f9f9f9;
+            /* Light background color */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            /* Soft shadow */
+        }
+
+        /* Modal Header Customization */
+        .modal-header {
+            background-color: #007bff;
+            /* Primary color background */
+            border-bottom: none;
+            /* Remove bottom border */
+        }
+
+        .modal-header .modal-title {
+            font-weight: bold;
+            /* Bold title */
+            font-size: 1.25rem;
+            /* Slightly larger font size */
+        }
+
+        .modal-header .close {
+            font-size: 1.5rem;
+            /* Larger close icon */
+            color: white;
+            /* White close button */
+            opacity: 0.8;
+            /* Slight transparency */
+        }
+
+        .modal-header .close:hover {
+            opacity: 1;
+            /* No transparency on hover */
+        }
+
+        /* Spacing and Font Improvements */
+        .modal-body {
+            padding: 20px 30px;
+            /* Increased padding for cleaner look */
+        }
+
+        #customerFormContent .form-group {
+            margin-bottom: 1rem;
+            /* Increase spacing between fields */
+        }
+
+        .form-control {
+            border-radius: 5px;
+            /* Rounded inputs */
+            border: 1px solid #ced4da;
+            /* Lighter border */
+            box-shadow: none;
+            /* Remove shadow */
+            transition: border-color 0.3s ease;
+            /* Smooth focus transition */
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            /* Primary color border on focus */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+            /* Soft blue glow */
+        }
+
+        /* Modal Footer Customization */
+        .modal-footer {
+            border-top: none;
+            /* Remove top border */
+            padding: 15px 30px;
+            /* Padding adjustments */
+            justify-content: flex-end;
+            /* Align buttons to the right */
+        }
+
+        /* Button Enhancements */
+        .btn-primary {
+            background-color: #007bff;
+            /* Primary button color */
+            border-color: #007bff;
+            /* Consistent border */
+            border-radius: 5px;
+            /* Rounded button */
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            /* Secondary button color */
+            border-color: #6c757d;
+            border-radius: 5px;
+        }
+
+        /* Add animation to modal appearance */
+        .modal.fade .modal-dialog {
+            transform: scale(0.8);
+            /* Scale down initial size */
+            transition: all 0.3s ease;
+            /* Smooth transition */
+        }
+
+        .modal.show .modal-dialog {
+            transform: scale(1);
+            /* Scale up to normal size */
         }
     </style>
 @endsection
