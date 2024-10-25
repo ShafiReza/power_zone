@@ -11,6 +11,7 @@
         @endif
 
         <form action="{{ route('admin.monthlyBill.index') }}" method="GET">
+            @csrf
             <div class="form-row">
                 <div class="form-group col-2">
                     <label for="month">Month:</label>
@@ -27,11 +28,21 @@
         </form>
 
         <a class="btn btn-success mb-3" href="{{ route('admin.monthlyBill.create') }}">Create Monthly Bill</a>
-        <form id="bulk-action-form" method="POST" action="{{ route('admin.monthlyBill.bulkInvoice', ['clientId' => $clientId, 'month' => $month]) }}">
-            @csrf
-            <input type="hidden" name="selected_bills" id="selected-bills">
-            <button type="button" id="bulk-print-invoice" class="btn btn-success">Print Selected Invoices</button>
-        </form>
+        <div class="d-flex justify-content-between mb-3">
+            <!-- Left Side: Mark as Paid -->
+            <form id="bulkMarkPaidForm" method="POST" action="{{ route('monthlyBill.bulkPaid') }}">
+                @csrf
+                <input type="hidden" name="selected_bills" id="selected-bills-pay">
+                <button type="button" id="bulk-pay-button" class="btn btn-primary">Mark Selected as Paid</button>
+            </form>
+
+            <!-- Right Side: Print Invoices -->
+            <form id="bulk-print-form" method="POST" action="{{ route('admin.monthlyBill.bulkInvoice', ['clientId' => $clientId, 'month' => $month]) }}">
+                @csrf
+                <input type="hidden" name="selected_bills" id="selected-bills-print">
+                <button type="button" id="bulk-print-invoice" class="btn btn-success">Print Selected Invoices</button>
+            </form>
+        </div>
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -45,13 +56,14 @@
                     <th>Bill Month</th>
                     <th>Start Date</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th colspan="4">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($bills as $bill)
                     <tr>
-                        <td><input type="checkbox" name="bill_ids[]" class="bill-checkbox" value="{{ $bill->id }}"></td>
+                        <td><input type="checkbox" name="bill_ids[]" class="bill-checkbox" value="{{ $bill->id }}"
+                                data-amount="{{ $bill->amount }}"></td>
                         <td>{{ $bill->id }}</td>
                         <td>{{ $bill->regularCustomer ? $bill->regularCustomer->name : 'N/A' }}</td>
                         <td>{{ $bill->customer_address }}</td>
@@ -106,6 +118,54 @@
                 @endforeach
             </tbody>
         </table>
+
+
+        <!-- Bulk Mark as Paid Modal -->
+        <div class="modal fade" id="bulkMarkPaidModal" tabindex="-1" role="dialog"
+            aria-labelledby="bulkMarkPaidModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form id="bulkMarkPaidForm" method="POST" action="{{ route('monthlyBill.bulkPaid') }}">
+                        @csrf
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="bulkMarkPaidModalLabel">Mark Selected Bills as Paid</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="selected_bills" id="selectedBillsBulkModal">
+                            <div class="form-group">
+                                <label for="bill_date">Receive Date</label>
+                                <input type="date" name="receive_date" id="receive_date" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="total_amount">Total Amount</label>
+                                <input type="text" id="totalAmountBulk" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="receivable_amount">Receivable Amount</label>
+                                <input type="text" name="receivable_amount" id="receivableAmountBulkModal"
+                                    class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="due_amount">Due Amount</label>
+                                <input type="text" id="dueAmountBulkModal" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="descriptionBulkModal">Description</label>
+                                <textarea id="descriptionBulkModal" class="form-control" name="description"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <!-- Ensure this button submits the form -->
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <div class="modal fade" id="markPaidModal" tabindex="-1" role="dialog" aria-labelledby="markPaidModalLabel"
             aria-hidden="true">
@@ -165,26 +225,173 @@
                 billCheckboxes.forEach(checkbox => {
                     checkbox.checked = selectAllCheckbox.checked;
                 });
+                calculateTotalAndDueAmounts(); // Update total and due amounts when selecting all
             });
 
-            // Collect selected bills and submit for bulk action (e.g., print invoices)
-            document.getElementById('bulk-print-invoice').addEventListener('click', function() {
+            // Handle Bulk Mark as Paid
+            document.getElementById('bulk-pay-button').addEventListener('click', function() {
                 const selectedBills = [];
+                let totalAmount = 0;
+                let paidCount = 0;
+
                 billCheckboxes.forEach(checkbox => {
                     if (checkbox.checked) {
                         selectedBills.push(checkbox.value);
+                        totalAmount += parseFloat(checkbox.dataset.amount);
+
+                        // Count how many selected bills are already marked as paid
+                        if (checkbox.closest('tr').querySelector('.btn-secondary')) {
+                            paidCount++;
+                        }
                     }
                 });
 
-                if (selectedBills.length > 0) {
-                    document.getElementById('selected-bills').value = selectedBills.join(',');
-                    document.getElementById('bulk-action-form').submit();
-                } else {
+                if (selectedBills.length === 0) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Please select at least one bill to proceed.',
+                        text: 'You have not selected any record.',
                     });
+                } else if (paidCount === 1) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: 'One of the selected bills is already marked as paid.',
+                    });
+                } else if (paidCount > 1) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: 'Multiple selected bills are already marked as paid.',
+                    });
+                } else {
+                    // Set values in the modal for bulk mark as paid
+                    document.getElementById('selectedBillsBulkModal').value = selectedBills.join(',');
+                    document.getElementById('totalAmountBulk').value = totalAmount.toFixed(
+                        2); // Show Total Amount
+                    document.getElementById('dueAmountBulkModal').value = totalAmount.toFixed(
+                        2); // Initially, Due = Total
+
+                    // Clear any previous receivable amounts
+                    document.getElementById('receivableAmountBulkModal').value = '';
+
+                    // Show the bulk mark paid modal
+                    $('#bulkMarkPaidModal').modal('show');
+                }
+            });
+
+            // Handle input in the receivable amount field to calculate the due amount
+            document.getElementById('receivableAmountBulkModal').addEventListener('input', function() {
+                const totalAmount = parseFloat(document.getElementById('totalAmountBulk').value);
+                const receivableAmount = parseFloat(this.value || 0); // Ensure it's a valid number
+                const dueAmount = totalAmount - receivableAmount;
+
+                document.getElementById('dueAmountBulkModal').value = dueAmount.toFixed(2); // Update Due Amount
+
+                // Check if due amount is zero to enable/disable form submission
+                // if (dueAmount > 0) {
+                //     Swal.fire({
+                //         icon: 'warning',
+                //         title: 'Warning',
+                //         text: 'Receivable amount must equal the total amount to proceed.',
+                //     });
+                // }
+            });
+
+            // Add event listener for bulk modal submit
+            // Add event listener for bulk modal submit
+            document.getElementById('bulkMarkPaidForm').addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                const receivableAmount = parseFloat(document.getElementById('receivableAmountBulkModal')
+                    .value);
+                const totalAmount = parseFloat(document.getElementById('totalAmountBulk').value);
+
+                if (receivableAmount !== totalAmount) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Receivable amount must be equal to the total bill amount.',
+                    });
+                    return;
+                }
+
+               // Prepare form data for submission
+                const formData = new FormData(this);
+
+                // Make the fetch call to submit the form data
+                fetch('{{ route('monthlyBill.bulkPaid') }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+
+                        }
+                    }).then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message ||
+                                    'An error occurred while processing the bills.',
+                            });
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An unexpected error occurred. Please try again.',
+                        });
+                    });
+
+            });
+            console.log('{{ route('monthlyBill.bulkPaid') }}');
+
+
+            // Helper function to calculate total and due amounts
+            function calculateTotalAndDueAmounts() {
+                let totalAmount = 0;
+                billCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        totalAmount += parseFloat(checkbox.dataset.amount);
+                    }
+                });
+
+                document.getElementById('totalAmountBulk').value = totalAmount.toFixed(2);
+                document.getElementById('dueAmountBulkModal').value = totalAmount.toFixed(
+                    2); // Initially due amount = total
+            }
+
+            // Update total and due amounts on checkbox changes
+            billCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', calculateTotalAndDueAmounts);
+            });
+
+            // Handle Bulk Print Invoice Button
+            document.getElementById('bulk-print-invoice').addEventListener('click', function() {
+                const selectedBills = [];
+
+                // Collect selected bill IDs for printing
+                billCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedBills.push(checkbox.value); // Use value (bill ID) for bulk print
+                    }
+                });
+
+                if (selectedBills.length === 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'You have not selected any record to print.',
+                    });
+                } else {
+                    // Set the selected bill IDs in the hidden input and submit the form
+                    document.getElementById('selected-bills-print').value = selectedBills.join(',');
+                    document.getElementById('bulk-print-form').submit();
                 }
             });
         });

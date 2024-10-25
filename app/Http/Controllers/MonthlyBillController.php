@@ -277,4 +277,48 @@ class MonthlyBillController extends Controller
 
         return redirect()->route('admin.monthlyBill.index')->with('success', 'Bill updated successfully');
     }
+    public function bulkPaid(Request $request)
+    {
+        // Log the incoming request data for debugging
+        \Log::info('Bulk Paid Request:', $request->all());
+
+        // Retrieve selected bill IDs from the request
+        $selectedBills = explode(',', $request->input('selected_bills'));
+
+        // Iterate over each selected bill
+        foreach ($selectedBills as $billId) {
+            $bill = MonthlyBill::find($billId);
+
+            if ($bill) {
+                $billAmount = ($bill->status === 'pending' || $bill->status === 'due') ? $bill->amount : $bill->due_amount;
+                $receivableAmount = $request->receivable_amount;
+                $dueAmount = $billAmount - $receivableAmount;
+
+                // Ensure due amount is correctly handled
+                if ($dueAmount > 0) {
+                    return response()->json(['success' => false, 'message' => 'Due amount must be zero to mark all bills as Paid.']);
+                }
+
+                // Mark the bill as paid
+                $bill->status = 'paid';
+                $bill->due_amount = 0;
+                $bill->save();
+
+                $payment = Payment::create([
+                    'bill_id' => $bill->id,
+                    'description' => $request->description,
+                    'receive_date' => $request->input('receive_date'),
+                    'amount' => $billAmount,
+                    'receivable_amount' => $receivableAmount,
+                    'due_amount' => 0,
+                ]);
+            }
+        }
+
+
+        // Redirect back with a success message
+        return redirect()->route('admin.monthlyBill.index');
+    }
+
+
 }

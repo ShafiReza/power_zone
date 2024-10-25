@@ -21,8 +21,8 @@
                         onkeyup="filterCustomers()">
 
                     <!-- Plus Icon aligned to the right -->
-                    <i class="fas fa-plus-circle" id="addCustomer"
-                        style="position: absolute; left: 450px; top: 35px; cursor: pointer;"
+                    <i class="fas fa-plus-square" id="addCustomer"
+                        style="position: absolute; left: 430px; top: 35px; cursor: pointer;"
                         onclick="openCustomerModal()"></i>
 
                     <div id="customerDropdown" class="dropdown-content" onchange="getCustomers(this.value)">
@@ -458,7 +458,7 @@
             let formContent = "";
 
             if (customerType === "regularCustomer") {
-                document.getElementById("customerForm").action = "{{ route('admin.regularCustomer.store') }}";
+                document.getElementById("customerForm").action = "{{ route('admin.regularCustomer.storeRegularCustomer') }}";
                 formContent = `
             <div class="form-group col-12">
                 <label for="name">Name:</label>
@@ -500,7 +500,7 @@
             </div>
         `;
             } else if (customerType === "irregularCustomer") {
-                document.getElementById("customerForm").action = "{{ route('admin.irregularCustomer.store') }}";
+                document.getElementById("customerForm").action = "{{ route('admin.irregularCustomer.storeIrregularCustomer') }}";
                 formContent = `
             <div class="form-group col-12">
                 <label for="name">Name:</label>

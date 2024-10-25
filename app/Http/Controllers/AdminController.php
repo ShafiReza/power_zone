@@ -27,28 +27,30 @@ class AdminController extends Controller
         $totalIrregularCustomers = IrregularCustomer::count();
 
         $totalDueAmount = MonthlyBill::where('status', 'Due')
-                                     ->whereMonth('created_at', $currentMonth)
-                                     ->whereYear('created_at', $currentYear)
-                                     ->sum('amount');
+            ->whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear)
+            ->sum('amount');
 
         $totalPaidAmount = MonthlyBill::where('status', 'Paid')
-                                      ->whereMonth('created_at', $currentMonth)
-                                      ->whereYear('created_at', $currentYear)
-                                      ->sum('amount');
+            ->whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear)
+            ->sum('amount');
 
         $totalPaid = PaymentHistory::whereMonth('created_at', $currentMonth)
-                         ->whereYear('created_at', $currentYear)
-                         ->sum('receivable_amount');
+            ->whereYear('created_at', $currentYear)
+            ->sum('receivable_amount');
 
 
 
         $totalDue = BillItem2::whereMonth('created_at', $currentMonth)
-                        ->whereYear('created_at', $currentYear)
-                        ->sum('due_amount');
-
-                        $totalProductAmount = Product::sum('total_amount');
+            ->whereYear('created_at', $currentYear)
+            ->sum('due_amount');
+        $totalExtraDue = Bill::where('due_amount', '>', 0)
+            ->where('status', 'pending')
+            ->sum('due_amount');
+        $totalProductAmount = Product::sum('total_amount');
         // Pass the count to the view
-        return view("admin.dashboard", compact('totalRegularCustomers', 'totalIrregularCustomers', 'totalDueAmount', 'totalPaidAmount', 'totalPaid', 'totalDue','totalProductAmount'));
+        return view("admin.dashboard", compact('totalRegularCustomers', 'totalIrregularCustomers', 'totalDueAmount', 'totalPaidAmount', 'totalPaid', 'totalDue', 'totalProductAmount', 'totalExtraDue'));
     }
 
     public function login(Request $request)
@@ -70,7 +72,7 @@ class AdminController extends Controller
 
             $this->validate($request, $rules, $customMessages);
             if (Auth::guard('admin')->attempt(['email' => $data['email'], 'password' => $data['password']])) {
-                return  redirect('admin/dashboard');
+                return redirect('admin/dashboard');
             } else {
                 return redirect()->back()->with('error_message', "Invalid Email or Password");
             }
@@ -78,7 +80,7 @@ class AdminController extends Controller
         return view("admin.login");
     }
 
-    public function  logout()
+    public function logout()
     {
         Auth::guard('admin')->logout();
         return redirect('admin/login');

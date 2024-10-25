@@ -41,6 +41,8 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         Route::get('regular-customers', [RegularCustomerController::class, 'index'])->name('admin.regularCustomer.index');
         Route::get('regular-customers/create', [RegularCustomerController::class, 'create'])->name('admin.regularCustomer.create');
         Route::post('regular-customers', [RegularCustomerController::class, 'store'])->name('admin.regularCustomer.store');
+        Route::post('regular-customers/regular/', [BillController::class, 'storeRegularCustomer'])->name('admin.regularCustomer.storeRegularCustomer');
+
         Route::get('regular-customer/{customer}/edit', [RegularCustomerController::class, 'edit'])->name('admin.regularCustomer.edit');
         Route::put('regular-customer/{customer}/update', [RegularCustomerController::class, 'update'])->name('admin.regularCustomer.update');
         Route::post('regular-customer/{customer}/toggle-status', [RegularCustomerController::class, 'toggleStatus'])->name('admin.regularCustomer.toggleStatus');
@@ -49,6 +51,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         Route::get('irregular-customers', [IrregularCustomerController::class, 'index'])->name('admin.irregularCustomer.index');
         Route::get('irregular-customers/create', [IrregularCustomerController::class, 'create'])->name('admin.irregularCustomer.create');
         Route::post('irregular-customers', [IrregularCustomerController::class, 'store'])->name('admin.irregularCustomer.store');
+        Route::post('irregular-customers/irregular', [BillController::class, 'storeIrregularCustomer'])->name('admin.irregularCustomer.storeIrregularCustomer');
         Route::get('irregular-customer/{customer}/edit', [IrregularCustomerController::class, 'edit'])->name('admin.irregularCustomer.edit');
         Route::put('irregular-customer/{customer}/update', [IrregularCustomerController::class, 'update'])->name('admin.irregularCustomer.update');
         Route::post('irregular-customer/{customer}/toggle-status', [IrregularCustomerController::class, 'toggleStatus'])->name('admin.irregularCustomer.toggleStatus');
@@ -102,6 +105,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         Route::get('bill/', [BillController::class, 'index'])->name('admin.bill.index');
         Route::get('bill/create', [BillController::class, 'create'])->name('admin.bill.create');
         Route::post('bill/', [BillController::class, 'store'])->name('bill.store');
+
         Route::put('bill/{id}', [BillController::class, 'update'])->name('admin.bill.update');
         Route::get('bill/{id}/invoice', [BillController::class, 'invoice'])->name('admin.bill.invoice');
         Route::get('bill/{id}/challan', [BillController::class, 'challan'])->name('admin.bill.challan');
@@ -131,6 +135,7 @@ Route::prefix("admin")->namespace("App\Http\Controllers")->group(function () {
         Route::get('monthlyBill/generateMonthlyBills', [MonthlyBillController::class, 'generateMonthlyBills'])->name('monthlyBill.generateMonthlyBills');
        // Route::post('admin/monthlyBill/bulkInvoice', [MonthlyBillController::class, 'bulkInvoice'])->name('admin.monthlyBill.bulkInvoice');
        Route::post('admin/monthlyBill/bulkInvoice/{clientId}/{month}', [MonthlyBillController::class, 'bulkInvoice'])->name('admin.monthlyBill.bulkInvoice');
+       Route::post('/monthlyBill/bulkPaid', [MonthlyBillController::class, 'bulkPaid'])->name('monthlyBill.bulkPaid');
 
 
 

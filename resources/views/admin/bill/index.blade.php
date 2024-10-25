@@ -16,11 +16,20 @@
                 </div>
             </div>
         </form>
-         <form id="bulk-action-form" method="POST" action="{{ route('admin.bill.bulkInvoice') }}">
-            @csrf
-            <input type="hidden" name="selected_bills" id="selected-bills">
-            <button type="button" id="bulk-print-invoice" class="btn btn-success">Print Selected Invoices</button>
-        </form>
+        <div class="row mb-3">
+            <div class="col-md-6 text-left">
+                <!-- Left side: Create Bill button -->
+                <a class="btn btn-success" href="{{ route('admin.bill.create') }}">Create Bill</a>
+            </div>
+            <div class="col-md-6 text-right">
+                <!-- Right side: Print Selected Invoices button -->
+                <form id="bulk-action-form" method="POST" action="{{ route('admin.bill.bulkInvoice') }}">
+                    @csrf
+                    <input type="hidden" name="selected_bills" id="selected-bills">
+                    <button type="button" id="bulk-print-invoice" class="btn btn-success">Print Selected Invoices</button>
+                </form>
+            </div>
+        </div>
         <table class="table table-hover">
             <thead>
                 <tr>
