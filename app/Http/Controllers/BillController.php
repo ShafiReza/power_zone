@@ -260,6 +260,7 @@ class BillController extends Controller
         $productIds = $request->input('product_id', []);
         $descriptions = $request->input('description', []);
         $quantities = $request->input('quantity', []);
+        $units = $request->input('unit', []);
         $unitPrices = $request->input('unitPrice', []);
         $discounts = $request->input('discount', []);
         $discountTypes = $request->input('discountType', []);
@@ -267,6 +268,7 @@ class BillController extends Controller
 
         foreach ($productIds as $index => $productId) {
             $quantity = $quantities[$index];
+            $unit = $units[$index];
             $unitPrice = $unitPrices[$index];
             $discount = $discounts[$index];
             $discountType = $discountTypes[$index];
@@ -304,6 +306,7 @@ class BillController extends Controller
             $billItem->product_name = $product->name; // Assuming the product has a 'name' field
             $billItem->description = $descriptions[$index];
             $billItem->quantity = $quantity;
+            $billItem->unit = $unit;
             $billItem->unit_price = $unitPrice;
             $billItem->discount = $discount;
             $billItem->discount_type = $discountType;

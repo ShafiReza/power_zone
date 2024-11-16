@@ -37,14 +37,13 @@
                                     <h4>
                                         <small class="float-right">Date:
                                             {{ \Carbon\Carbon::parse($bill->bill_date)->format('d-m-Y') }}<br>
-                                            <!-- Adding the Invoice Number below the Date -->
                                         </small>
                                         Invoice No: {{ $bill->id }}
                                     </h4>
                                 </div>
                             </div>
                             <!-- info row -->
-                            <div class="row invoice-info">
+                            <div class="row">
                                 <div class="col-sm-4 invoice-col">
                                     <address>
                                         <strong>Power Zone</strong><br>
@@ -53,7 +52,7 @@
                                         Phone: 01722-533538, 01918-750912<br>
                                     </address>
                                 </div>
-                                <div class="col-sm-4 invoice-col" style="margin-left: 300px;">
+                                <div class="col-sm-4 invoice-col">
                                     <address>
                                         <strong>{{ $customer->name }}</strong><br>
                                         {{ $customer->address }}<br>
@@ -91,16 +90,17 @@
                                                     <td>{{ $product->product_name }}</td>
 
                                                     @if ($hasDescription)
-                                                        <td>
-                                                            {{ !empty($product->description) ? $product->description : 'None' }}
-                                                        </td>
+                                                    <td>
+                                                        <span style="white-space: pre-wrap;">{{ !empty($product->description) ? e($product->description) : 'None' }}</span>
+                                                    </td>
                                                     @endif
 
                                                     <td>{{ $product->brand_name }}</td>
 
                                                     <td>{{ $product->origin }}</td>
 
-                                                    <td>{{ $product->quantity }}</td>
+                                                    <td>{{ $product->quantity }}{{ $product->unit }}</td>
+
                                                     <td>{{ $product->unit_price }}</td>
                                                     <td>
                                                         @if ($product->discount_type == 'Percentage')
@@ -112,7 +112,6 @@
                                                     <td>{{ $product->total_amount }}</td>
                                                 </tr>
                                             @endforeach
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -120,7 +119,7 @@
 
                             <div class="row">
                                 @if ($previousBills->count() > 0)
-                                    <div class="col-6">
+                                    <div class="col-5">
                                         <table class="table table-striped">
                                             <thead>
                                                 <tr>
@@ -143,16 +142,16 @@
                                         </table>
                                     </div>
                                 @endif
-                                <div class="col-6 ml-auto">
+                                <div class="col-5 ml-auto">
                                     <div class="table-responsive">
-                                         @php
+                                        @php
                                             $totalAmountSum = $products->sum('total_amount');
                                         @endphp
                                         <table class="table">
                                             <tr>
-                                                    <th>Total Amount</th>
-                                                    <td>{{ number_format($totalAmountSum, 2) }}</td>
-                                                </tr>
+                                                <th>Total Amount</th>
+                                                <td>{{ number_format($totalAmountSum, 2) }}</td>
+                                            </tr>
                                             @foreach ($billItems2 as $item)
                                                 <tr>
                                                     <th>Discount</th>
@@ -183,14 +182,16 @@
                                     </div>
                                 </div>
                             </div>
-                             <div class="row signature-row">
-                                <div class="col-7 ml-5">
 
+                            <!-- Signature row -->
+                            <div class="row signature-rown mt-4">
+                                <div class="col-7 ml-5">
                                     <p>__________________________</p>
                                     <p><strong>Client Signature</strong></p>
                                 </div>
                                 <div class="col-4 text-right ml-1">
-                                     <img src="{{ asset('admin/images/img001.jpg') }}" alt="Authorized Signature" style="max-width: 100px; margin-left: 150px;" >
+                                    <img src="{{ asset('admin/images/img001.jpg') }}" alt="Authorized Signature"
+                                        style="max-width: 100px; margin-left: 150px;">
                                     <p>__________________________</p>
                                     <p><strong>Authorized Signature</strong></p>
                                 </div>
@@ -226,17 +227,17 @@
         background: none;
         /* No background color or gradient */
         border: none;
-        height: 100vw;
+        height: auto;
         box-shadow: none;
-        overflow: hidden;
+        overflow: visible;
+        /* Allow content to overflow */
         z-index: 1;
-        /* Ensure content is above the background */
     }
 
     .invoice::before {
         content: "";
         position: absolute;
-        top: 130;
+        top: 130px;
         left: 0;
         width: 100%;
         height: 90vw;
@@ -248,76 +249,104 @@
         background-position: center center;
         background-size: cover;
         opacity: 0.2;
-        /* Adjust the opacity of the background image */
         z-index: -1;
-        /* Ensure the background is behind the content */
+    }
+
+    /* Page Breaks for Print */
+    @media print {
+        .invoice {
+            page-break-before: always;
+            page-break-inside: avoid;
+        }
+
+        .invoice::before {
+            opacity: 0.2;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* Hide print buttons */
+        .no-print {
+            display: none;
+        }
+
+        .table-responsive {
+            page-break-before: auto;
+        }
+
+        .signature-row {
+            page-break-before: always;
+            margin-top: 40px;
+        }
+
+        /* Adjust font sizes and spacing for printing */
+        .invoice h1,
+        .invoice h4,
+        .invoice p {
+            font-size: 12pt;
+            margin-bottom: 10px;
+        }
+
+        .images-container img {
+            width: 80px;
+        }
+
+        /* Ensuring content fits well */
+        .invoice {
+            padding: 1rem;
+            margin-bottom: 20px;
+        }
+    }
+
+    .row {
+        display: flex;
+        /* Use flexbox layout for the row */
+        justify-content: space-between;
+        /* Ensure the columns are spaced dynamically */
+        gap: 20px;
+        /* Adjust the gap between the columns */
+    }
+
+    .invoice-col {
+        flex: 1;
+        /* Allow both columns to take up equal width */
+        /* Ensure that the content inside the columns does not overflow */
+        word-wrap: break-word;
+    }
+
+    /* Adjust for responsiveness */
+    @media screen and (max-width: 768px) {
+        .row {
+            flex-direction: column;
+            /* Stack columns on smaller screens */
+        }
     }
 
     .header-with-images {
         display: flex;
         justify-content: space-between;
+        /* Ensure the text and images are on opposite sides */
         align-items: center;
+        /* Vertically align the text and images */
+        gap: 20px;
+        /* Add space between the text and images */
     }
 
     .text-container {
-        flex-grow: 1;
+        flex: 1;
+        /* Allow the text to take up available space */
     }
 
     .images-container {
         display: flex;
         gap: 10px;
+        /* Add space between images */
     }
 
     .images-container img {
-        width: 100px;
+        max-width: 150px;
+        /* Adjust image size */
         height: auto;
-    }
-
-    @media print {
-        .invoice {
-            height: 135vw;
-            padding: 1rem;
-        }
-
-        .invoice::before {
-            opacity: 0.2;
-            /* Adjust the opacity for print if needed */
-            -webkit-print-color-adjust: exact;
-            /* Ensures background image and color are printed */
-            print-color-adjust: exact;
-            /* For modern browsers */
-        }
-
-        .no-print {
-            display: none;
-            /* Hide print buttons during printing */
-        }
-    }
-     .signature-row {
-        margin-top: 80px;
-    }
-
-    .signature-row .col-7 {
-        display: flex;
-        flex-direction: column;
-        align-items: justify;
-        justify-content: justify;
-        height: 100px;
-        margin-left: 60px;
-        /* Add margin-left to move client signature to the right */
-    }
-
-    .signature-row .col-4 {
-        display: flex;
-        flex-direction: column;
-        align-items: justify;
-        justify-content: justify;
-        height: 100px;
-        margin-left: 150px;
-        /* Adjust margin-left for more space */
-    }
-
-    .signature-row .text-right {
-        text-align: right;
+        /* Maintain aspect ratio */
     }
 </style>

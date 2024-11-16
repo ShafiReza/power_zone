@@ -76,6 +76,7 @@
                         <th>Product Name</th>
                         <th>Description</th>
                         <th>Quantity</th>
+                        <th>Unit</th>
                         <th>Unit Price</th>
                         <th>Discount</th>
                         <th>Discount Type</th>
@@ -337,11 +338,16 @@
                 <tr>
                     <input type="hidden" name="product_id[]" value="${productId}">
                     <td><input type="text" class="form-control" name="product_name[]" value="${data.name}" readonly></td>
-                    <td><textarea class="form-control" name="description[]"></textarea></td>
+                    <td>
+                        <textarea class="form-control" name="description[]" style="white-space: pre-wrap;"></textarea>
+                    </td>
                     <td>
                         <input type="number" class="form-control quantity" name="quantity[]" value="${initialQuantity}" min="0" oninput="calculateTotal(this)">
                         <input type="hidden" class="availableQuantity" value="${availableQuantity}">
                     </td>
+                     <td>
+                    <input type="text" class="form-control unit" name="unit[]" placeholder="Enter unit">
+                </td>
                     <td><input type="number" class="form-control unitPrice" name="unitPrice[]" value="${data.sell_price}" oninput="calculateTotal(this)"></td>
                     <td><input type="number" class="form-control discount" name="discount[]" value="0.00" oninput="calculateTotal(this)"></td>
                     <td>
@@ -458,7 +464,8 @@
             let formContent = "";
 
             if (customerType === "regularCustomer") {
-                document.getElementById("customerForm").action = "{{ route('admin.regularCustomer.storeRegularCustomer') }}";
+                document.getElementById("customerForm").action =
+                    "{{ route('admin.regularCustomer.storeRegularCustomer') }}";
                 formContent = `
             <div class="form-group col-12">
                 <label for="name">Name:</label>
@@ -500,7 +507,8 @@
             </div>
         `;
             } else if (customerType === "irregularCustomer") {
-                document.getElementById("customerForm").action = "{{ route('admin.irregularCustomer.storeIrregularCustomer') }}";
+                document.getElementById("customerForm").action =
+                    "{{ route('admin.irregularCustomer.storeIrregularCustomer') }}";
                 formContent = `
             <div class="form-group col-12">
                 <label for="name">Name:</label>
@@ -764,6 +772,37 @@
         .modal.show .modal-dialog {
             transform: scale(1);
             /* Scale up to normal size */
+        }
+
+        textarea.form-control {
+            transition: all 0.3s ease;
+            /* Smooth transition */
+            resize: none;
+            /* Prevent manual resizing */
+            width: 200px;
+            /* Initial width */
+            height: 100px;
+            /* Initial height */
+        }
+
+        /* Enlarge the textarea when focused or input is given */
+        textarea.form-control:focus {
+            transform: scale(1.2);
+            /* Enlarges the textarea by 20% */
+            width: 300px;
+            /* Increased width when focused */
+            height: 200px;
+            /* Increased height when focused */
+        }
+
+        /* Optional: Change size on mouse hover */
+        textarea.form-control:hover {
+            transform: scale(1.1);
+            /* Slightly enlarge the textarea on hover */
+
+            /* Slightly increased width on hover */
+
+            /* Slightly increased height on hover */
         }
     </style>
 @endsection

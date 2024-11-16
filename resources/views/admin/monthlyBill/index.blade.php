@@ -29,20 +29,28 @@
 
         <a class="btn btn-success mb-3" href="{{ route('admin.monthlyBill.create') }}">Create Monthly Bill</a>
         <div class="d-flex justify-content-between mb-3">
-            <!-- Left Side: Mark as Paid -->
-            <form id="bulkMarkPaidForm" method="POST" action="{{ route('monthlyBill.bulkPaid') }}">
-                @csrf
-                <input type="hidden" name="selected_bills" id="selected-bills-pay">
-                <button type="button" id="bulk-pay-button" class="btn btn-primary">Mark Selected as Paid</button>
-            </form>
+            @if ($bills->isNotEmpty())
+                <!-- Left Side: Mark as Paid -->
+                <form id="bulkMarkPaidForm" method="POST" action="{{ route('monthlyBill.bulkPaid') }}">
+                    @csrf
+                    <input type="hidden" name="selected_bills" id="selected-bills-pay">
+                    <button type="button" id="bulk-pay-button" class="btn btn-primary">Mark Selected as Paid</button>
+                </form>
 
-            <!-- Right Side: Print Invoices -->
-            <form id="bulk-print-form" method="POST" action="{{ route('admin.monthlyBill.bulkInvoice', ['clientId' => $clientId, 'month' => $month]) }}">
-                @csrf
-                <input type="hidden" name="selected_bills" id="selected-bills-print">
-                <button type="button" id="bulk-print-invoice" class="btn btn-success">Print Selected Invoices</button>
-            </form>
+                <!-- Right Side: Print Invoices -->
+                <form id="bulk-print-form" method="POST" action="{{ route('admin.monthlyBill.bulkInvoice', ['clientId' => $clientId, 'month' => $month]) }}">
+                    @csrf
+                    <input type="hidden" name="selected_bills" id="selected-bills-print">
+                    <button type="button" id="bulk-print-invoice" class="btn btn-success">Print Selected Invoices</button>
+                </form>
+            @else
+                <!-- Display message below the Create Monthly Bill button -->
+                <div class="w-100 text-center mt-3">
+                    <p class="alert alert-info">Please create monthly bill first.</p>
+                </div>
+            @endif
         </div>
+
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -60,10 +68,9 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($bills as $bill)
+                @forelse ($bills as $bill)
                     <tr>
-                        <td><input type="checkbox" name="bill_ids[]" class="bill-checkbox" value="{{ $bill->id }}"
-                                data-amount="{{ $bill->amount }}"></td>
+                        <td><input type="checkbox" name="bill_ids[]" class="bill-checkbox" value="{{ $bill->id }}" data-amount="{{ $bill->amount }}"></td>
                         <td>{{ $bill->id }}</td>
                         <td>{{ $bill->regularCustomer ? $bill->regularCustomer->name : 'N/A' }}</td>
                         <td>{{ $bill->customer_address }}</td>
@@ -74,48 +81,35 @@
                         <td>{{ $bill->start_date }}</td>
                         <td>
                             @if ($bill->status == 'paid' && $bill->due_amount == 0)
-                                <button class="btn btn-sm btn-secondary">
-                                    Paid
-                                </button>
+                                <button class="btn btn-sm btn-secondary">Paid</button>
                             @elseif($bill->status == 'pending')
-                                <button class="btn btn-sm btn-success mark-paid-button" data-id="{{ $bill->id }}"
-                                    data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">
-                                    Mark as Paid
-                                </button>
+                                <button class="btn btn-sm btn-success mark-paid-button" data-id="{{ $bill->id }}" data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">Mark as Paid</button>
                             @elseif($bill->status == 'due')
-                                <button class="btn btn-sm btn-danger mark-paid-button" data-id="{{ $bill->id }}"
-                                    data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">
-                                    Due
-                                </button>
+                                <button class="btn btn-sm btn-danger mark-paid-button" data-id="{{ $bill->id }}" data-final-amount="{{ $bill->amount }}" data-due-amount="{{ $bill->due_amount }}">Due</button>
                             @elseif($bill->status != 'paid' && $bill->bill_month == \Carbon\Carbon::now()->format('F Y'))
-                                <button class="btn btn-sm btn-danger">
-                                    Due
-                                </button>
+                                <button class="btn btn-sm btn-danger">Due</button>
                             @endif
                         </td>
-
                         <td>
-                            <form action="{{ route('monthlyBill.destroy', $bill->id) }}" method="POST"
-                                class="delete-form">
+                            <form action="{{ route('monthlyBill.destroy', $bill->id) }}" method="POST" class="delete-form">
                                 @csrf
                                 @method('DELETE')
                                 <button type="button" class="btn btn-danger delete-button">Delete</button>
                             </form>
                         </td>
                         <td>
-                            <a href="{{ route('admin.monthlyBill.edit', $bill->id) }}"
-                                class="btn btn-warning btn-sm">Edit</a>
-                        </td>
-                        <td><a class="btn btn-primary mb-3"
-                                href="{{ route('admin.monthlyBill.showBill', ['id' => $bill->id]) }}">Payment History</a>
+                            <a href="{{ route('admin.monthlyBill.edit', $bill->id) }}" class="btn btn-warning btn-sm">Edit</a>
                         </td>
                         <td>
-                            <a href="{{ route('admin.monthlyBill.invoice', ['clientId' => $bill->id, 'month' => $bill->bill_month]) }}"
-                                onclick="printInvoice(event, '{{ route('admin.monthlyBill.showInvoicePrint', $bill->id) }}')"
-                                class="btn btn-default"><i class="fas fa-print"></i> Print</a>
+                            <a class="btn btn-primary mb-3" href="{{ route('admin.monthlyBill.showBill', ['id' => $bill->id]) }}">Payment History</a>
+                        </td>
+                        <td>
+                            <a href="{{ route('admin.monthlyBill.invoice', ['clientId' => $bill->id, 'month' => $bill->bill_month]) }}" onclick="printInvoice(event, '{{ route('admin.monthlyBill.showInvoicePrint', $bill->id) }}')" class="btn btn-default"><i class="fas fa-print"></i> Print</a>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    
+                @endforelse
             </tbody>
         </table>
 
@@ -137,7 +131,7 @@
                             <input type="hidden" name="selected_bills" id="selectedBillsBulkModal">
                             <div class="form-group">
                                 <label for="bill_date">Receive Date</label>
-                                <input type="date" name="receive_date" id="receive_date" class="form-control">
+                                <input type="date" name="receive_date" id="receive_date" class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label for="total_amount">Total Amount</label>
@@ -154,7 +148,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="descriptionBulkModal">Description</label>
-                                <textarea id="descriptionBulkModal" class="form-control" name="description"></textarea>
+                                <textarea id="descriptionBulkModal" class="form-control" name="description" required></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -183,7 +177,7 @@
                             <input type="hidden" name="bill_id" id="billId">
                             <div class="form-group">
                                 <label for="bill_date">Receive Date</label>
-                                <input type="date" name="receive_date" id="receive_date" class="form-control">
+                                <input type="date" name="receive_date" id="receive_date" class="form-control" required>
                             </div>
 
                             <div class="form-group">
@@ -201,7 +195,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="description">Description</label>
-                                <textarea name="description" id="description" class="form-control"></textarea>
+                                <textarea name="description" id="description" class="form-control" required></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
